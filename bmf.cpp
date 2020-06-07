@@ -1287,7 +1287,7 @@ int main(int argc, char **argv){
 								}else if(index_other.end() == index_other.find("dimension")){ mpre("ОШИБКА размер ветви не указан", __LINE__);
 								}else if(int dimension_next = (string::npos == index_next.at("dimension").find_last_of("0123456789") ? 0 : stoi(index_next.at("dimension"))); dimension_next <= 0){ mpre("ОШИБКА расчета размера слещующей ветви", __LINE__);
 								}else if(int dimension_other = (string::npos == index_other.at("dimension").find_last_of("0123456789") ? 0 : stoi(index_other.at("dimension"))); dimension_other <= 0){ mpre("ОШИБКА расчета размера другой ветви", __LINE__);
-								}else if(dimension_next < dimension_other){ //mpre("Баланс соблюден", __LINE__);
+								}else if(dimension_next <= dimension_other){ //mpre("Баланс соблюден", __LINE__);
 								}else if(TMs calc_pos = erb(BMF_CALC_POS, {{"bmf-calc_pos", index.at("calc_pos_id")}}); calc_pos.empty()){ mpre("ОШИБКА выборки отрицательной текущей позиции", __LINE__);
 								}else if(index.at("calc_pos_id") = calc_pos.at("id"); index.empty()){ mpre("ОШИБКА присвоения обновленной позиции морфу", __LINE__);
 								}else if(stairs.at("calc_pos_id") = stairs.at("bmf-calc_pos") = index.at("calc_pos_id"); stairs.empty()){ mpre("ОШИБКА установки свойств ступени", __LINE__);
@@ -1300,7 +1300,7 @@ int main(int argc, char **argv){
 								}else if(erb_insert(BMF_INDEX_EX, index_other.at("id"), index_other); index_other.empty()){ mpre("ОШИБКА сохранения обновленной позиции в справочнике", __LINE__);
 								}else if(std::swap(index_next, index_other); false){ mpre("ОШИБКА изменнеия мест переменных", __LINE__);
 								}else if(index_field = ("index_id" == index_field ? "bmf-index" : "index_id"); 0 >= index_field.length()){ mpre("ОШИБКА изменения поля перехода", __LINE__);
-								}else{ //mpre(stairs, __LINE__, "Ступень"); mpre(index, __LINE__, "Морф"); mpre("ОШИБКА Балансировка дерева " +to_string(dimension_next) +" " +to_string(dimension_other) +" [" +stairs.at("calc_1") + "," +stairs.at("calc_2") +"]", __LINE__);
+								}else{ mpre("Балансировка дерева " +to_string(dimension_next) +" " +to_string(dimension_other) +" [" +stairs.at("calc_1") + "," +stairs.at("calc_2") +"]", __LINE__);
 								} return false; }()){ mpre("ОШИБКА балансировки дерева", __LINE__);
 							}else if([&](){ // Изменения
 								if(stairs.end() == stairs.find("promise")){ //mpre(stairs["index_id"]+ " Обещание не установлено", __LINE__);
