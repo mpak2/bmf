@@ -214,8 +214,7 @@ int main(int argc, char **argv){
 						std::cout << "Данная версия является условной бесплатной с граничением сети в "+ to_string(size_max)+ " морфов" << endl;
 						std::cout << "Морф — наименьшая осмысленная единица языка (логики)" << endl << endl;
 
-						std::cout << "Авторы программы -- Кривошлыков Евгений Павлович +7 911 9842884" << endl << endl;
-
+						std::cout << "Авторы программы -- Кривошлыков Евгений Павлович +79582014736" << endl << endl;
 					} return true;
 				}()){ mpre("Информация о версии", __LINE__);
 			}else{
@@ -1578,142 +1577,133 @@ int main(int argc, char **argv){
 			}
 		return false; }()){ mpre("ОШИБКА создания рабочих функций", __LINE__);
 	}else if([&](){ // Запуск расчетов
-			static std::vector<std::thread> threads; int thread;
-			if(0 >= in.size()){ mpre("Данные для обучения не заданы", __LINE__);
-			//}else if([&](){ thread = (ARGV.end() == ARGV.find("-t") ? threads_count : stoi("" == ARGV.at("-t") ? "0" : ARGV.at("-t"))); return false; }()){ mpre("ОШИБКА получения количества потоков", __LINE__);a
-			}else if([&](){ // Расчет количества потоков
-					string _thread;
-					if(0 <= (thread = -1)){ mpre("ОШИБКА установленки первоначального значение количества потоков", __LINE__);
-					}else if([&](){ _thread = (ARGV.end() == ARGV.find("-t") ? "0" : ARGV.at("-t")); return (0 >= _thread.length()); }()){ mpre("Количество потоков не задано в консоли", __LINE__);
-					}else if(string::npos != _thread.find_first_not_of("0123456789")){ mpre("ОШИБКА формат количества потоков не число "+ _thread, __LINE__);
-					}else if([&](){ thread = stoi(_thread); return false; }()){ mpre("ОШИБКА конвертации количества потоков в число", __LINE__);
-					}else{ //mpre("Количество потоков "+ _thread, __LINE__);
-					}
-				return (0 > thread); }()){ mpre("ОШИБКА расчета количества потоков", __LINE__);
-			}else if([&](){ for(int _thread = 1; _thread <= thread; _thread++){
-					std::thread th;
-					if([&](){ th = std::thread(Do, thread, _thread); return false; }()){ mpre("ОШИБКА запуска потока", __LINE__);
-					}else if([&](){ threads.push_back(std::move(th)); return (0 >= threads.size()); }()){ mpre("ОШИБКА добавления потока в справочник", __LINE__);
-					}else{ mpre("Запуск потока "+ to_string(_thread), __LINE__);
-					}
-				} return false; }()){ mpre("ОШИБКА запуска потока", __LINE__);
-			}else if([&](){ for (std::thread& th: threads){ // Ожидание потоков
-					if(!th.joinable()){ mpre("ОШИБКА поток не подключаемый", __LINE__);
-					}else if([&](){ th.join(); return false; }()){ mpre("ОШИБКА отключения от потока", __LINE__);
-					}else{ mpre("Завершение потока #"+ to_string(--thread), __LINE__);
-					}
-				} return false; }()){ mpre("ОШИБКА отвязывания от потоков", __LINE__);
-			}else if([&](){ // Без потоков
-					if(threads.size()){ mpre("Количество потоков "+ to_string(threads.size()), __LINE__);
-					}else{ Do(0, 0);
-					}
-				return false; }()){ mpre("ОШИБКА запуска функции без потоков", __LINE__);
-			}else{ //mpre("Ожидание закончилось", __LINE__); 
-			}
-		return false; }()){ mpre("ОШИБКА перебора всех входных значений", __LINE__);
+		static std::vector<std::thread> threads; int thread;
+		if(0 >= in.size()){ mpre("Данные для обучения не заданы", __LINE__);
+		//}else if([&](){ thread = (ARGV.end() == ARGV.find("-t") ? threads_count : stoi("" == ARGV.at("-t") ? "0" : ARGV.at("-t"))); return false; }()){ mpre("ОШИБКА получения количества потоков", __LINE__);a
+		}else if([&](){ // Расчет количества потоков
+				if(0 <= (thread = -1)){ mpre("ОШИБКА установленки первоначального значение количества потоков", __LINE__);
+				}else if(string _thread = (ARGV.end() == ARGV.find("-t") ? "0" : ARGV.at("-t")); (0 >= _thread.length())){ mpre("Количество потоков не задано в консоли", __LINE__);
+				}else if(string::npos != _thread.find_first_not_of("0123456789")){ mpre("ОШИБКА формат количества потоков не число "+ _thread, __LINE__);
+				}else if(thread = stoi(_thread); false){ mpre("ОШИБКА конвертации количества потоков в число", __LINE__);
+				}else{ //mpre("Количество потоков "+ _thread, __LINE__);
+				}
+			return (0 > thread); }()){ mpre("ОШИБКА расчета количества потоков", __LINE__);
+		}else if([&](){ for(int _thread = 1; _thread <= thread; _thread++){
+				if(std::thread th = std::thread(Do, thread, _thread); false){ mpre("ОШИБКА запуска потока", __LINE__);
+				}else if(threads.push_back(std::move(th)); (0 >= threads.size())){ mpre("ОШИБКА добавления потока в справочник", __LINE__);
+				}else{ mpre("Запуск потока "+ to_string(_thread), __LINE__);
+				}
+			} return false; }()){ mpre("ОШИБКА запуска потока", __LINE__);
+		}else if([&](){ for (std::thread& th: threads){ // Ожидание потоков
+				if(!th.joinable()){ mpre("ОШИБКА поток не подключаемый", __LINE__);
+				}else if(th.join(); false){ mpre("ОШИБКА отключения от потока", __LINE__);
+				}else{ mpre("Завершение потока #"+ to_string(--thread), __LINE__);
+				}
+			} return false; }()){ mpre("ОШИБКА отвязывания от потоков", __LINE__);
+		}else if([&](){ // Без потоков
+			if(threads.size()){ mpre("Количество потоков "+ to_string(threads.size()), __LINE__);
+			}else{ Do(0, 0);
+			} return false; }()){ mpre("ОШИБКА запуска функции без потоков", __LINE__);
+		}else{ //mpre("Ожидание закончилось", __LINE__); 
+		} return false; }()){ mpre("ОШИБКА перебора всех входных значений", __LINE__);
 	}else if(1 > BMF_ITOG_VALUES_EX.at("").size()){ mpre("Cписок значений не установлен", __LINE__);
 	}else if([&](){ // Расчет итога
-			Value = ([&](TMs itog_values){
-				TMMi ITOG, INDEX; string bin = "", val, value; double dec;
-				if([&](){ ITOG = rb(BMF_ITOG_EX, {{"itog_values_id", itog_values.at("id")}}); return ITOG.empty(); }()){ mpre("ОШИБКА получения списка знаков значения", __LINE__); //mpre(itog_values, __LINE__, "Значение"); mpre(BMF_ITOG_EX.at(""), __LINE__, "ОШИБКА получения списка знаков значения");
-				//}else if(true){ mpre("ОШИБКА Расчет временно остановлен из за функции Calc", __LINE__);
-				}else if([&](){ for(auto itog_itr:ITOG){ //for_each(ITOG.begin(), ITOG.end(), [&](auto itog_itr){ // Сортировка списка
-						TMs itog, index, dano; int pos, os;
-						if([&](){ itog = itog_itr.second; return itog.empty(); }()){ mpre("ОШИБКА получения итога", __LINE__);
-						}else if(itog.end() == itog.find("index_id")){ mpre("ОШИБКА поле index_id у итога не задано", __LINE__);
-						}else if("" == itog.at("index_id")){ mpre("Пустое поле у итога index_id", __LINE__);
-						}else if(BMF_INDEX_EX.at("").end() == BMF_INDEX_EX.at("").find(stoi(itog["index_id"]))){ mpre("Морф итога не указан", __LINE__);
-						}else if([&](){ index = erb(BMF_INDEX_EX, {{"id", itog.at("index_id")}}); return index.empty(); }()){ //mpre("ОШИБКА получения морфа итога", __LINE__);
-						}else if([&](){ dano = erb(BMF_DANO_EX, {{"id", index.at("dano_id")}}); return dano.empty(); }()){ mpre("ОШИБКА выборки исходника морфа", __LINE__);
-						}else if(dano.end() == dano.find("val")){ mpre("ОШИБКА поле исходника val не устанволено", __LINE__);
-						}else if("" == dano.at("val")){ mpre("ОШИБКА значение исходника морфа не задано", __LINE__);
-						}else if([&](){ index["val"] = Learn(index, "", BMF_DANO_EX, BMF_ITOG_EX);	return index.empty(); }()){ mpre("ОШИБКА расчета значения морфа", __LINE__);
-						}else if([&](){ mpre("Расчет "+ itog.at("id")+ " "+ itog_values.at("name")+ " ("+ itog.at("name")+ ") index["+ index.at("id")+ "]="+ index["val"] , __LINE__); return false; }()){ mpre("ОШИБКА уведомления", __LINE__);
-						}else if([&](){ INDEX.insert(make_pair(stoi(itog.at("name")), index)); return INDEX.empty(); }()){ mpre("ОШИБКА добавления итогов к сортированному списку", __LINE__);
-						}else{ //mpre(itog, __LINE__, "Итог");
-						}
-					}; return ITOG.empty(); }()){ mpre("ОШИБКА получения сортированного списка значений", __LINE__);
-				//}else if(true){ mpre(BMF_INDEX_EX.at(""), __LINE__, "Справочник"); mpre("Прверка", __LINE__);
-				//}else if(true){ mpre(INDEX, __LINE__, "Список");
-				}else if([&](){ for(auto &index_itr:INDEX){ //for_each(INDEX.begin(), INDEX.end(), [&](auto index_itr){ // Установка знаков в значение
-						TMs index; int pos, os; string _val, _bin;
-						if([&](){ index = index_itr.second; return index.empty(); }()){ mpre("ОШИБКА получения индекса", __LINE__);
-						}else if([&](){ pos = index_itr.first; return false; }()){ mpre("ОШИБКА получения позиции знака", __LINE__);
-						}else if([&](){ os = INDEX.rbegin()->first-pos; return (0 > os); }()){ mpre("ОШИБКА получения смещения (ноль и больше)", __LINE__);
-						}else if([&](){ bin += (os >= bin.length() ? std::string(os-bin.length()+1, '-') : ""); return (os >= bin.length()); }()){ mpre("ОШИБКА увеличения длинны строки до нужного размера", __LINE__);
-						}else if([&](){ _val = (0 == pos ? "." : index.at("val")); return (0 >= _val.length()); }()){ mpre("ОШИБКА получения символа знака", __LINE__);
-						}else if([&](){ _bin = bin; bin = bin.substr(0, os)+ _val+ bin.substr(os+1, bin.length()); return (0 >= bin.length()); }()){ mpre("ОШИБКА установки символа знака", __LINE__);
-						}else{ //mpre("Расчеты позиции и смещения pos="+ to_string(pos)+ " os="+ to_string(os)+ " length="+ to_string(bin.length())+ " val="+ val, __LINE__);
-							//mpre("Изменения "+ _bin+ " >> "+ bin, __LINE__);
-						}
-					}; return INDEX.empty(); }()){ mpre("Морфы значения не установлены `"+ itog_values["name"]+ "`", __LINE__);
-				}else if([&](){ bin = ((INDEX.find(0) != INDEX.end()) && (INDEX.at(0).at("val") == "1") ? "-" : "")+ bin; return (0 >= bin.length()); }()){ mpre("ОШИБКА установки символа отрицания", __LINE__);
-				}else if([&](){ dec = Bin2dec(bin); return false; }()){ mpre("ОШИБКА конвертации двоичной в десятичную систему", __LINE__);
-				}else if([&](){ dec = Bin2dec(bin); return false; }()){ mpre("ОШИБКА перевода двоичной строки в десятичное число", __LINE__);
-				}else if([&](){ value = to_string(dec); return false; }()){ mpre("ОШИБКА установки значения расчета", __LINE__);
-				}else if([&](){ itog_values["value"] = value; return itog_values.empty(); }()){ mpre("ОШИБКА получения конвертируемого значения", __LINE__);
-				}else{ //mpre("Значение bin="+ bin+ " dec="+ to_string(dec), __LINE__);
-				} return itog_values;
-			});
-		return false; }()){ mpre("ОШИБКА создания функции расчета итога", __LINE__);
-	}else if([&](){ // Вывод итоговых значений
-			nlohmann::json j, _in; json el; TMs dano;
-			if(ARGV.end() == ARGV.find("-j")){ //mpre("Данные для расчета не указаны", __LINE__);
-			}else if([&](){ _in = ("" == ARGV.at("-j") ? in : json::parse(ARGV.at("-j"))); return false; }()){ mpre("ОШИБКА разбора строки атрибута -j", __LINE__);
-			//}else if([&](){ j["status"] = {{"size", in.size()}, {"change", change_sum}, {"pips", pips_perc}, {"bmf", BMF_INDEX_EX.at("").size()}}; return j.empty(); }()){ mpre("ОШИБКА добавления статистики", __LINE__);
-			}else if(0 < change_sum){ mpre("При ошибках результат не выводим", __LINE__);
-			}else if([&](){ for(auto& js:_in.items()){ // Расчет списка теста
-					TMs dano, itog; json el; string key; int cache;
-					if([&](){ el = js.value(); return el.empty(); }()){ mpre("ОШИБКА элемент не найден", __LINE__);
-					}else if([&](){ key = js.key(); return (0 >= key.length()); }()){ mpre("ОШИБКА расчета ключа", __LINE__);
-					}else if(el.end() == el.find("dano")){ mpre("ОШИБКА исходные данные не могут быть пустыми", __LINE__);
-					}else if([&](){ TMs _dano = el.at("dano"); dano = _dano; return dano.empty(); }()){ mpre("ОШИБКА получения входных знаков", __LINE__);
-					}else if([&](){ // Получение итога
-							if(el.end() == el.find("itog")){ //mpre("Итог не задан", __LINE__);
-							}else if([&](){ TMs _itog = el.at("itog"); itog = _itog; return itog.empty(); }()){ mpre("ОШИБКА получения итоговых знаков", __LINE__);
-							}else{ //mpre(itog, __LINE__, "Итог");
-							}
-						return false; }()){ mpre("ОШИБКА получения итога", __LINE__);
-					}else if([&](){ mpre("РЕЗУЛЬТАТ: "+ el.dump(), __LINE__); return false; }()){ mpre("ОШИБКА уведомления", __LINE__);
-					}else if([&](){ cache = Crc32(el["dano"].dump().c_str()); return false; }()){ mpre("ОШИБКА расчета ключа кеша", __LINE__);
-					}else if([&](){ Vals(dano, "dano", cache, BMF_DANO_EX, BMF_DANO_VALUES_EX, BMF_DANO_TITLES_EX, clump_id); return BMF_DANO_EX.empty(); }()){ mpre("ОШИБКА установки входящих значений", __LINE__);
-					}else if([&](){ for(auto &itog_values_itr:BMF_ITOG_VALUES_EX.at("")){ //for_each(BMF_ITOG_VALUES_EX.at("").begin(), BMF_ITOG_VALUES_EX.at("").end(), [&](auto &itog_values_itr){ // Расчет значений
-							TMs itog_values;
-							if(BMF_INDEX_EX.at("").empty()){ mpre("Установка первоначальных морфов", __LINE__);
-							}else if([&](){ itog_values = itog_values_itr.second; return itog_values.empty(); }()){ mpre("ОШИБКА получения значения", __LINE__);
-							}else if([&](){ itog_values = Value(itog_values); return itog_values.empty(); }()){ mpre("ОШИБКА расчета значения", __LINE__);
-							}else if([&](){ itog_values_itr.second = itog_values; return itog_values_itr.second.empty(); }()){ mpre("ОШИБКА сохранения результатов расчета в справочник", __LINE__);
-							}else{ //mpre(itog_values, __LINE__, "Расчетное значение"); //mpre("Расчетное значение `"+ itog_values["name"]+ "` "+ to_string(dec)+ " ("+ bin+ ")", __LINE__);
-							}
-						}; return false; }()){ mpre("Ошибка отображение результата расчета", __LINE__);
-					}else if([&](){ for(auto &itog_values_itr:BMF_ITOG_VALUES_EX.at("")){
-							TMMi TITLES; TMs itog_values, itog_titles; string name, value; 
-							if([&](){ itog_values = itog_values_itr.second; return itog_values.empty(); }()){ mpre("ОШИБКА получения значения итога", __LINE__);
-							}else if([&](){ name = itog_values.at("name"); return (0 >= name.length()); }()){ mpre("ОШИБКА слишком короткое имя параметра", __LINE__);
-							}else if([&](){ value = itog_values.at("value"); return (0 > value.length()); }()){ mpre("ОШИБКА слишком короткое значение параметра", __LINE__);
-							}else if([&](){ char dig[100]; sprintf(dig,"%g", stod(value)); j[key][name] = value = dig; return false; }()){ mpre("ОШИБКА присвоения значения массиву", __LINE__);
-							}else if([&](){ // Проверка совпадения расчета с итогом
-								if(itog.empty()){ //mpre("Итоги не заданы", __LINE__);
-								}else if(itog.end() == itog.find(name)){ mpre("Имя в итогах не найдено "+ name, __LINE__);
-								}else if(value != itog.at(name)){ mpre(itog, __LINE__, "Итог"); mpre("ОШИБКА значение итога не совпало "+ name+ "="+ value, __LINE__);
-								}else{ //mpre("Итоги совпадают", __LINE__);
-								} return false; }()){ mpre("ОШИБКА проверки итога", __LINE__);
-							}else if([&](){
-								if([&](){ itog_titles = erb(BMF_ITOG_TITLES_EX, {{"itog_values_id", itog_values["id"]}, {"value", value}}); return itog_titles.empty(); }()){ //mpre("Заголовок значения `"+ itog_values["name"]+ "` не найден", __LINE__);
-								}else if(itog_titles.end() == itog_titles.find("name")){ mpre("ОШИБКА поле `name` не найдено у заголовка", __LINE__);
-								}else if([&](){ j[key][name] = itog_titles.at("name"); return false; }()){ mpre("ОШИБКА установки заголовка значению", __LINE__);
-								}else{ //mpre(itog_titles, __LINE__, "Замения значения заголовком");
-								} return false; }()){ mpre("ОШИБКА замены значения заголовком", __LINE__);
-							}else{ //mpre(itog_titles, __LINE__, "Заголовок значения "+ value);
-							}
-						} return false; }()){ mpre("ОШИБКА расчета результата", __LINE__);
-					}else{ //mpre("Итог "+ j.dump(), __LINE__);
+		Value = ([&](TMs itog_values){
+			TMMi ITOG, INDEX; string bin = "", val, value; double dec;
+			if([&](){ ITOG = rb(BMF_ITOG_EX, {{"itog_values_id", itog_values.at("id")}}); return ITOG.empty(); }()){ mpre("ОШИБКА получения списка знаков значения", __LINE__); //mpre(itog_values, __LINE__, "Значение"); mpre(BMF_ITOG_EX.at(""), __LINE__, "ОШИБКА получения списка знаков значения");
+			//}else if(true){ mpre("ОШИБКА Расчет временно остановлен из за функции Calc", __LINE__);
+			}else if([&](){ for(auto itog_itr:ITOG){ //for_each(ITOG.begin(), ITOG.end(), [&](auto itog_itr){ // Сортировка списка
+					TMs itog, index, dano; int pos, os;
+					if([&](){ itog = itog_itr.second; return itog.empty(); }()){ mpre("ОШИБКА получения итога", __LINE__);
+					}else if(itog.end() == itog.find("index_id")){ mpre("ОШИБКА поле index_id у итога не задано", __LINE__);
+					}else if("" == itog.at("index_id")){ mpre("Пустое поле у итога index_id", __LINE__);
+					}else if(BMF_INDEX_EX.at("").end() == BMF_INDEX_EX.at("").find(stoi(itog["index_id"]))){ mpre("Морф итога не указан", __LINE__);
+					}else if([&](){ index = erb(BMF_INDEX_EX, {{"id", itog.at("index_id")}}); return index.empty(); }()){ //mpre("ОШИБКА получения морфа итога", __LINE__);
+					}else if([&](){ dano = erb(BMF_DANO_EX, {{"id", index.at("dano_id")}}); return dano.empty(); }()){ mpre("ОШИБКА выборки исходника морфа", __LINE__);
+					}else if(dano.end() == dano.find("val")){ mpre("ОШИБКА поле исходника val не устанволено", __LINE__);
+					}else if("" == dano.at("val")){ mpre("ОШИБКА значение исходника морфа не задано", __LINE__);
+					}else if([&](){ index["val"] = Learn(index, "", BMF_DANO_EX, BMF_ITOG_EX);	return index.empty(); }()){ mpre("ОШИБКА расчета значения морфа", __LINE__);
+					}else if([&](){ mpre("Расчет "+ itog.at("id")+ " "+ itog_values.at("name")+ " ("+ itog.at("name")+ ") index["+ index.at("id")+ "]="+ index["val"] , __LINE__); return false; }()){ mpre("ОШИБКА уведомления", __LINE__);
+					}else if([&](){ INDEX.insert(make_pair(stoi(itog.at("name")), index)); return INDEX.empty(); }()){ mpre("ОШИБКА добавления итогов к сортированному списку", __LINE__);
+					}else{ //mpre(itog, __LINE__, "Итог");
 					}
-				} return false; }()){ mpre("ОШИБКА расчета списка теста", __LINE__);
-			}else{ //mpre("j "+ j.dump(), __LINE__);
-				std::cout << j.dump('\t');
-			}
-		return false; }()){ mpre("Ошибка отображение результата расчета", __LINE__);
+				}; return ITOG.empty(); }()){ mpre("ОШИБКА получения сортированного списка значений", __LINE__);
+			//}else if(true){ mpre(BMF_INDEX_EX.at(""), __LINE__, "Справочник"); mpre("Прверка", __LINE__);
+			//}else if(true){ mpre(INDEX, __LINE__, "Список");
+			}else if([&](){ for(auto &index_itr:INDEX){ //for_each(INDEX.begin(), INDEX.end(), [&](auto index_itr){ // Установка знаков в значение
+					TMs index; int pos, os; string _val, _bin;
+					if([&](){ index = index_itr.second; return index.empty(); }()){ mpre("ОШИБКА получения индекса", __LINE__);
+					}else if([&](){ pos = index_itr.first; return false; }()){ mpre("ОШИБКА получения позиции знака", __LINE__);
+					}else if([&](){ os = INDEX.rbegin()->first-pos; return (0 > os); }()){ mpre("ОШИБКА получения смещения (ноль и больше)", __LINE__);
+					}else if([&](){ bin += (os >= bin.length() ? std::string(os-bin.length()+1, '-') : ""); return (os >= bin.length()); }()){ mpre("ОШИБКА увеличения длинны строки до нужного размера", __LINE__);
+					}else if([&](){ _val = (0 == pos ? "." : index.at("val")); return (0 >= _val.length()); }()){ mpre("ОШИБКА получения символа знака", __LINE__);
+					}else if([&](){ _bin = bin; bin = bin.substr(0, os)+ _val+ bin.substr(os+1, bin.length()); return (0 >= bin.length()); }()){ mpre("ОШИБКА установки символа знака", __LINE__);
+					}else{ //mpre("Расчеты позиции и смещения pos="+ to_string(pos)+ " os="+ to_string(os)+ " length="+ to_string(bin.length())+ " val="+ val, __LINE__);
+						//mpre("Изменения "+ _bin+ " >> "+ bin, __LINE__);
+					}
+				}; return INDEX.empty(); }()){ mpre("Морфы значения не установлены `"+ itog_values["name"]+ "`", __LINE__);
+			}else if([&](){ bin = ((INDEX.find(0) != INDEX.end()) && (INDEX.at(0).at("val") == "1") ? "-" : "")+ bin; return (0 >= bin.length()); }()){ mpre("ОШИБКА установки символа отрицания", __LINE__);
+			}else if([&](){ dec = Bin2dec(bin); return false; }()){ mpre("ОШИБКА конвертации двоичной в десятичную систему", __LINE__);
+			}else if([&](){ dec = Bin2dec(bin); return false; }()){ mpre("ОШИБКА перевода двоичной строки в десятичное число", __LINE__);
+			}else if([&](){ value = to_string(dec); return false; }()){ mpre("ОШИБКА установки значения расчета", __LINE__);
+			}else if([&](){ itog_values["value"] = value; return itog_values.empty(); }()){ mpre("ОШИБКА получения конвертируемого значения", __LINE__);
+			}else{ //mpre("Значение bin="+ bin+ " dec="+ to_string(dec), __LINE__);
+			} return itog_values;
+		}); return false; }()){ mpre("ОШИБКА создания функции расчета итога", __LINE__);
+	}else if([&](){ // Вывод итоговых значений
+		nlohmann::json j, _in; json el; TMs dano;
+		if(ARGV.end() == ARGV.find("-j")){ //mpre("Данные для расчета не указаны", __LINE__);
+		}else if([&](){ _in = ("" == ARGV.at("-j") ? in : json::parse(ARGV.at("-j"))); return false; }()){ mpre("ОШИБКА разбора строки атрибута -j", __LINE__);
+		//}else if([&](){ j["status"] = {{"size", in.size()}, {"change", change_sum}, {"pips", pips_perc}, {"bmf", BMF_INDEX_EX.at("").size()}}; return j.empty(); }()){ mpre("ОШИБКА добавления статистики", __LINE__);
+		}else if(0 < change_sum){ mpre("При ошибках результат не выводим", __LINE__);
+		}else if([&](){ for(auto& js:_in.items()){ // Расчет списка теста
+				TMs dano, itog; json el;
+				if([&](){ el = js.value(); return el.empty(); }()){ mpre("ОШИБКА элемент не найден", __LINE__);
+				}else if(string key = js.key(); (0 >= key.length())){ mpre("ОШИБКА расчета ключа", __LINE__);
+				}else if(el.end() == el.find("dano")){ mpre("ОШИБКА исходные данные не могут быть пустыми", __LINE__);
+				}else if([&](){ TMs _dano = el.at("dano"); dano = _dano; return dano.empty(); }()){ mpre("ОШИБКА получения входных знаков", __LINE__);
+				}else if([&](){ // Получение итога
+					if(el.end() == el.find("itog")){ //mpre("Итог не задан", __LINE__);
+					}else if([&](){ TMs _itog = el.at("itog"); itog = _itog; return itog.empty(); }()){ mpre("ОШИБКА получения итоговых знаков", __LINE__);
+					}else{ //mpre(itog, __LINE__, "Итог");
+					} return false; }()){ mpre("ОШИБКА получения итога", __LINE__);
+				}else if(mpre("РЕЗУЛЬТАТ: "+ el.dump(), __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
+				}else if(int cache = Crc32(el["dano"].dump().c_str()); false){ mpre("ОШИБКА расчета ключа кеша", __LINE__);
+				}else if(Vals(dano, "dano", cache, BMF_DANO_EX, BMF_DANO_VALUES_EX, BMF_DANO_TITLES_EX, clump_id); BMF_DANO_EX.empty()){ mpre("ОШИБКА установки входящих значений", __LINE__);
+				}else if([&](){ for(auto &itog_values_itr:BMF_ITOG_VALUES_EX.at("")){ //for_each(BMF_ITOG_VALUES_EX.at("").begin(), BMF_ITOG_VALUES_EX.at("").end(), [&](auto &itog_values_itr){ // Расчет значений
+						if(BMF_INDEX_EX.at("").empty()){ mpre("Установка первоначальных морфов", __LINE__);
+						}else if(TMs itog_values = itog_values_itr.second; itog_values.empty()){ mpre("ОШИБКА получения значения", __LINE__);
+						}else if(itog_values = Value(itog_values); itog_values.empty()){ mpre("ОШИБКА расчета значения", __LINE__);
+						}else if(itog_values_itr.second = itog_values; itog_values_itr.second.empty()){ mpre("ОШИБКА сохранения результатов расчета в справочник", __LINE__);
+						}else{ //mpre(itog_values, __LINE__, "Расчетное значение"); //mpre("Расчетное значение `"+ itog_values["name"]+ "` "+ to_string(dec)+ " ("+ bin+ ")", __LINE__);
+						}
+					}; return false; }()){ mpre("Ошибка отображение результата расчета", __LINE__);
+				}else if([&](){ for(auto &itog_values_itr:BMF_ITOG_VALUES_EX.at("")){
+						if(TMs itog_values = itog_values_itr.second; itog_values.empty()){ mpre("ОШИБКА получения значения итога", __LINE__);
+						}else if(string name = itog_values.at("name"); (0 >= name.length())){ mpre("ОШИБКА слишком короткое имя параметра", __LINE__);
+						}else if(string value = itog_values.at("value"); (0 > value.length())){ mpre("ОШИБКА слишком короткое значение параметра", __LINE__);
+						}else if([&](){ char dig[100]; sprintf(dig,"%g", stod(value)); j[key][name] = value = dig; return false; }()){ mpre("ОШИБКА присвоения значения массиву", __LINE__);
+						}else if([&](){ // Проверка совпадения расчета с итогом
+							if(itog.empty()){ //mpre("Итоги не заданы", __LINE__);
+							}else if(itog.end() == itog.find(name)){ mpre("Имя в итогах не найдено "+ name, __LINE__);
+							}else if(value != itog.at(name)){ mpre(itog, __LINE__, "Итог"); mpre("ОШИБКА значение итога не совпало "+ name+ "="+ value, __LINE__);
+							}else{ //mpre("Итоги совпадают", __LINE__);
+							} return false; }()){ mpre("ОШИБКА проверки итога", __LINE__);
+						}else if([&](){
+							if(TMs itog_titles = erb(BMF_ITOG_TITLES_EX, {{"itog_values_id", itog_values["id"]}, {"value", value}}); itog_titles.empty()){ //mpre("Заголовок значения `"+ itog_values["name"]+ "` не найден", __LINE__);
+							}else if(itog_titles.end() == itog_titles.find("name")){ mpre("ОШИБКА поле `name` не найдено у заголовка", __LINE__);
+							}else if(j[key][name] = itog_titles.at("name"); false){ mpre("ОШИБКА установки заголовка значению", __LINE__);
+							}else{ //mpre(itog_titles, __LINE__, "Замения значения заголовком");
+							} return false; }()){ mpre("ОШИБКА замены значения заголовком", __LINE__);
+						}else{ //mpre(itog_titles, __LINE__, "Заголовок значения "+ value);
+						}
+					} return false; }()){ mpre("ОШИБКА расчета результата", __LINE__);
+				}else{ //mpre("Итог "+ j.dump(), __LINE__);
+				}
+			} return false; }()){ mpre("ОШИБКА расчета списка теста", __LINE__);
+		}else{ //mpre("j "+ j.dump(), __LINE__);
+			std::cout << j.dump('\t');
+		} return false; }()){ mpre("Ошибка отображение результата расчета", __LINE__);
 	}else if([&](){ std::cerr << endl;
 			Save = ([&](string table, TMMi ROW){ // Расчет значения формулы
 				TMs index; int count_insert = 0, count_update = 0, count_delete = 0; string sql;
