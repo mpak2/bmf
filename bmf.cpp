@@ -1079,7 +1079,6 @@ int main(int argc, char **argv){
 		}else if([&](){ // Обучение
 			Learn = ([&](TMs bmf_index, string val = "", TM3i& _BMF_DANO_EX, TM3i& _BMF_ITOG_EX){ //mpre("Обучение "+ index.at("id"), __LINE__);  //system("sleep 1"); // mpre(BMF_INDEX, __LINE__, "Список"); // if(remove){ mpre(row, __LINE__, "Ученик"); }
 				TMs stair;
-				//if(TMs stair = {}; false){ mpre("ОШИБКА создания результирующей ступени", __LINE__);
 				if(int rep = 1e9; 0 >= rep){ mpre("ОШИБКА установки предельного размера обучения для сети", __LINE__);
 				}else if(static TMMi CACHE; false){ mpre("ОШИБКА создания кеша результата", __LINE__);
 				}else if(TMMi STAIRS; false){ mpre("ОШИБКА задания списка ступеней", __LINE__);
@@ -1364,8 +1363,8 @@ int main(int argc, char **argv){
 				}else if(_BMF_ITOG_EX.at("").end() == _BMF_ITOG_EX.at("").find(stoi(itog.at("id")))){ mpre(itog, __LINE__, "Итог"); mpre("ОШИБКА итог в локальном списке не найден", __LINE__);
 				}else if(itog.end() == itog.find("itog_values_id")){ mpre(itog, __LINE__, "Итог"); mpre("ОШИБКА формата итога", __LINE__);
 				}else if(TMs index = [&](TMs index = {}){ // Проверка на разные ссылки сетей у итогов
-					std::lock_guard<std::recursive_mutex> lock(mu);
-					if(BMF_ITOG_EX.at("").end() == BMF_ITOG_EX.at("").find(stoi(itog.at("id")))){ mpre("ОШИБКА локального морф не найден в глобальном списке", __LINE__);
+					if(std::lock_guard<std::recursive_mutex> lock(mu); false){ mpre("ОШИБКА установки блокировки", __LINE__);
+					}else if(BMF_ITOG_EX.at("").end() == BMF_ITOG_EX.at("").find(stoi(itog.at("id")))){ mpre("ОШИБКА локального морф не найден в глобальном списке", __LINE__);
 					}else if(TMs bmf_itog = BMF_ITOG_EX.at("").at(stoi(itog.at("id"))); bmf_itog.empty()){ mpre("ОШИБКА выборки глобального морфа", __LINE__);
 					}else if(index = erb(BMF_INDEX_EX ,{{"id", bmf_itog["index_id"]}}); !index.empty()){ //mpre("Связь с морфом", __LINE__);
 					}else if(TMs dano = _BMF_DANO_EX.at("").begin()->second; dano.empty()){ mpre("ОШИБКА выборки первого дано", __LINE__);
@@ -1379,8 +1378,8 @@ int main(int argc, char **argv){
 					}else{ //mpre("ОШИБКА добавления связи с морфом", __LINE__);
 					} return index; }(); index.empty()){ mpre("ОШИБКА морф связи не найден", __LINE__);
 				}else if(TMs values = [&](TMs values = {}){ // Значение
-					std::lock_guard<std::recursive_mutex> lock(mu);
-					if("" == index.at("itog_values_id")){ mpre("ОШИБКА значение у итога не указано", __LINE__);
+					if(std::lock_guard<std::recursive_mutex> lock(mu); false){ mpre("ОШИБКА установки блокировки", __LINE__);
+					}else if("" == index.at("itog_values_id")){ mpre("ОШИБКА значение у итога не указано", __LINE__);
 					}else if(BMF_ITOG_VALUES_EX.at("").end() == BMF_ITOG_VALUES_EX.at("").find(stoi(index["itog_values_id"]))){ mpre("ОШИБКА значение не найдено", __LINE__);
 					}else if(values = BMF_ITOG_VALUES_EX.at("").at(stoi(index.at("itog_values_id"))); values.empty()){ mpre("ОШИБКА выборки значения итога", __LINE__);
 					}else{ //mpre(values, __LINE__, "Значение итога");
@@ -1424,60 +1423,60 @@ int main(int argc, char **argv){
 			}); return false; }()){ mpre("ОШИБКА установки функции обучения", __LINE__);
 		}else if([&](){ // Непосредственно расчет
 			Do = ([&](int thread, int _thread){ // Цикл повторений расчета
-				int pips_change = 0, pips_sum = 0, split = 0, remains = 0, loop_max = 0, change; float _perc, _pips_perc;
-				TM3i _BMF_DANO_EX, _BMF_ITOG_EX; // Локальные переменные
-				auto _in = in;
-				if([&](){ // Проверка количества эпох из командной строки
+				int change;
+				if(int loop_max = [&](int loop_max = 0){ // Проверка количества эпох из командной строки
 					if(0 != loop_max){ mpre("ОШИБКА для проверки необходимо скинуть значения эпох", __LINE__);
-					//}else if(ARGV.end() == ARGV.find("-e")){ mpre("ОШИБКА количество эпох не задано -e", __LINE__);
-					//}else if(0 >= ARGV.at("-e").length()){ mpre("Не задано количество эпох -e", __LINE__);
 					}else if(string _loop_max = (ARGV.end() == ARGV.find("-e") ? "1" : ARGV.at("-e")); (0 >= _loop_max.length())){ mpre("ОШИБКА количество эпох не задано", __LINE__);
 					}else if(string::npos != _loop_max.find_last_not_of("0123456789")){ mpre("ОШИБКА формат количества эпох задан неправильно "+ _loop_max, __LINE__);
 					}else if(loop_max = stoi(_loop_max); (0 >= loop_max)){ mpre("ОШИБКА количество эпох не достаточно для продолжения", __LINE__);
 					}else{ //mpre("Количество эпох установлено "+ to_string(loop_max), __LINE__);
 					} return (0 >= loop_max); }()){ mpre("ОШИБКА количество эпох задано не верно -e", __LINE__);
-				}else if([&](){ _BMF_DANO_EX = BMF_DANO_EX; return false; }()){ mpre("ОШИБКА установки первоначальных исходников дано", __LINE__);
-				}else if([&](){ _BMF_ITOG_EX = BMF_ITOG_EX; return false; }()){ mpre("ОШИБКА установки первоначальных итогов дано", __LINE__);
+				}else if(TM3i _BMF_DANO_EX = BMF_DANO_EX; _BMF_DANO_EX.empty()){ mpre("ОШИБКА установки первоначальных исходников дано", __LINE__);
+				}else if(TM3i _BMF_ITOG_EX = BMF_ITOG_EX; _BMF_ITOG_EX.empty()){ mpre("ОШИБКА установки первоначальных итогов дано", __LINE__);
+				}else if(auto _in = in; _in.empty()){ mpre("ОШИБКА установки временного массива", __LINE__);
 				}else if([&](){ // Обучение до состояния без ошибок
 						do{ // Расчет и обучение входящих параметров
-							if([&](){ loop += 1; change = pips_sum = pips_change = 0; return false; }()){ mpre("ОШИБКА скидывания флага изменений", __LINE__);
+							if(loop += 1; false){ mpre("ОШИБКА увеличения итераций", __LINE__);
+							}else if(change = 0; false){ mpre("ОШИБКА скидывания флага изменений", __LINE__);
+							}else if(int pips_sum = 0; false){ mpre("ОШИБКА обнуления суммы пипсов", __LINE__);
+							}else if(int pips_change = 0; false){ mpre("ОШИБКА обнуления изменений пипсов", __LINE__);
 							}else if([&](){ // Перемешивание
 								if(1 >= _in.size()){ //mpre("Не перемешиваем одно значение", __LINE__);
 								}else if(_in.is_object()){ mpre("Обьект не перемешиваем", __LINE__);
 								}else if(string random = (ARGV.end() == ARGV.find("-r") ? "1" : ARGV.at("-r")); (0 >= random.length())){ mpre("ОШИБКА аргумент перемешивания не задан -r", __LINE__);
 								}else if(string::npos != random.find_last_not_of("0123456789")){ mpre("ОШИБКА формат перемешивания задан неправильно "+ random, __LINE__);
 								}else if("0" == random){ mpre("Перемешивание отключено -r " +ARGV.at("-r"), __LINE__);
-								}else if([&](){ std::random_device rd; std::mt19937 g(rd()); shuffle(_in.begin(), _in.end(), g); std::lock_guard<std::recursive_mutex> lock(mu); std::cerr << endl << __LINE__ << " ПЕРЕМЕШИВАНИЕ " << loop; return _in.empty(); }()){ mpre("ОШИБКА перемешивания массива входящих значений", __LINE__);
+								}else if(std::random_device rd;  false){ mpre("ОШИБКА создания случайного значения", __LINE__);
+								}else if(std::mt19937 g(rd()); false){ mpre("ОШИБКА инициации случайного значения", __LINE__);
+								}else if(shuffle(_in.begin(), _in.end(), g); false){ mpre("ОШИБКА перемешивания массива", __LINE__);
+								}else if([&](){ std::lock_guard<std::recursive_mutex> lock(mu); std::cerr << endl << __LINE__ << " ПЕРЕМЕШИВАНИЕ " << loop; return _in.empty(); }()){ mpre("ОШИБКА перемешивания массива входящих значений", __LINE__);
 								}else{ //mpre("Перемешиваем список", __LINE__);
 								} return false; }()){ mpre("ОШИБКА перемешивания списка", __LINE__);
+							}else if(int count = 0; (count < 0)){ mpre("ОШИБКА установки счетчика расчетов", __LINE__);
 							}else if([&](){ // Расчет каждого из входных значений
-								TMs dano, itog; int count = 0, key;
 								for(auto &js:_in.items()){ // Расчет исходных данных
-									json el; int key; string info;
 									if(false){ mpre("Остановка потока _in.items()", __LINE__);
-									//}else if([&](){ mpre("Items " +to_string(_thread), __LINE__); return false; }()){ mpre("ОШИБКА уведомления", __LINE__);
-									}else if([&](){ count += 1; return (0 >= count); }()){ mpre("ОШИБКА увеличения примера", __LINE__);
-									//}else if([&](){ mpre("Ключ "+ js.key(), __LINE__); return false; }()){ mpre("ОШИБКА расчета ключа", __LINE__);
-									}else if([&](){ el = js.value(); return el.empty(); }()){ mpre("ОШИБКА элемент не найден", __LINE__);
-									}else if([&](){ key = Crc32(el["dano"].dump().c_str()); return (0 == key); }()){ mpre("ОШИБКА расчета crc32", __LINE__);
-									}else if([&](){ pips_sum += BMF_ITOG_EX.at("").size(); return false; }()){ mpre("ОШИБКА расчета количества итогов", __LINE__);
-									}else if([&](){ TMs _dano = el["dano"]; dano = _dano; return dano.empty(); }()){ mpre("ОШИБКА получения входных знаков", __LINE__);
-									}else if([&](){ _perc = (0 >= in.size() ? : float(in.size()-change)*100.0/in.size()); return false; }()){ mpre("ОШИБКА расчета процента", __LINE__);
-									}else if([&](){ _pips_perc = (0 >= pips_sum ? 0 : float(pips_sum-pips_change)*100.0/pips_sum); return false; }()){ mpre("ОШИБКА расчета процента совпадения сигнала", __LINE__);
+									}else if(count += 1; (0 >= count)){ mpre("ОШИБКА увеличения примера", __LINE__);
+									}else if(json el = js.value(); el.empty()){ mpre("ОШИБКА элемент не найден", __LINE__);
+									}else if(int key = Crc32(el["dano"].dump().c_str()); (0 == key)){ mpre("ОШИБКА расчета crc32", __LINE__);
+									}else if(pips_sum += BMF_ITOG_EX.at("").size(); false){ mpre("ОШИБКА расчета количества итогов", __LINE__);
+									}else if(TMs dano = TMs(el["dano"]); dano.empty()){ mpre("ОШИБКА получения входных знаков", __LINE__);
+									}else if(float _perc = (0 >= in.size() ? : float(in.size()-change)*100.0/in.size()); false){ mpre("ОШИБКА расчета процента", __LINE__);
+									}else if(float _pips_perc = (0 >= pips_sum ? 0 : float(pips_sum-pips_change)*100.0/pips_sum); false){ mpre("ОШИБКА расчета процента совпадения сигнала", __LINE__);
 									}else if([&](){ std::lock_guard<std::recursive_mutex> locker(mu); std::cerr << endl << __LINE__ << ".РАСЧЕТ " +to_string(_thread) +" \"dano\":" << el["dano"].dump().substr(0 ,89) << "..." << endl;  return false; }()){ mpre("ОШИБКА отображения информации", __LINE__);
-									}else if([&](){ Values(dano, "dano", BMF_DANO_VALUES_EX, clump_id); return BMF_DANO_VALUES_EX.empty(); }()){ mpre("ОШИБКА установки входящих значений", __LINE__);
-									}else if([&](){ Vals(dano, "dano", key, _BMF_DANO_EX, BMF_DANO_VALUES_EX, BMF_DANO_TITLES_EX, clump_id); return _BMF_DANO_EX.empty(); }()){ mpre("ОШИБКА установки входящих значений", __LINE__);
+									}else if(Values(dano, "dano", BMF_DANO_VALUES_EX, clump_id); BMF_DANO_VALUES_EX.empty()){ mpre("ОШИБКА установки входящих значений", __LINE__);
+									}else if(Vals(dano, "dano", key, _BMF_DANO_EX, BMF_DANO_VALUES_EX, BMF_DANO_TITLES_EX, clump_id); _BMF_DANO_EX.empty()){ mpre("ОШИБКА установки входящих значений", __LINE__);
 									}else if(el["itog"].empty()){ //std::lock_guard<std::recursive_mutex> locker(mu); std::cerr << __LINE__ << ".ОБУЧЕНИЕ не задано" << endl;
 									}else if([&](){ std::lock_guard<std::recursive_mutex> locker(mu); std::cerr << __LINE__ << " ОБУЧЕНИЕ " +to_string(_thread) +" \"itog\":" << el["itog"].dump() << endl; return false; }()){ mpre("ОШИБКА вывода уведомления", __LINE__);
-									}else if([&](){ TMs _itog = el["itog"]; itog = _itog; return dano.empty(); }()){ mpre("ОШИБКА получения входных знаков", __LINE__);
-									}else if([&](){ Values(itog, "itog", BMF_ITOG_VALUES_EX, clump_id); return BMF_ITOG_VALUES_EX.empty(); }()){ mpre("ОШИБКА установки входящих значений", __LINE__);
-									}else if([&](){ Vals(itog, "itog", key, _BMF_ITOG_EX, BMF_ITOG_VALUES_EX, BMF_ITOG_TITLES_EX, clump_id); return _BMF_ITOG_EX.empty(); }()){ mpre("ОШИБКА установки входящих значений", __LINE__);
-									}else if([&](){ info = "Эпоха:"+ to_string(loop)+ " Размер:"+ to_string(in.size())+ " Пример:"+ js.key()+ " Изменений:"+ to_string(change)+ " Сеть:"+ to_string(BMF_INDEX_EX.at("").size())+ " Процент:"+ to_string(perc)+ "/"+ to_string(_perc)+ "% Время:"+ to_string(time(0)-timestamp); return (0 >= info.length()); }()){ mpre("ОШИБКА составления строки состояния", __LINE__);
+									}else if(TMs itog = TMs(el["itog"]); itog.empty()){ mpre("ОШИБКА получения входных знаков", __LINE__);
+									}else if(Values(itog, "itog", BMF_ITOG_VALUES_EX, clump_id); BMF_ITOG_VALUES_EX.empty()){ mpre("ОШИБКА установки входящих значений", __LINE__);
+									}else if(Vals(itog, "itog", key, _BMF_ITOG_EX, BMF_ITOG_VALUES_EX, BMF_ITOG_TITLES_EX, clump_id); _BMF_ITOG_EX.empty()){ mpre("ОШИБКА установки входящих значений", __LINE__);
+									}else if(string info = "Эпоха:"+ to_string(loop)+ " Размер:"+ to_string(in.size())+ " Пример:"+ js.key()+ " Изменений:"+ to_string(change)+ " Сеть:"+ to_string(BMF_INDEX_EX.at("").size())+ " Процент:"+ to_string(perc)+ "/"+ to_string(_perc)+ "% Время:"+ to_string(time(0)-timestamp); (0 >= info.length())){ mpre("ОШИБКА составления строки состояния", __LINE__);
 									}else if([&](){ //mpre("Начало Items " +to_string(_thread), __LINE__); // Уведомление об изменениях
-										int _change;
-										if([&](){ pips_change += _change = LearningAll(el, thread, _thread, clump_id, _BMF_DANO_EX, _BMF_ITOG_EX); return false; }()){ mpre("Расчет изменеений", __LINE__);
+										if(int _change = LearningAll(el, thread, _thread, clump_id, _BMF_DANO_EX, _BMF_ITOG_EX); false){ mpre("Расчет изменеений", __LINE__);
+										}else if(pips_change += _change; false){ mpre("ОШИБКА получения количества пипсов", __LINE__);
 										}else if(0 == _change){ //mpre("Расчет "+ info, __LINE__);
-										}else if([&](){ return (0 >= ++change); }()){ mpre("ОШИБКА установки флага изменения", __LINE__);
+										}else if(0 >= ++change){ mpre("ОШИБКА установки флага изменения", __LINE__);
 										}else{ //mpre("Несовпадение результатов "+ info, __LINE__);
 										} return false; }()){ //mpre("Нет изменений "+ info, __LINE__);
 									}else if([&](){ std::lock_guard<std::recursive_mutex> locker(mu); std::cerr << __LINE__ << " Время: " << (time(0)-timestamp) << " Выборка: " << loop << "/" << in.size() << "/" << count << " Морфы: " << BMF_INDEX_EX.at("").size() << "/" << change << " " << perc << "/" << _perc << "% Итоги: " << BMF_ITOG_EX.at("").size() << "/" << pips_sum << "/" << pips_change << " " << pips_perc << "/" << _pips_perc << "%" << endl; return false; }()){ mpre("ОШИБКА вывода информации о данных", __LINE__);
@@ -1493,7 +1492,6 @@ int main(int argc, char **argv){
 							}
 						}while(change != 0 && ((0 == loop_max) || (loop < loop_max)));
 					return false; }()){ mpre("ОШИБКА цикла обучения", __LINE__);
-				//}else if([&](){ BMF_DANO_EX = _BMF_DANO_EX; return BMF_DANO_EX.empty(); }()){ mpre("ОШИБКА установки последнего дано", __LINE__);
 				}else{ //mpre(BMF_DANO_EX.at(""), __LINE__, "Дано"); mpre(BMF_ITOG_EX.at(""), __LINE__, "Итог");
 				} return false;
 			}); return false; }()){ mpre("ОШИБКА создания функции непосредственно расчета", __LINE__);
