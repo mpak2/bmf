@@ -1462,7 +1462,7 @@ int main(int argc, char **argv){
 					}else if(string::npos != _loop_max.find_last_not_of("0123456789")){ mpre("ОШИБКА формат количества эпох задан неправильно "+ _loop_max, __LINE__);
 					}else if(loop_max = stoi(_loop_max); (0 >= loop_max)){ mpre("ОШИБКА количество эпох не достаточно для продолжения", __LINE__);
 					}else{ //mpre("Количество эпох установлено "+ to_string(loop_max), __LINE__);
-					} return (0 >= loop_max); }()){ mpre("ОШИБКА количество эпох задано не верно -e", __LINE__);
+					} return loop_max; }(); (0 > loop_max)){ mpre("ОШИБКА количество эпох задано не верно -e", __LINE__);
 				}else if(TM3i _BMF_DANO_EX = BMF_DANO_EX; _BMF_DANO_EX.empty()){ mpre("ОШИБКА установки первоначальных исходников дано", __LINE__);
 				}else if(TM3i _BMF_ITOG_EX = BMF_ITOG_EX; _BMF_ITOG_EX.empty()){ mpre("ОШИБКА установки первоначальных итогов дано", __LINE__);
 				}else if(auto _in = in; _in.empty()){ mpre("ОШИБКА установки временного массива", __LINE__);
