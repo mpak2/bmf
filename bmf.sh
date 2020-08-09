@@ -3,23 +3,24 @@
 #sudo apt install libsqlite3-dev
 
 #cat clump/dva.json | ./bimorph - -c -e 10 -r 0 ./2
-#sqlite3 ./2 -column -header "SELECT * FROM mp_bmf_test ORDER BY id DESC LIMIT 10; -- SELECT COUNT(*) as step, SUM(change) as SumChange, MAX(bmf) as bmf FROM mp_bmf_test WHERE perc<10;"
-#sqlite3 ./2 -column -header "SELECT * FROM mp_bmf_index ORDER BY id DESC"
+#sqlite ./2 -column -header "SELECT * FROM mp_bmf_test ORDER BY id DESC LIMIT 10; -- SELECT COUNT(*) as step, SUM(change) as SumChange, MAX(bmf) as bmf FROM mp_bmf_test WHERE perc<10;"
+#sqlite ./2 -column -header "SELECT * FROM mp_bmf_index ORDER BY id DESC"
 
-#cat clump/tri.json | ./bimorph - -c -e 100 -r 0 ./3
-#sqlite3 ./3 -column -header "SELECT * FROM mp_bmf_test ORDER BY id DESC LIMIT 10; -- SELECT COUNT(*) as step, SUM(change) as SumChange, MAX(bmf) as bmf FROM mp_bmf_test WHERE perc<10;"
-#sqlite3 ./3 -column -header "SELECT * FROM mp_bmf_index ORDER BY id DESC"
-./bimorph clump/iris.sqlite -j '[{"dano":{"ДлиннаЧашелистика":"2.0","ШиринаЧашелистика":"4.0","ДлиннаЛепестка":"1.8","ШиринаЛепестка":"1.8"}}]'
+cat clump/tri.json | ./bimorph - -c -e 100 -r 0 ./3
+sqlite3 ./3 -column -header "SELECT * FROM mp_bmf_test ORDER BY id DESC LIMIT 10; -- SELECT COUNT(*) as step, SUM(change) as SumChange, MAX(bmf) as bmf FROM mp_bmf_test WHERE perc<10;"
+sqlite3 ./3 -column -header "SELECT * FROM mp_bmf_index ORDER BY id DESC"
+./bimorph ./3 -j '[{"dano":{"Один":"0", "Два":"0", "Три":"0"}}]'
 
 #cat clump/iris.json | ./bimorph - clump/iris.sqlite -c -e 100
-#sqlite3 clump/iris.sqlite -column -header "SELECT * FROM mp_bmf_test ORDER BY id DESC LIMIT 10; -- SELECT COUNT(*) as step, SUM(change) as SumChange, MAX(bmf) as bmf FROM mp_bmf_test WHERE perc<10;"
-#sqlite3 clump/iris.sqlite -column -header "SELECT MAX(depth) FROM mp_bmf_index"
+#sqlite clump/iris.sqlite -column -header "SELECT * FROM mp_bmf_test ORDER BY id DESC LIMIT 10; -- SELECT COUNT(*) as step, SUM(change) as SumChange, MAX(bmf) as bmf FROM mp_bmf_test WHERE perc<10;"
+#sqlite clump/iris.sqlite -column -header "SELECT MAX(depth) FROM mp_bmf_index"
+#./bimorph clump/iris.sqlite -j '[{"dano":{"ДлиннаЧашелистика":"2.0","ШиринаЧашелистика":"4.0","ДлиннаЛепестка":"1.8","ШиринаЛепестка":"1.8"}}]'
 
 #cat clump/crc8.json | ./bimorph - clump/crc8.sqlite -c -r 0 -t 8
-#sqlite3 clump/crc8.sqlite -column -header "SELECT * FROM mp_bmf_test ORDER BY id DESC LIMIT 10; -- SELECT COUNT(*) as step, SUM(change) as SumChange, MAX(bmf) as bmf FROM mp_bmf_test WHERE perc<10;"
+#sqlite clump/crc8.sqlite -column -header "SELECT * FROM mp_bmf_test ORDER BY id DESC LIMIT 10; -- SELECT COUNT(*) as step, SUM(change) as SumChange, MAX(bmf) as bmf FROM mp_bmf_test WHERE perc<10;"
 
 #cat clump/house.json | ./bimorph - clump/house.sqlite -c -r 0 -ocl 1
-#sqlite3 clump/house.sqlite -column -header "SELECT * FROM mp_bmf_test ORDER BY id DESC LIMIT 10; -- SELECT COUNT(*) as step, SUM(change) as SumChange, MAX(bmf) as bmf FROM mp_bmf_test WHERE perc<10;"
+#sqlite clump/house.sqlite -column -header "SELECT * FROM mp_bmf_test ORDER BY id DESC LIMIT 10; -- SELECT COUNT(*) as step, SUM(change) as SumChange, MAX(bmf) as bmf FROM mp_bmf_test WHERE perc<10;"
 
 #mv ./3 /tmp
 #echo '[{"dano":{"Один":"0", "Два":"0", "Три":"0"},"itog":{"Два":"0"}}]' | ./bmf - ./3
