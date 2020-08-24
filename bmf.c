@@ -1,52 +1,3 @@
-int mpre(TMs row, int line, string comment = "", string prefix = "", string key = ""){
-	std::lock_guard<std::recursive_mutex> lock(mu);
-	string num;
-	if([&](){ // Получение ключа
-			if("" != key){ num = key;
-			}else if(row.end() != row.find("id")){ num = row["id"];
-			}else{ //mpre("Ни ключ ни идентификатор не задан", __LINE__);
-			} return false;
-		}()){ //mpre("ОШИБКА получения ключа", __LINE__);
-	}else{
-		std::cerr << prefix << num << " => " << "( // __" << to_string(line) << "__ " << comment << "\n";
-		for(TMs::iterator itr = row.begin(); itr != row.end(); itr++){
-			string field = (string) itr->first;
-			string val = (string) itr->second;
-			std::cerr << prefix << "\t[" << field << "]=>" << val << "," << endl;
-		}; std::cerr << prefix << ")\n";
-	} return 1;
-}
-
-int mpre(TMMi TAB, int line, string comment = ""){
-	std::lock_guard<std::recursive_mutex> lock(mu);
-	std::cerr << "Array";
-	if(line > 0){
-		std::cerr << "__" << std::to_string(line) << "__";
-	}; std::cerr << "( // " << comment << "\n";
-	for(auto itr = TAB.begin(); itr != TAB.end(); itr++){
-		int key = itr->first;
-		TMs row = itr->second;
-		mpre(row, line, comment, "\t", to_string(key));
-	} std::cerr << ")\n";
-	return 1;
-}
-
-
-int mpre(TMMs& TAB, int line, string comment = ""){
-	std::lock_guard<std::recursive_mutex> lock(mu);
-	std::cerr << "Array";
-	if(line > 0){
-		std::cerr << "__" << std::to_string(line) << "__";
-	}; std::cerr << "( // " << comment << "\n";
-	for(auto itr = TAB.begin(); itr != TAB.end(); itr++){
-		string key = itr->first;
-		TMs row = itr->second;
-		mpre(row, line, comment, "\t", key);
-	} std::cerr << ")\n";
-	return 1;
-}
-
-
 int mpre(string mess, int line, string comment = ""){
 	if(std::lock_guard<std::recursive_mutex> lock(mu); false){ mpre("ОШИБКА установки блокировки", __LINE__);
 	}else if(std::cerr << line << "." << mess << (comment.empty() ? "" : " `") << comment << (comment.empty() ? "" : "`") << endl; false){ mpre("ОШИБКА вывода уведомления", __LINE__);
@@ -55,18 +6,72 @@ int mpre(string mess, int line, string comment = ""){
 	}else if(int response = system("sleep 3"); (0 != response)){ std::cerr << __LINE__ << " Остановка программы" << endl; exit(1);
 	}else{ //mpre("Возвращенное значение"+ to_string(response), __LINE__);
 	} return 1;
+} int mpre(string mess, string comment, int line){
+	return mpre(mess, line, comment);
 }
 
-int mpre(TM3i& TABS, int line, string comment = ""){
-	std::lock_guard<std::recursive_mutex> lock(mu);
+int mpre(TMs row, int line, string comment = "", string prefix = "", string key = ""){
+	if(std::lock_guard<std::recursive_mutex> lock(mu); false){ mpre("ОШИБКА блокировки", __LINE__);
+	}else if(string num = [&](string num = ""){ // Получение ключа
+			if("" != key){ num = key;
+			}else if(row.end() != row.find("id")){ num = row["id"];
+			}else{ //mpre("Ни ключ ни идентификатор не задан", __LINE__);
+			} return num;
+		}(); false){ //mpre("ОШИБКА получения ключа", __LINE__);
+	}else{
+		std::cerr << prefix << num << " => " << "( // __" << to_string(line) << "__ " << comment << "\n";
+		for(TMs::iterator itr = row.begin(); itr != row.end(); itr++){
+			string field = (string) itr->first;
+			string val = (string) itr->second;
+			std::cerr << prefix << "\t[" << field << "]=>" << val << "," << endl;
+		}; std::cerr << prefix << ")\n";
+	} return 1;
+} int mpre(TMs row, string comment, int line){
+	return mpre(row, line, comment);
+}
+
+int mpre(TMMi TAB, int line, string comment = ""){
 	std::cerr << "Array";
-	if(line > 0){
+	if(std::lock_guard<std::recursive_mutex> lock(mu); false){ mpre("ОШИБКА блокировки", __LINE__);
+	}else if(line > 0){
 		std::cerr << "__" << std::to_string(line) << "__";
 	}; std::cerr << "( // " << comment << "\n";
-	//for_each(TABS.begin(), TABS.end(), [&](auto &tab_itr){
+	for(auto itr = TAB.begin(); itr != TAB.end(); itr++){
+		int key = itr->first;
+		TMs row = itr->second;
+		mpre(row, line, comment, "\t", to_string(key));
+	} std::cerr << ")\n";
+	return 1;
+} int mpre(TMMi TAB, string comment, int line){
+	return mpre(TAB, line, comment);
+}
+
+
+int mpre(TMMs& TAB, int line, string comment = ""){
+	std::cerr << "Array";
+	if(std::lock_guard<std::recursive_mutex> lock(mu); false){ mpre("ОШИБКА блокировки", __LINE__);
+	}else if(line > 0){
+		std::cerr << "__" << std::to_string(line) << "__";
+	}; std::cerr << "( // " << comment << "\n";
+	for(auto itr = TAB.begin(); itr != TAB.end(); itr++){
+		string key = itr->first;
+		TMs row = itr->second;
+		mpre(row, line, comment, "\t", key);
+	} std::cerr << ")\n";
+	return 1;
+} int mpre(TMMs TAB, string comment, int line){
+	return mpre(TAB, line, comment);
+}
+
+
+int mpre(TM3i& TABS, int line, string comment = ""){
+	std::cerr << "Array";
+	if(std::lock_guard<std::recursive_mutex> lock(mu); false){ mpre("ОШИБКА блокировки", __LINE__);
+	}else if(line > 0){
+		std::cerr << "__" << std::to_string(line) << "__";
+	}; std::cerr << "( // " << comment << "\n";
 	for(auto &tab_itr:TABS){
-		string keys;
-		if([&](){ keys = tab_itr.first; return false; }()){ mpre("ОШИБКА получения ключа очередного элемента", __LINE__);
+		if(string keys = tab_itr.first; false){ mpre("ОШИБКА получения ключа очередного элемента", __LINE__);
 		}else{
 			std::cerr << "\tArray";
 			if(line > 0){
@@ -80,6 +85,8 @@ int mpre(TM3i& TABS, int line, string comment = ""){
 		}
 	}; std::cerr << ")\n";
 	return 1;
+} int mpre(TM3i TABS, string comment, int line){
+	return mpre(TABS, line, comment);
 }
 
 
