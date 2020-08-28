@@ -1,0 +1,56 @@
+version: '3.4'
+services:
+  nginx:
+    image: proxy
+    ports:
+      - 80:80
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    environment:
+      - LC_ALL=C.UTF-8
+    deploy:
+      replicas: 1
+    restart: always
+  ftp:
+    image: bogem/ftp
+    ports:
+      - 20:20
+      - 21:21
+      - 47400-47470:47400-47470
+    environment:
+      - LC_ALL=C.UTF-8
+      - FTP_USER=bob
+      - FTP_PASS=pass
+      - PASV_ADDRESS=31.134.136.186
+    deploy:
+      replicas: 1
+    restart: always
+  bmf:
+    image: bmf:latest
+    ports:
+      - 1080:80
+    environment:
+      - LC_ALL=C.UTF-8
+    #volumes:
+    #  - "glusterfs:/var/www/html/"
+    command: '/usr/sbin/apache2ctl -D FOREGROUND'
+    deploy:
+      replicas: 1
+    restart: always
+#volumes:
+#  grusterfs:
+#    name: "glusterfs"
+#    driver: glusterfs
+#networks:
+#  default:
+#    external:
+#      name: nginx
+#instances:
+#  - name: bmf
+#    dns:
+#      - bmf
+#      - localhost
+#    ip:
+#      - 127.0.0.1
+
+
