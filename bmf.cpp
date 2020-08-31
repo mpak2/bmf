@@ -740,16 +740,19 @@ int main(int argc, char **argv){
 						}else if(_DANO.end() == _DANO.find(dano_itr.first)){ mpre("Уже удален " +dano.at("id"), __LINE__);
 						}else if(dano.end() == dano.find("values")){ mpre("ОШИБКА в исходнике не найдена история", __LINE__);
 						}else if(string values = dano.at("values"); (0 >= values.length())){ mpre("ОШИБКА выборки истории исходника", __LINE__);
-						}else if(int len = values.length(); (0 > len)){ mpre("Пропуск расчетов", __LINE__);
+						}else if(int len = values.length(); (0 >= len)){ mpre("Пропуск расчетов", __LINE__);
 						}else if(bool erase = [&](){ // Удаление неподходящего по длинне исходника
 							if(pos < len){ //mpre("Позиция символа в пределах истории pos="+ to_string(pos) +" len="+ to_string(len), __LINE__);
 							}else if(_DANO.erase(dano_itr.first); false){ mpre("ОШИБКА удаления короткого значения истории", __LINE__);
 							}else{ //mpre("Удаляем исходник с короткой историей " +dano.at("id"), __LINE__);
-							} return false; }()){ mpre("ОШИБКА удаления исходника по длинне "+ dano.at("id"), __LINE__);
+								return true;
+							} return false; }()){ mpre("Удаления исходника по длинне "+ dano.at("id"), __LINE__);
 						}else if(1 >= _DANO.size()){ //mpre("Не удаляем последнее значение", __LINE__);
 						}else if([&](){
 							if(string char_last = values.substr(len -1, 1); (1 != char_last.length())){ mpre("ОШИБКА получения последнего символа", __LINE__);
+			//}else if(mpre("Проверка len=" +to_string(len) +" pos=" +to_string(pos), __LINE__); false){ mpre("ОШИБКА отображения уведомления", __LINE__);
 							}else if(string char_cur = values.substr(len -pos -1, 1); (1 != char_cur.length())){ mpre("ОШИБКА получения текущего символа", __LINE__);
+			//}else if(mpre("Проверка2", __LINE__); false){ mpre("ОШИБКА отображения уведомления", __LINE__);
 							}else if(char_last != char_cur){ //mpre("Подходящее значение", __LINE__);
 							}else if(_DANO.erase(dano_itr.first); false){ mpre("ОШИБКА удаления короткого значения истории", __LINE__);
 							}else{
@@ -1233,13 +1236,15 @@ int main(int argc, char **argv){
 						}else if(stairs.end() == stairs.find("val")){ mpre("ОШИБКА Расчет не задан. Не создаем морф", __LINE__);
 						}else if(transfer.end() == transfer.find("promise")){ mpre("Не расширяем так как не задано обещание", __LINE__);
 						}else if(dano.end() == dano.find("val")){ mpre("ОШИБКА исходник не содержит значения", __LINE__);
-						//}else if(TMs _dano = Choice(index, dano.at("val"), _BMF_DANO_EX, _BMF_ITOG_EX); _dano.empty()){ mpre("ОШИБКА выборки из подходящих сигналов", __LINE__);
-						}else if(TMs _dano = [&](TMs _dano = {}){ // Выбор исходника
+						//}else if(mpre("Проверка1", __LINE__); false){ mpre("ОШИБКА отображения уведомления", __LINE__);
+						}else if(TMs _dano = Choice(index, dano.at("val"), _BMF_DANO_EX, _BMF_ITOG_EX); _dano.empty()){ mpre("ОШИБКА выборки из подходящих сигналов", __LINE__);
+						/*}else if(TMs _dano = [&](TMs _dano = {}){ // Выбор исходника
 							if("" == transfer.at("other_id")){ _dano = Choice(index, dano.at("val"), _BMF_DANO_EX, _BMF_ITOG_EX);
 							}else if(_index = erb(BMF_INDEX_EX, {{"id", transfer.at("other_id")}}); _index.empty()){ mpre("ОШИБКА выборки смежного морфа", __LINE__);
 							}else if(_dano = erb(_BMF_DANO_EX, {{"id", _index.at("dano_id")}}); _dano.empty()){ mpre("ОШИБКА выборки исходного значения", __LINE__);
 							}else{ mpre(_dano, "Выбор исходника по смежному", __LINE__);
-							} return _dano; }(); _dano.empty()){ mpre("ОШИБКА исходник не выбран", __LINE__);
+							} return _dano; }(); _dano.empty()){ mpre("ОШИБКА исходник не выбран", __LINE__);*/
+						//}else if(mpre("Проверка2", __LINE__); false){ mpre("ОШИБКА отображения уведомления", __LINE__);
 						}else if(string depth = to_string(stoi(index.at("depth"))+1); (0 >= depth.length())){ mpre("ОШИБКА расчета глубины нового морфа", __LINE__);
 						}else if(transfer.end() == transfer.find("field")){ mpre("ОШИБКА не указано поле дальнейшего перехода", __LINE__);
 						}else if(string calc_pos_id = ("index_id" == transfer.at("field") ? "0" : "3"); (1 != calc_pos_id.length())){ mpre("ОШИБКА расчета позиции", __LINE__);
