@@ -12,8 +12,8 @@ sqlite3 ./3 -column -header "SELECT * FROM mp_bmf_index ORDER BY id DESC"
 #./bimorph ./3 -j '[{"dano":{"Один":"0", "Два":"0", "Три":"0"}}]'
 
 #cat clump/iris.json | ./bimorph - clump/iris.sqlite -c -e 100
-#sqlite clump/iris.sqlite -column -header "SELECT * FROM mp_bmf_test ORDER BY id DESC LIMIT 10; -- SELECT COUNT(*) as step, SUM(change) as SumChange, MAX(bmf) as bmf FROM mp_bmf_test WHERE perc<10;"
-#sqlite clump/iris.sqlite -column -header "SELECT MAX(depth) FROM mp_bmf_index"
+#sqlite3 clump/iris.sqlite -column -header "SELECT * FROM mp_bmf_test ORDER BY id DESC LIMIT 10; -- SELECT COUNT(*) as step, SUM(change) as SumChange, MAX(bmf) as bmf FROM mp_bmf_test WHERE perc<10;"
+#sqlite3 clump/iris.sqlite -column -header "SELECT MAX(depth) FROM mp_bmf_index"
 #./bimorph clump/iris.sqlite -j '[{"dano":{"ДлиннаЧашелистика":"2.0","ШиринаЧашелистика":"4.0","ДлиннаЛепестка":"1.8","ШиринаЛепестка":"1.8"}}]'
 
 #cat clump/crc8.json | ./bimorph - clump/crc8.sqlite -c -r 0 -t 8
