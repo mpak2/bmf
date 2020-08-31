@@ -1187,7 +1187,7 @@ int main(int argc, char **argv){
 							if(string::npos != stairs.at("status").find_last_not_of("34")){ //mpre("Обучаем только на 3 и 4 этапе", __LINE__);
 							}else if(stairs.end() == stairs.find("val")){ mpre("ОШИБКА Расчет еще не произведен при выборе направления", __LINE__);
 							}else if(dano.end() == dano.find("val")){ mpre("ОШИБКА у исходного значения не установлен статус", __LINE__);
-							}else if(string mask = "1232113211321232"; (16 > mask.length())){ mpre("ОШИБКА формирования маски переходов", __LINE__);
+							}else if(string mask = "1132123211321232"; (16 > mask.length())){ mpre("ОШИБКА формирования маски переходов", __LINE__);
 							}else if(index.end() == index.find("calc_pos_id")){ mpre("ОШИБКА в морфе не указана позиция", __LINE__);
 							}else if(int calc_pos_id = atoi(index.at("calc_pos_id").c_str()); (0 > calc_pos_id)){ mpre("ОШИБКА формата позисии морфа", __LINE__);
 							}else if(string key = [&](string key = ""){ // Расчет позиции маски
@@ -1216,7 +1216,7 @@ int main(int argc, char **argv){
 								}else if(string calc = ("3" == stairs["status"] ? "1" : "0"); (1 != calc.length())){ mpre("ОШИБКА получения значения расчетов", __LINE__);
 								}else if(string val = (stairs["learn_" +calc].length() ? stairs["learn_" +calc] : stairs["calc_" +calc]); (1 != val.length())){ mpre("ОШИБКА получения текущего значения", __LINE__);
 								}else if(transfer["promise"] = ("1" == val ? "0" : "1"); (1 != transfer["promise"].length())){ mpre("ОШИБКА получения обновленного обещания", __LINE__);
-								}else{ mpre(stairs, "Ступень", __LINE__); mpre("Направление обучения " +index.at("id") +" > " +transfer.at("next_id") +" " +transfer.at("field") + " promise=" +transfer.at("promise"), __LINE__); mpre("Установка требований к нижестоящей ветви", __LINE__);
+								}else{ //mpre(stairs, "Ступень", __LINE__); mpre("Направление обучения " +index.at("id") +" > " +transfer.at("next_id") +" " +transfer.at("field") + " promise=" +transfer.at("promise"), __LINE__); mpre("Установка требований к нижестоящей ветви", __LINE__);
 								} return false; }()){ mpre("ОШИБКА установки требований к обучению", __LINE__);
 							}else{ //mpre(transfer, "Направление", __LINE__);
 							} return false; }()){ mpre("ОШИБКА выборки направления расчета", __LINE__);
@@ -1495,7 +1495,7 @@ int main(int argc, char **argv){
 							if(stairs.end() == stairs.find("promise")){ //mpre("Обещание в ступени установлено", __LINE__);
 							}else if(stairs.end() == stairs.find("val")){ mpre("ОШИБКА значение в ступени не задано", __LINE__);
 							}else if(stairs.at("promise") == stairs.at("val")){ //mpre("Обещаяние выполнено", __LINE__);
-							}else{ Tree(bmf_index, _BMF_DANO_EX); mpre(index, "Морф", __LINE__); mpre(stairs, "Ступень", __LINE__); mpre("ОШИБКА обещание ступени не выполнено " +index.at("id"), __LINE__);
+							}else{ //Tree(bmf_index, _BMF_DANO_EX); mpre(index, "Морф", __LINE__); mpre(stairs, "Ступень", __LINE__); mpre("ОШИБКА обещание ступени не выполнено " +index.at("id"), __LINE__);
 							} return false; }()){ mpre("ОШИБКА проверки равенства результата и обещания", __LINE__);
 						}else if(STAIRS.erase(stairs_itr->first); false){ mpre("Окончание пустая лестница", __LINE__);
 						}else{ //mpre("Удаление ступени с лестницы id=" +stairs.at("id") +" status=" +stairs.at("status"), __LINE__);
@@ -1547,9 +1547,9 @@ int main(int argc, char **argv){
 				}else if(mpre("Расчет "+ itog.at("id")+ " "+ values.at("name")+ " ("+ itog.at("name")+ ") index["+ index.at("id")+ "]="+ itog.at("val")+ " "+ _val , __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
 				}else if(0 >= _val.length()){ mpre("ОШИБКА формат расчета не верный "+ _val, __LINE__);
 				}else if(string val = _val.substr(_val.length()-1, 1); (1 != val.length())){ mpre("ОШИБКА получения результатов расчета", __LINE__);
-				}else if(val != itog.at("val")){ Tree(index, _BMF_DANO_EX); mpre("ОШИБКА обещанный результат не совпал с ожидаемым "+ itog.at("val")+ " val=" +val +" _val=" +_val, __LINE__);
+				}else if(val != itog.at("val")){// Tree(index, _BMF_DANO_EX); mpre("ОШИБКА обещанный результат не совпал с ожидаемым "+ itog.at("val")+ " val=" +val +" _val=" +_val, __LINE__);
 				}else if(change += (2 <= _val.length() ? 1 : 0); false){ mpre("ОШИБКА установки изменения", __LINE__);
-				}else{ Tree(index, _BMF_DANO_EX); //mpre(BMF_INDEX_EX.at(""), __LINE__, "Справочник"); mpre(BMF_DANO_EX.at(""), __LINE__, "Справочник"); mpre("ОШИБКА тест "+ itog["val"]+ " "+ _val+ " count="+ to_string(BMF_INDEX_EX.at("").size()), __LINE__);
+				}else{ //Tree(index, _BMF_DANO_EX); //mpre(BMF_INDEX_EX.at(""), __LINE__, "Справочник"); mpre(BMF_DANO_EX.at(""), __LINE__, "Справочник"); mpre("ОШИБКА тест "+ itog["val"]+ " "+ _val+ " count="+ to_string(BMF_INDEX_EX.at("").size()), __LINE__);
 				} return false; }()){ mpre("ОШИБКА обучения морфа", __LINE__);
 			}else{ //mpre("Окончание обучения морфа "+ itog["name"], __LINE__); //system("sleep 0.5");
 			} return change; }); false){ mpre("ОШИБКА устанвоки функции расчета итога", __LINE__);
