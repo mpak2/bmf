@@ -1086,7 +1086,7 @@ int main(int argc, char **argv){
 				//}else if(stairs["learn"] = ""; false){ mpre("ОШИБКА установки признака обучения", __LINE__);
 				}else if(STAIRS.insert(make_pair(STAIRS.size(), stairs)); STAIRS.empty()){ mpre("ОШИБКА устанвоки первоначального значения лестнице", __LINE__);
 				}else if(bmf_index.empty()){ mpre("ОШИБКА входное значение лестницы пусто", __LINE__);
-				}else{ //mpre("Установка требований к лестнице promise="+ val, __LINE__);
+				}else{ mpre("Установка требований к лестнице promise="+ val, __LINE__);
 				} return STAIRS; }(); STAIRS.empty()){ mpre("ОШИБКА установки первоначального значения лестницы", __LINE__);
 			}else if([&](){ do{ //mpre("Повтор "+ to_string(rep), __LINE__); // Ступени расчета
 					if(STAIRS.empty()){ mpre("ОШИБКА лестница пуста", __LINE__);
@@ -1136,6 +1136,35 @@ int main(int argc, char **argv){
 						}else if(stairs.end() != stairs.find("calc_"+ status)){ mpre("ОШИБКА поле расчета уже задано у ступени calc_"+ status, __LINE__);
 						}else{ //mpre("СТАТУС id=" +stairs.at("id") + " status=" +stairs.at("status"), __LINE__); //mpre(stairs["index_id"]+ " Статус STAIRS["+ to_string(size-1)+ "] status="+ stairs["status"]+ (stairs.end() == stairs.find("promise") ? "" : " promise="+ stairs["promise"])+ (stairs.end() == stairs.find("learn") ? "" : " learn="+ stairs["learn"]), __LINE__);
 						} return (string::npos != stairs.at("status").find_last_not_of("1234567890")); }()){ mpre("ОШИБКА установки состояния", __LINE__);
+					}else if([&](string val = ""){ // Расчет значения морфа
+						if(index.end() == index.find("dano_id")){ mpre("ОШИБКА ссылка на исходное значение не указана", __LINE__);
+						}else if(string dano_id = (index.at("dano_id")); (0 >= dano_id.length())){ mpre("ОШИБКА идентификатор исходного значения не указан", __LINE__);
+						}else if(string calc_1 = (stairs["learn_1"].length() ? stairs["learn_1"] : stairs["calc_1"]); false){ mpre("ОШИБКА получения значения старшего морфа", __LINE__);
+						}else if(string calc_0 = (stairs["learn_0"].length() ? stairs["learn_0"] : stairs["calc_0"]); false){ mpre("ОШИБКА получения значения младшего морфа", __LINE__);
+						}else if(int calc_pos_id = atoi(index["calc_pos_id"].c_str()); (0 > calc_pos_id)){ mpre("ОШИБКА формата позисии морфа", __LINE__);
+						}else if([&](){ // Расчет результата по одному направлению
+							if(string::npos != stairs.at("status").find_last_not_of("2")){ //mpre("Только для первого статуса", __LINE__);
+							}else if(stairs["calc_1"].length() == stairs["calc_0"].length()){ mpre("ОШИБКА размер значений одинаковый", __LINE__);
+							}else if(string calc = (stairs["calc_1"].length() ? "1" : "0"); (1 != calc.length())){ mpre("ОШИБКА получения поля значения", __LINE__);
+							}else if(string _val = stairs["calc_" +calc]; (1 != _val.length())){ mpre("ОШИБКА получения значения", __LINE__);
+							}else if(bool sign = calc == _val; false){ mpre("ОШИБКА получения совпадения сигнала", __LINE__);
+							}else if(bool pos = calc_pos_id&2 == calc_pos_id&1; false){ mpre("ОШИБКА расчета совпадения позиции", __LINE__);
+							}else if(sign == pos){ //mpre("Не можем вычислить значение по одной позиции calc_pos_id=" +to_string(calc_pos_id) +" calc_1=" +calc_1 +" calc_0=" +calc_0, __LINE__);
+							}else if(val = (calc_pos_id&1 ? "1" : "0"); (1 != val.length())){ mpre("ОШИБКА расчета значения", __LINE__);
+							}else if(stairs_itr->second["val"] = stairs["val"] = val; (1 != stairs["val"].length())){ mpre("ОШИБКА расчета значения", __LINE__);
+							}else{ mpre("Расчет результата по одному значению id=" + index.at("id")+ " calc_pos_id=" +to_string(calc_pos_id) +" calc_"+ calc+ "=" +_val, __LINE__);
+							} return false; }()){ mpre("Результат расчитан по одному значению", __LINE__);
+						}else if([&](){ // Расчет по двум значениям
+							if(string::npos != stairs.at("status").find_last_not_of("345")){ //mpre("Только для первого статуса", __LINE__);
+							}else if(string sign = (calc_pos_id&1 ? "1" : "0"); (1 != sign.length())){ mpre("ОШИБКА расчета общего сигнала", __LINE__);
+							}else if(string shift = ("1" == sign ? "0" : "1"); (1 !=shift.length())){ mpre("ОШИБКА расчета исключительного сигнала", __LINE__);
+							}else if(string vals = ((calc_pos_id&2 == calc_pos_id&1) ? "10" : "01"); (2 != vals.length())){ mpre("ОШИБКА получения исключительных значений", __LINE__);
+							}else if(val = (vals == calc_1 +calc_0 ? shift : sign); (1 != val.length())){ mpre("ОШИБКА получения результата расчетов", __LINE__);
+							}else if(stairs_itr->second["val"] = stairs["val"] = val; (1 != stairs["val"].length())){ mpre("ОШИБКА расчета значения", __LINE__);
+							}else{ mpre("Расчет результата по двум значениям id=" + index.at("id")+ " calc_pos_id=" + to_string(calc_pos_id) +" calc_1=" +calc_1 +" calc_0=" +calc_0 +" sign=" +sign +" vals=" +vals +" val=" +val, __LINE__);
+							} return false; }()){ mpre("ОШИБКА расчета результата", __LINE__);
+						}else{ //mpre("Итоговый расчет результата " +val, __LINE__);
+						} return false; }()){ mpre("ОШИБКА расчета значения морфа", __LINE__);
 					}else if(TMs transfer = [&](TMs transfer = {}){ // Расчет направления
 						if(false){ mpre("Пропуск выбора направления для расчета", __LINE__);
 						//}else if(string calc = "calc_"+ stairs.at("status"); (0 >= calc.length())){ mpre("ОШИБКА расчета поля статуса", __LINE__);
@@ -1146,13 +1175,13 @@ int main(int argc, char **argv){
 							}else if(int depth_1 = (index_1.end() == index_1.find("depth") ? 0 : atoi(index_1.at("depth").c_str())); (0 > depth_1)){ mpre("ОШИБКА не указана глубина ветвей", __LINE__);
 							}else if(int depth_0 = (index_0.end() == index_0.find("depth") ? 0 : atoi(index_0.at("depth").c_str())); (0 > depth_0)){ mpre("ОШИБКА не указана глубина ветвей", __LINE__);
 							}else if(transfer = (depth_1 < depth_0 ? transfer_1 : transfer_0); transfer.empty()){ mpre("ОШИБКА установки перехода", __LINE__);
-							}else{ //mpre("Выбор направления первого расчета " +to_string(depth_1) +" <=> " +to_string(depth_0) +" " +transfer.at("field"), __LINE__);
+							}else{ mpre("Выбор направления первого расчета " +index.at("id") +" > " +transfer.at("next_id") +" " +to_string(depth_1) +" <=> " +to_string(depth_0) +" " +transfer.at("field"), __LINE__);
 							} return false; }()){ mpre("ОШИБКА выбора направления первого расчета", __LINE__);
 						}else if([&](){ // Выбор направления второго расчета
 							if(string::npos != stairs.at("status").find_last_not_of("2")){ //mpre("Расчитываем только на 1 и 2 этапе", __LINE__);
 							}else if(string calc = (stairs["calc_1"].length() ? "1" : "0"); (1 != calc.length())){ mpre("ОШИБКА выборки расчитанного направления", __LINE__);
 							}else if(transfer = ("0" == calc ? transfer_1 : transfer_0); transfer.empty()){ mpre("ОШИБКА определения второго направления", __LINE__);
-							}else{ //mpre("Выбор направления второго расчета calc_" +calc +"=" +stairs["calc_" +calc] +" " +transfer.at("field"), __LINE__);
+							}else{ mpre("Выбор направления второго расчета " +index.at("id") +" > " +transfer.at("next_id") +" calc_" +calc +"=" +stairs["calc_" +calc] +" " +transfer.at("field"), __LINE__);
 							} return false; }()){ mpre("ОШИБКА выбора направления второго расчета", __LINE__);
 						}else if([&](){ // Выбор направления обучения
 							if(string::npos != stairs.at("status").find_last_not_of("34")){ //mpre("Обучаем только на 3 и 4 этапе", __LINE__);
@@ -1161,20 +1190,21 @@ int main(int argc, char **argv){
 							}else if(string mask = "1232113211321232"; (16 > mask.length())){ mpre("ОШИБКА формирования маски переходов", __LINE__);
 							}else if(index.end() == index.find("calc_pos_id")){ mpre("ОШИБКА в морфе не указана позиция", __LINE__);
 							}else if(int calc_pos_id = atoi(index.at("calc_pos_id").c_str()); (0 > calc_pos_id)){ mpre("ОШИБКА формата позисии морфа", __LINE__);
-							}else if(int pos = [&](int pos = 0){ // Расчет позиции маски
+							}else if(string key = [&](string key = ""){ // Расчет позиции маски
 								if(int dano_val = atoi(dano.at("val").c_str()); (0 > dano_val)){ mpre("ОШИБКА расчета ключа значения", __LINE__);
-								}else if(int val_1 = atoi(stairs.at("calc_1").c_str()); (0 > val_1)){ mpre("ОШИБКА расчета ключа значения", __LINE__);
-								}else if(int val_0 = atoi(stairs.at("calc_0").c_str()); (0 > val_0)){ mpre("ОШИБКА расчета ключа значения", __LINE__);
-								}else if(pos = ((calc_pos_id&1)<<3) +(dano_val<<2) +(val_1<<1) +val_0; (0 > pos)){ mpre("ОШИБКА расчета позиции маски", __LINE__);
-								}else{ //mpre("Позиция в маске "+ to_string(pos), __LINE__);
-								} return pos; }(); (0 > pos)){ mpre("ОШИБКА расчета позиции маски", __LINE__);
-							}else if(string key = mask.substr(pos, 1); (1 != key.length())){ mpre("ОШИБКА получения ключа направления", __LINE__);
+								}else if(string calc_1 = (stairs["learn_1"].length() ? stairs["learn_1"] : stairs["calc_1"]); (1 != calc_1.length())){ mpre("ОШИБКА выборки значения старшей сети", __LINE__);
+								}else if(string calc_0 = (stairs["learn_0"].length() ? stairs["learn_0"] : stairs["calc_0"]); (1 != calc_0.length())){ mpre("ОШИБКА выборки значения старшей сети", __LINE__);
+								}else if(int val_1 = atoi(calc_1.c_str()); (0 > val_1)){ mpre("ОШИБКА расчета ключа значения", __LINE__);
+								}else if(int val_0 = atoi(calc_0.c_str()); (0 > val_0)){ mpre("ОШИБКА расчета ключа значения", __LINE__);
+								}else if(int pos = ((calc_pos_id&1)<<3) +(dano_val<<2) +(val_1<<1) +val_0; (0 > pos)){ mpre("ОШИБКА расчета позиции маски", __LINE__);
+								}else if(key = mask.substr(pos, 1); (1 != key.length())){ mpre("ОШИБКА получения ключа направления", __LINE__);
+								}else{ mpre("Выбор по маске " +index.at("id") +" status=" +stairs.at("status") +" " +mask +" calc_pos_id=" +to_string(calc_pos_id) +" dano_val=" +to_string(dano_val) +" val_1=" +to_string(val_1) +" val_0=" +to_string(val_0) + " > " +key +"("+ to_string(pos) +")", __LINE__);
+								} return key; }(); (1 != key.length())){ mpre("ОШИБКА расчета позиции маски", __LINE__);
 							}else if(TMs _transfer = ("3" == stairs.at("status") ? transfer_1 : transfer_0); _transfer.empty()){ mpre("ОШИБКА установки направления обучения", __LINE__);
 							}else if(int bit = ("3" == stairs.at("status") ? 2 : 1); (0 > bit)){ mpre("ОШИБКА выборки бита маски", __LINE__);
-							}else if(string calc = ("3" == stairs["status"] ? "calc_1" : "calc_0"); (6 != calc.length())){ mpre("ОШИБКА получения значения расчетов", __LINE__);
 							}else if([&](){ // Проверка соответствия обещаний результатам
 								if(stairs.end() == stairs.find("promise")){ //mpre("Обещания к ступени не установлены", __LINE__);
-								}else if(stairs["val"] == stairs["promise"]){ //mpre("Результаты совпадают", __LINE__);
+								}else if(stairs["val"] == stairs["promise"]){ mpre("Результаты совпадают " +index.at("id") +" val="+ stairs.at("val"), __LINE__);
 								}else if(transfer = (atoi(key.c_str())&bit ? _transfer : transfer); false){ mpre("ОШИБКА выборки направления по биту маски", __LINE__);
 								}else{ //mpre(transfer, "Направление", __LINE__); mpre("Установка направления для обучения", __LINE__); //mpre("ОШИБКА установки направления обучения", __LINE__); //mpre(stairs, "Ступень calc_pos_id=" +index.at("calc_pos_id") + " dano=" + dano.at("val")+ " calc_1=" + to_string(val_1)+ " calc_0=" +to_string(val_0) +" mask=" +mask +" val=" +val +" shift=" +shift, __LINE__); mpre(transfer, "Направление обучения", __LINE__); //mpre("ОШИБКА Установка требований", __LINE__);
 								} return false; }()){ mpre("ОШИБКА установки обещания", __LINE__);
@@ -1182,8 +1212,11 @@ int main(int argc, char **argv){
 								if(transfer.empty()){ //mpre("Направление не задано", __LINE__);
 								}else if(stairs.end() == stairs.find("promise")){ mpre("Обещание у ступени не задано", __LINE__);
 								}else if(1 != stairs.at("promise").length()){ mpre(stairs, "Ступень", __LINE__); mpre("ОШИБКА формат обещания указан не верно", __LINE__);
-								}else if(transfer["promise"] = ("1" == stairs[calc] ? "0" : "1"); (1 != val.length())){ mpre("ОШИБКА получения обновленного обещания", __LINE__);
-								}else{ //mpre(transfer, "Направление", __LINE__); mpre("Установка требований к нижестоящей ветви", __LINE__);
+								//}else if(transfer["promise"] = ("1" == transfer["calc"] ? "0" : "1"); (1 != transfer["promise"].length())){ mpre("ОШИБКА расчета обещания", __LINE__);
+								}else if(string calc = ("3" == stairs["status"] ? "1" : "0"); (1 != calc.length())){ mpre("ОШИБКА получения значения расчетов", __LINE__);
+								}else if(string val = (stairs["learn_" +calc].length() ? stairs["learn_" +calc] : stairs["calc_" +calc]); (1 != val.length())){ mpre("ОШИБКА получения текущего значения", __LINE__);
+								}else if(transfer["promise"] = ("1" == val ? "0" : "1"); (1 != transfer["promise"].length())){ mpre("ОШИБКА получения обновленного обещания", __LINE__);
+								}else{ mpre(stairs, "Ступень", __LINE__); mpre("Направление обучения " +index.at("id") +" > " +transfer.at("next_id") +" " +transfer.at("field") + " promise=" +transfer.at("promise"), __LINE__); mpre("Установка требований к нижестоящей ветви", __LINE__);
 								} return false; }()){ mpre("ОШИБКА установки требований к обучению", __LINE__);
 							}else{ //mpre(transfer, "Направление", __LINE__);
 							} return false; }()){ mpre("ОШИБКА выборки направления расчета", __LINE__);
@@ -1191,12 +1224,22 @@ int main(int argc, char **argv){
 						} return transfer; }(); false){ mpre("ОШИБКА расчета направления перехода", __LINE__);
 					}else if(TMs _index = [&](TMs _index = {}){ // Добавление нового морфа
 						if(string::npos != stairs.at("status").find_last_not_of("34")){ //mpre("Расчитываем только на 3 и 4 этапе", __LINE__);
-						}else if(transfer.end() == transfer.find("next_id")){ //mpre("В направлении не задан следующий переход", __LINE__);
-						}else if("" != transfer.at("next_id")){ mpre("Следующий элемент для перехода не пуст", __LINE__);
+						}else if(transfer.end() == transfer.find("next_id")){ //mpre("В направлении не задан следующий переход id="+ index.at("id"), __LINE__);
+						//}else if("" != transfer.at("next_id")){ mpre("Следующий элемент для перехода не пуст", __LINE__);
+						}else if(transfer.end() == transfer.find("field")){ mpre("ОШИБКА поле перехода не установлено", __LINE__);
+						}else if(string field = transfer.at("field"); (0 >= field.length())){ mpre("ОШИБКА выборки поля перехода", __LINE__);
+						}else if(index.end() == index.find(field)){ mpre("ОШИБКА у морфа не найдено поле перехода", __LINE__);
+						}else if("" != index.at(field)){ mpre("Поле перехода уже заполнено не обновляем", __LINE__);
 						}else if(stairs.end() == stairs.find("val")){ mpre("ОШИБКА Расчет не задан. Не создаем морф", __LINE__);
 						}else if(transfer.end() == transfer.find("promise")){ mpre("Не расширяем так как не задано обещание", __LINE__);
 						}else if(dano.end() == dano.find("val")){ mpre("ОШИБКА исходник не содержит значения", __LINE__);
-						}else if(TMs _dano = Choice(index, dano.at("val"), _BMF_DANO_EX, _BMF_ITOG_EX); _dano.empty()){ mpre("ОШИБКА выборки из подходящих сигналов", __LINE__);
+						//}else if(TMs _dano = Choice(index, dano.at("val"), _BMF_DANO_EX, _BMF_ITOG_EX); _dano.empty()){ mpre("ОШИБКА выборки из подходящих сигналов", __LINE__);
+						}else if(TMs _dano = [&](TMs _dano = {}){ // Выбор исходника
+							if("" == transfer.at("other_id")){ _dano = Choice(index, dano.at("val"), _BMF_DANO_EX, _BMF_ITOG_EX);
+							}else if(_index = erb(BMF_INDEX_EX, {{"id", transfer.at("other_id")}}); _index.empty()){ mpre("ОШИБКА выборки смежного морфа", __LINE__);
+							}else if(_dano = erb(_BMF_DANO_EX, {{"id", _index.at("dano_id")}}); _dano.empty()){ mpre("ОШИБКА выборки исходного значения", __LINE__);
+							}else{ mpre(_dano, "Выбор исходника по смежному", __LINE__);
+							} return _dano; }(); _dano.empty()){ mpre("ОШИБКА исходник не выбран", __LINE__);
 						}else if(string depth = to_string(stoi(index.at("depth"))+1); (0 >= depth.length())){ mpre("ОШИБКА расчета глубины нового морфа", __LINE__);
 						}else if(transfer.end() == transfer.find("field")){ mpre("ОШИБКА не указано поле дальнейшего перехода", __LINE__);
 						}else if(string calc_pos_id = ("index_id" == transfer.at("field") ? "0" : "3"); (1 != calc_pos_id.length())){ mpre("ОШИБКА расчета позиции", __LINE__);
@@ -1213,7 +1256,7 @@ int main(int argc, char **argv){
 						}else if(string _calc = ("3" == stairs["status"] ? "calc_1" : "calc_0"); (6 != _calc.length())){ mpre("ОШИБКА расчета поля результата", __LINE__);
 						}else if(stairs_itr->second[_calc] = stairs[_calc] = _val; (1 != stairs.at(calc).length())){ mpre("ОШИБКА установки нового значения морфа", __LINE__);
 						}else if(stairs_itr->second["revision"] = stairs["revision"] = "+"; (1 != stairs.at(calc).length())){ mpre("ОШИБКА установки доп информации по обучению", __LINE__);
-						}else{ //mpre("Добавление нового морфа " +index.at("id") +" > "+ _index.at("id") + " _calc=" +_calc +" val=" +_val, __LINE__); //mpre(index, "Морф", __LINE__); mpre(stairs, "Ступень", __LINE__);
+						}else{ mpre("Добавление нового морфа " +index.at("id") +" > "+ _index.at("id") + " _calc=" +_calc +" val=" +_val, __LINE__); //mpre(index, "Морф", __LINE__); mpre(stairs, "Ступень", __LINE__);
 						} return _index; }(); false){ mpre("ОШИБКА добавления морфа", __LINE__);
 					}else if([&](){
 						/*if(false){
@@ -1416,64 +1459,44 @@ int main(int argc, char **argv){
 						}else if(stairs_itr->second[calc] = stairs[calc] = dano.at("val"); (1 != stairs.at(calc).length())){ mpre("ОШИБКА расчета значения", __LINE__);
 						}else{ //mpre("Устанавливаем значение из нижестоящего " +calc +"=" +stairs.at(calc) +" dano_id=" +dano.at("id"), __LINE__);
 						} return false; }()){ mpre("ОШИБКА подстановки собственных значений", __LINE__);
-					}else if([&](string val = ""){ // Расчет значения морфа
-						if(index.end() == index.find("dano_id")){ mpre("ОШИБКА ссылка на исходное значение не указана", __LINE__);
-						}else if(string dano_id = (index.at("dano_id")); (0 >= dano_id.length())){ mpre("ОШИБКА идентификатор исходного значения не указан", __LINE__);
-						}else if(string calc_1 = stairs["calc_1"]; false){ mpre("ОШИБКА получения значения старшего морфа", __LINE__);
-						}else if(string calc_0 = stairs["calc_0"]; false){ mpre("ОШИБКА получения значения младшего морфа", __LINE__);
-						}else if(int calc_pos_id = atoi(index["calc_pos_id"].c_str()); (0 > calc_pos_id)){ mpre("ОШИБКА формата позисии морфа", __LINE__);
-						}else if([&](){ // Расчет результата по одному направлению
-							if(string::npos != stairs.at("status").find_last_not_of("1")){ //mpre("Только для первого статуса", __LINE__);
-							}else if(stairs["calc_1"].length() == stairs["calc_0"].length()){ mpre("ОШИБКА размер значений одинаковый", __LINE__);
-							}else if(string calc = (stairs["calc_1"].length() ? "1" : "0"); (1 != calc.length())){ mpre("ОШИБКА получения поля значения", __LINE__);
-							}else if(string _val = stairs["calc_" +calc]; (1 != _val.length())){ mpre("ОШИБКА получения значения", __LINE__);
-							}else if(bool sign = calc == _val; false){ mpre("ОШИБКА получения совпадения сигнала", __LINE__);
-							}else if(bool pos = calc_pos_id&2 == calc_pos_id&1; false){ mpre("ОШИБКА расчета совпадения позиции", __LINE__);
-							}else if(sign == pos){ //mpre("Не можем вычислить значение по одной позиции calc_pos_id=" +to_string(calc_pos_id) +" calc_1=" +calc_1 +" calc_0=" +calc_0, __LINE__);
-							}else if(val = (calc_pos_id&1 ? "1" : "0"); (1 != val.length())){ mpre("ОШИБКА расчета значения", __LINE__);
-							}else if(stairs_itr->second["val"] = stairs["val"] = val; (1 != stairs["val"].length())){ mpre("ОШИБКА расчета значения", __LINE__);
-							}else{ //mpre("Расчет результата по одному значению calc_pos_id=" +to_string(calc_pos_id) +" calc_"+ calc+ "=" +_val, __LINE__);
-							} return false; }()){ mpre("Результат расчитан по одному значению", __LINE__);
-						}else if([&](){ // Расчет по двум значениям
-							if(string::npos != stairs.at("status").find_last_not_of("2345")){ //mpre("Только для первого статуса", __LINE__);
-							}else if(string sign = (calc_pos_id&1 ? "1" : "0"); (1 != sign.length())){ mpre("ОШИБКА расчета общего сигнала", __LINE__);
-							}else if(string shift = ("1" == sign ? "0" : "1"); (1 !=shift.length())){ mpre("ОШИБКА расчета исключительного сигнала", __LINE__);
-							}else if(string vals = ((calc_pos_id&2 == calc_pos_id&1) ? "10" : "01"); (2 != vals.length())){ mpre("ОШИБКА получения исключительных значений", __LINE__);
-							}else if(val = (vals == calc_1 +calc_0 ? shift : sign); (1 != val.length())){ mpre("ОШИБКА получения результата расчетов", __LINE__);
-							}else if(stairs_itr->second["val"] = stairs["val"] = val; (1 != stairs["val"].length())){ mpre("ОШИБКА расчета значения", __LINE__);
-							}else{ //mpre("Расчет результата по двум значениям calc_pos_id=" + to_string(calc_pos_id) +" calc_1=" +calc_1 +" calc_0=" +calc_0 +" sign=" +sign +" vals=" +vals +" val=" +val, __LINE__);
-							} return false; }()){ mpre("ОШИБКА расчета результата", __LINE__);
-						}else{ //mpre("Итоговый расчет результата " +val, __LINE__);
-						} return false; }()){ mpre("ОШИБКА расчета значения морфа", __LINE__);
 					}else if(TMs stairs_next = [&](TMs stairs_next = {}){ // Добавление новой ступени
 						if(!_index.empty()){ //mpre("Пропуск добавления ступени морф уже добавлен", __LINE__);
 						}else if(transfer.end() == transfer.find("next_id")){ //mpre("Ступень не добавляем не указан следующий морф", __LINE__);
 						}else if("" == transfer.at("next_id")){ //mpre("Не добавляем пустую ветвь", __LINE__);
-						}else if(stairs_next = {{"id", transfer.at("next_id")}}; stairs_next.empty()){ mpre("ОШИБКА установки формирования ступени", __LINE__);
+						}else if(stairs_next = {{"id", transfer.at("next_id")}, {"parent", transfer.at("calc")}}; stairs_next.empty()){ mpre("ОШИБКА установки формирования ступени", __LINE__);
 						}else if([&](){ // Установка обещаний
 							if(transfer.end() == transfer.find("promise")){ //mpre("Требования к нижестоящей не заданы", __LINE__);
 							}else if(stairs_next["promise"] = transfer.at("promise"); stairs_next.empty()){ mpre("ОШИБКА установки обещаний к нижестоящей", __LINE__);
-							}else{ mpre("Установка обещаний к нижестоящему", __LINE__);
+							}else{ mpre("Установка обещаний к нижестоящему " +index.at("id") +" > " +transfer.at("next_id") +" promise=" +transfer.at("promise"), __LINE__);
 							} return false; }()){ mpre("ОШИБКА формирования новой ступени", __LINE__);
 						}else if(STAIRS.insert(make_pair(STAIRS.size(), stairs_next)); STAIRS.empty()){ mpre("ОШИБКА добавления новой ступени", __LINE__);
-						}else{ //mpre("Добавление ступени id="+ stairs_next.at("id"), __LINE__);
+						}else{ mpre("Добавление ступени id="+ stairs_next.at("id"), __LINE__);
 						} return stairs_next; }(); false){ mpre("ОШИБКА Добавления морфа в лестницу", __LINE__);
 					}else if([&](){ // Удаление ступени
 						if(false){ mpre("Пропуск удаления", __LINE__);
 						}else if(stairs.end() == stairs.find("status")){ mpre("ОШИБКА статус ступени не найден", __LINE__);
 						}else if(string::npos != stairs.at("status").find_last_not_of("5")){ //mpre(STAIRS, "Лестница", __LINE__); mpre("Статус удаления не максимальный " +stairs.at("status"), __LINE__); //mpre(stairs["index_id"]+ " Не расчитываем результат для статуса "+ stairs["status"], __LINE__);
-						/*}else if([&](){ // Сохранение результатов родителю
-							if(1 >= STAIRS.size()){ mpre("Нет родителя не сохраняем результат", __LINE__);
+						}else if([&](){ // Сохранение результатов родителю
+							if(1 >= STAIRS.size()){ //mpre("Нет родителя не сохраняем результат", __LINE__);
+							}else if(stairs.end() == stairs.find("parent")){ mpre("ОШИБКА номер результата родителя не указан", __LINE__);
 							}else if(auto stairs_parent_itr = stairs_itr; false){ mpre("Ссылка на текущую ступень", __LINE__);
 							}else if(TMs stairs_parent = (++stairs_parent_itr)->second; stairs_parent.empty()){ mpre("ОШИБКА выборки ступеньки родителя", __LINE__);
-							}else{ mpre(stairs_parent, "Родитель", __LINE__); mpre("ОШИБКА сохранения результата родителю", __LINE__);
-							} return false; }()){ mpre("ОШИБКА сохранения результатов родителю", __LINE__);*/
+							}else if(string learn = "learn_" +stairs.at("parent"); (0 >= learn.length())){ mpre("ОШИБКА получения вышестоящего морфа", __LINE__);
+							}else if(stairs_parent_itr->second[learn] = stairs_parent[learn] = stairs["val"]; (1 != stairs_parent[learn].length())){ mpre("ОШИБКА установки значения вышестоящему морфу", __LINE__);
+							}else{ mpre("Сохранения результата родителю " +stairs_parent.at("id") +" < " +stairs.at("id") +" " +learn +"=" +stairs["val"], __LINE__);
+							} return false; }()){ mpre("ОШИБКА сохранения результатов родителю", __LINE__);
 						}else if(stair = [&](){ // Сохранение результатов расчета
 							if(1 < STAIRS.size()){ //mpre("Ступень не последняя", __LINE__);
 							}else if(1 > STAIRS.size()){ mpre("ОШИБКА в лестнице не осталось ступеней для результата", __LINE__);
 							}else if(stair = STAIRS.begin()->second; stair.empty()){ mpre("ОШИБКА выборки результата из ступени", __LINE__);
 							}else{ //mpre(stair, "Результат расчетов", __LINE__);
 							} return stair; }(); false){ mpre("ОШИБКА получения результатов расчета", __LINE__);
+						}else if([&](){ // Проверка результата ступени
+							if(stairs.end() == stairs.find("promise")){ //mpre("Обещание в ступени установлено", __LINE__);
+							}else if(stairs.end() == stairs.find("val")){ mpre("ОШИБКА значение в ступени не задано", __LINE__);
+							}else if(stairs.at("promise") == stairs.at("val")){ //mpre("Обещаяние выполнено", __LINE__);
+							}else{ Tree(bmf_index, _BMF_DANO_EX); mpre(index, "Морф", __LINE__); mpre(stairs, "Ступень", __LINE__); mpre("ОШИБКА обещание ступени не выполнено " +index.at("id"), __LINE__);
+							} return false; }()){ mpre("ОШИБКА проверки равенства результата и обещания", __LINE__);
 						}else if(STAIRS.erase(stairs_itr->first); false){ mpre("Окончание пустая лестница", __LINE__);
 						}else{ //mpre("Удаление ступени с лестницы id=" +stairs.at("id") +" status=" +stairs.at("status"), __LINE__);
 						} return false; }()){ mpre("ОШИБКА удаления ступени из лестницы", __LINE__);
@@ -1524,9 +1547,9 @@ int main(int argc, char **argv){
 				}else if(mpre("Расчет "+ itog.at("id")+ " "+ values.at("name")+ " ("+ itog.at("name")+ ") index["+ index.at("id")+ "]="+ itog.at("val")+ " "+ _val , __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
 				}else if(0 >= _val.length()){ mpre("ОШИБКА формат расчета не верный "+ _val, __LINE__);
 				}else if(string val = _val.substr(_val.length()-1, 1); (1 != val.length())){ mpre("ОШИБКА получения результатов расчета", __LINE__);
-				}else if(val != itog.at("val")){ mpre("ОШИБКА обещанный результат не совпал с ожидаемым "+ itog.at("val")+ " val=" +val +" _val=" +_val, __LINE__);
+				}else if(val != itog.at("val")){ Tree(index, _BMF_DANO_EX); mpre("ОШИБКА обещанный результат не совпал с ожидаемым "+ itog.at("val")+ " val=" +val +" _val=" +_val, __LINE__);
 				}else if(change += (2 <= _val.length() ? 1 : 0); false){ mpre("ОШИБКА установки изменения", __LINE__);
-				}else{ //mpre(BMF_INDEX_EX.at(""), __LINE__, "Справочник"); mpre(BMF_DANO_EX.at(""), __LINE__, "Справочник"); mpre("ОШИБКА тест "+ itog["val"]+ " "+ _val+ " count="+ to_string(BMF_INDEX_EX.at("").size()), __LINE__);
+				}else{ Tree(index, _BMF_DANO_EX); //mpre(BMF_INDEX_EX.at(""), __LINE__, "Справочник"); mpre(BMF_DANO_EX.at(""), __LINE__, "Справочник"); mpre("ОШИБКА тест "+ itog["val"]+ " "+ _val+ " count="+ to_string(BMF_INDEX_EX.at("").size()), __LINE__);
 				} return false; }()){ mpre("ОШИБКА обучения морфа", __LINE__);
 			}else{ //mpre("Окончание обучения морфа "+ itog["name"], __LINE__); //system("sleep 0.5");
 			} return change; }); false){ mpre("ОШИБКА устанвоки функции расчета итога", __LINE__);
