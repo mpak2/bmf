@@ -145,8 +145,8 @@ TMs erb_insert(TM3i& TABS, string id, TMs index){ //mpre("Добавление �
 	}else if([&](){ for(auto& tabs_itr:TABS){ // Удаление индексов
 			TMs fields; string values = "";
 			if(string field = tabs_itr.first; (0 >= field.length())){ //mpre("Список значений", __LINE__);
-			}else if(TABS.at("").end() == TABS.at("").find(stoi(id))){ //mpre("Элемент не найден не удаляем ключи", __LINE__);
-			}else if(TMs _index = TABS.at("").at(stoi(id)); _index.empty()){ mpre("ОШИБКА выборки морфа из списка", __LINE__);
+			}else if(TABS.at("").end() == TABS.at("").find(atoi(id.c_str()))){ //mpre("Элемент не найден не удаляем ключи", __LINE__);
+			}else if(TMs _index = TABS.at("").at(atoi(id.c_str())); _index.empty()){ mpre("ОШИБКА выборки морфа из списка", __LINE__);
 			}else if([&](){ // Выборка списка полей
 					string token; istringstream tokenStream(field);
 					while(std::getline(tokenStream, token, ',')){
@@ -199,8 +199,8 @@ TMs erb_insert(TM3i& TABS, string id, TMs index){ //mpre("Добавление �
 			}
 		} return false; }()){ mpre("ОШИБКА добавления индекса", __LINE__);
 	}else if([&](){ // Установка морфа
-		if(TABS.at("").end() != TABS.at("").find(stoi(id))){ TABS.at("").at(stoi(id)) = index; //mpre("Изменение уже установленного "+ index.at("id"), __LINE__);
-		}else if(TABS.at("").insert(make_pair(stoi(id), index)); index.empty()){ mpre("ОШИБКА новой установки элемента", __LINE__);
+		if(TABS.at("").end() != TABS.at("").find(atoi(id.c_str()))){ TABS.at("").at(atoi(id.c_str())) = index; //mpre("Изменение уже установленного "+ index.at("id"), __LINE__);
+		}else if(TABS.at("").insert(make_pair(atoi(id.c_str()), index)); index.empty()){ mpre("ОШИБКА новой установки элемента", __LINE__);
 		}else{ //mpre("Новая установка "+ index.at("id"), __LINE__);
 		} return index.empty(); }()){ mpre("ОШИБКА изменения списка морфов", __LINE__);
 	}else if([&](){ // Уведомление
@@ -208,8 +208,8 @@ TMs erb_insert(TM3i& TABS, string id, TMs index){ //mpre("Добавление �
 		if(true){ //mpre("Пропускаем сравнение", __LINE__);
 		}else if(index.end() == index.find(field)){ //mpre("Новый элемент не содержит "+ field, __LINE__);
 		}else if([&](){ // Старый элемент
-			if(TABS.at("").end() == TABS.at("").find(stoi(id))){ //mpre("Список не содержит элемента редактирвоания "+ id, __LINE__);
-			}else if([&](){ tabs = TABS.at("").at(stoi(id)); return tabs.empty(); }()){ mpre("ОШИБКА выборки локального элемента", __LINE__);
+			if(TABS.at("").end() == TABS.at("").find(atoi(id.c_str()))){ //mpre("Список не содержит элемента редактирвоания "+ id, __LINE__);
+			}else if([&](){ tabs = TABS.at("").at(atoi(id.c_str())); return tabs.empty(); }()){ mpre("ОШИБКА выборки локального элемента", __LINE__);
 			}else{
 			} return false; }()){ mpre("ОШИБКА выборки старого элемента", __LINE__);
 		}else if([&](){ mpre("Изменение элемента "+ id, __LINE__); mpre(tabs, __LINE__, "Старый"); mpre(index, __LINE__, "Новый"); return false; }()){ mpre("ОШИБКА уведомления", __LINE__);
@@ -280,8 +280,8 @@ TMMi rb(TM3i& TABS, TMs values, bool debug = false){
 		}else if([&](){ for(auto& index_itr:TABS.at(fields).at(value_crc32)){ // Формируем список по ключам
 				if(index_itr.second != value_md5){ mpre("ОШИБКА md5 не совпал для индекса (Коллизия crc32)", __LINE__);
 				}else if(string id = index_itr.first; (0 >= id.length())){ mpre("ОШИБКА нулевая длинна ключа индекса "+ id, __LINE__);
-				}else if(TABS.at("").end() == TABS.at("").find(stoi(id))){ mpre("ОШИБКА элемент по индексному ключю не найден в списке", __LINE__);
-				}else if(LIST.insert(make_pair(stoi(id), TABS.at("").at(stoi(id)))); LIST.empty()){ mpre("ОШИБКА добавления нового элемента в список результата", __LINE__);
+				}else if(TABS.at("").end() == TABS.at("").find(atoi(id.c_str()))){ mpre("ОШИБКА элемент по индексному ключю не найден в списке", __LINE__);
+				}else if(LIST.insert(make_pair(atoi(id.c_str()), TABS.at("").at(atoi(id.c_str())))); LIST.empty()){ mpre("ОШИБКА добавления нового элемента в список результата", __LINE__);
 				}else{ //mpre(TABS.at(fields).at(value_crc32), __LINE__, "Список индексных полей");
 				}
 			} return false; }()){ mpre("ОШИБКА формирования совпадений по crc32/md5", __LINE__);
@@ -298,8 +298,8 @@ TMs erb(TM3i& TABS, TMs values, bool debug = false){ // Поиск по инде
 			if(1 != values.size()){ //mpre("ОШИБКА полей для поиска больше одного", __LINE__);
 			}else if(values.end() == values.find("id")){ //mpre("Выборка только по id", __LINE__);
 			}else if(string id = values.at("id"); (0 >= id.length())){ //mpre("Значение id в выборке не установлено", __LINE__);
-			}else if(TABS.at("").end() == TABS.at("").find(stoi(id))){ /*mpre(TABS.at(""), __LINE__, "Список");*/ mpre("ОШИБКА Запись по id не найдена "+ id, __LINE__);
-			}else if(line = TABS.at("").at(stoi(id)); line.empty()){ mpre("ОШИБКА выборка по id пуста", __LINE__);
+			}else if(TABS.at("").end() == TABS.at("").find(atoi(id.c_str()))){ /*mpre(TABS.at(""), __LINE__, "Список");*/ mpre("ОШИБКА Запись по id не найдена "+ id, __LINE__);
+			}else if(line = TABS.at("").at(atoi(id.c_str())); line.empty()){ mpre("ОШИБКА выборка по id пуста", __LINE__);
 			}else{ //mpre("ОШИБКА Выборка по идентификатору "+ id, __LINE__);
 			} return false;
 		}()){ mpre("ОШИБКА получения значения выборки по id", __LINE__);
