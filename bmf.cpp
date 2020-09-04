@@ -879,7 +879,11 @@ int main(int argc, char **argv){
 										}else if(("-" != _value.substr(0, 1)) && (0 == nn)){ //mpre("Не создаем положительный знак отрицания", __LINE__);
 										//}else if(ARGV.end() != ARGV.find("-t")){ mpre(values, __LINE__, "Значение"); mpre("ОШИБКА в многопоточном режиме недопустимо создание новых знаков "+ alias+ "_values_id="+ values.at("id")+ " name="+ to_string(nn), __LINE__);
 										}else if(vals = {{"id", Id((*BMF).at(""))}, {"clump_id", clump_id}, {alias+ "_values_id", values.at("id")}, {"name", to_string(nn)}, {"val", ""}, {"values", ""}}; vals.empty()){ mpre("ОШИБКА создания нового знака", __LINE__);
-										}else if(ARGV.end() != ARGV.find("-i")){ mpre(vals, "Знак", __LINE__); mpre("ОШИБКА в многооконном режиме вставка знаков запрещена", __LINE__);
+										}else if(string itog = [&](string itog = ""){ // Проверка вставки в многопоточном режиме
+											if(ARGV.end() == ARGV.find("-i")){ //mpre("В многооконном режиме вставка знаков запрещена", __LINE__);
+											}else if(string _itog = ARGV.at("-i"); "0" != itog){ //mpre("ОШИБКА пустой итог", __LINE__);
+											}else{ itog = _itog;
+											} return itog; }(); !itog.empty()){ mpre("ОШИБКА в многопоточном режиме вставка знаков запрещена", __LINE__);
 										}else if(erb_insert(*BMF, vals.at("id"), vals); vals.empty()){ mpre("ОШИБКА обновления справочника знаков", __LINE__);
 										}else{ //mpre(*BMF, __LINE__, "Список знаков"); mpre("Добавление глобального знака `"+ values["name"]+ "` ["+ vals.at("id")+ "] "+ to_string(nn), __LINE__); mpre(vals, __LINE__, "Знак"); //mpre("ОШИБКА добавления знака "+ alias+ " "+ vals.at("id"), __LINE__);
 										} return vals; }(); false){ mpre("ОШИБКА Добавления нового знака", __LINE__);
@@ -888,7 +892,12 @@ int main(int argc, char **argv){
 										}else if(std::lock_guard<std::recursive_mutex> lock(mu); false){ mpre("ОШИБКА устанвоки блокировки", __LINE__);
 										}else if(_vals = (BMF_VALS.at("").end() == BMF_VALS.at("").find(atoi(vals.at("id").c_str())) ? TMs({}) : BMF_VALS.at("").at(atoi(vals.at("id").c_str()))); !_vals.empty()){ //mpre("Знак есть в локальной базе", __LINE__);
 										}else if(_vals = vals; _vals.empty()){ mpre("ОШИБКА копирования глобального значения", __LINE__); //mpre(_vals, __LINE__, "Знак `"+ values["name"]+ "` уже добавлен "+ to_string(nn));
-										}else if(ARGV.end() != ARGV.find("-i")){ mpre(_vals, "Знак", __LINE__); mpre("ОШИБКА в многооконном режиме вставка знаков запрещена", __LINE__);
+										//}else if(ARGV.end() != ARGV.find("-i")){ mpre(_vals, "Знак", __LINE__); mpre("ОШИБКА в многооконном режиме вставка знаков запрещена", __LINE__);
+										}else if(string itog = [&](string itog = ""){ // Проверка вставки в многопоточном режиме
+											if(ARGV.end() == ARGV.find("-i")){ //mpre("В многооконном режиме вставка знаков запрещена", __LINE__);
+											}else if(string _itog = ARGV.at("-i"); "0" != itog){ //mpre("ОШИБКА пустой итог", __LINE__);
+											}else{ itog = _itog;
+											} return itog; }(); !itog.empty()){ mpre("ОШИБКА в многопоточном режиме вставка знаков запрещена", __LINE__);
 										}else if(erb_insert(BMF_VALS, _vals.at("id"), _vals); _vals.empty()){ mpre("ОШИБКА обновления справочника знаков", __LINE__);
 										}else{ //mpre("Добавление глобального знака `"+ values["name"]+ "` "+ to_string(nn), __LINE__); mpre(_vals, __LINE__, "Знак"); mpre("ОШИБКА добавления знака "+ alias+ " "+ _vals.at("id"), __LINE__);
 										} return _vals; }(); false){ mpre("ОШИБКА Добавления локального знака", __LINE__);
@@ -1433,8 +1442,7 @@ int main(int argc, char **argv){
 				}; return false; }()){ mpre("ОШИБКА перебора знаков для обучения", __LINE__);
 			}else{// mpre("Обучение", __LINE__);
 			} return change; }); false){ mpre("ОШИБКА установки функции обучения", __LINE__);
-		}else if(Do = ([&](int thread, int _thread){ // Цикл повторений расчета
-			int change;
+		}else if(Do = ([&](int thread, int _thread, int change = 0){ // Цикл повторений расчета
 			if(false){ mpre("ОШИБКА остановка выполнения", __LINE__);
 			}else if(int loop_max = [&](int loop_max = 0){ // Проверка количества эпох из командной строки
 				if(0 != loop_max){ mpre("ОШИБКА для проверки необходимо скинуть значения эпох", __LINE__);
@@ -1447,10 +1455,9 @@ int main(int argc, char **argv){
 			}else if(TM3i _BMF_ITOG_EX = BMF_ITOG_EX; _BMF_ITOG_EX.empty()){ mpre("ОШИБКА установки первоначальных итогов дано", __LINE__);
 			}else if(auto _in = in; _in.empty()){ mpre("ОШИБКА установки временного массива", __LINE__);
 			//}else if(true){ mpre(BMF_DANO_VALUES_EX, __LINE__, "Список дано");
-			}else if([&](){ // Обучение до состояния без ошибок
+			}else if([&](int loop = 0, bool proceed = false){ // Обучение до состояния без ошибок
 					do{ // Расчет и обучение входящих параметров
-						if(loop += 1; false){ mpre("ОШИБКА увеличения итераций", __LINE__);
-						}else if(change = 0; false){ mpre("ОШИБКА скидывания флага изменений", __LINE__);
+						if(change = 0; false){ mpre("ОШИБКА скидывания флага изменений", __LINE__);
 						}else if(int pips_sum = 0; false){ mpre("ОШИБКА обнуления суммы пипсов", __LINE__);
 						}else if(int pips_change = 0; false){ mpre("ОШИБКА обнуления изменений пипсов", __LINE__);
 						}else if([&](){ // Перемешивание
@@ -1476,17 +1483,22 @@ int main(int argc, char **argv){
 								}else if(TMs dano = TMs(el["dano"]); dano.empty()){ mpre("ОШИБКА получения входных знаков", __LINE__);
 								}else if(float _perc = (0 >= in.size() ? : float(in.size()-change)*100.0/in.size()); false){ mpre("ОШИБКА расчета процента", __LINE__);
 								}else if(float _pips_perc = (0 >= pips_sum ? 0 : float(pips_sum-pips_change)*100.0/pips_sum); false){ mpre("ОШИБКА расчета процента совпадения сигнала", __LINE__);
+								}else if(el["itog"].empty()){ //std::lock_guard<std::recursive_mutex> locker(mu); std::cerr << __LINE__ << ".ОБУЧЕНИЕ не задано" << endl;
 								}else if([&](){ std::lock_guard<std::recursive_mutex> locker(mu); std::cerr << endl << __LINE__ << ".РАСЧЕТ " +to_string(_thread) +" \"dano\":" << el["dano"].dump().substr(0 ,89) << "..." << endl;  return false; }()){ mpre("ОШИБКА отображения информации", __LINE__);
 								}else if(Values(dano, "dano", BMF_DANO_VALUES_EX, clump_id); BMF_DANO_VALUES_EX.empty()){ mpre("ОШИБКА установки входящих значений", __LINE__);
 								}else if(Vals(dano, "dano", key, _BMF_DANO_EX, BMF_DANO_VALUES_EX, BMF_DANO_TITLES_EX, clump_id); _BMF_DANO_EX.empty()){ mpre("ОШИБКА установки входящих значений", __LINE__);
-								}else if(el["itog"].empty()){ //std::lock_guard<std::recursive_mutex> locker(mu); std::cerr << __LINE__ << ".ОБУЧЕНИЕ не задано" << endl;
 								}else if([&](){ std::lock_guard<std::recursive_mutex> locker(mu); std::cerr << __LINE__ << " ОБУЧЕНИЕ " +to_string(_thread) +" \"itog\":" << el["itog"].dump() << endl; return false; }()){ mpre("ОШИБКА вывода уведомления", __LINE__);
 								}else if(TMs itog = TMs(el["itog"]); itog.empty()){ mpre("ОШИБКА получения входных знаков", __LINE__);
 								}else if(Values(itog, "itog", BMF_ITOG_VALUES_EX, clump_id); BMF_ITOG_VALUES_EX.empty()){ mpre("ОШИБКА установки входящих значений", __LINE__);
 								}else if(Vals(itog, "itog", key, _BMF_ITOG_EX, BMF_ITOG_VALUES_EX, BMF_ITOG_TITLES_EX, clump_id); _BMF_ITOG_EX.empty()){ mpre("ОШИБКА установки входящих значений", __LINE__);
 								}else if(string info = "Эпоха:"+ to_string(loop)+ " Размер:"+ to_string(in.size())+ " Пример:"+ js.key()+ " Изменений:"+ to_string(change)+ " Сеть:"+ to_string(BMF_INDEX_EX.at("").size())+ " Процент:"+ to_string(perc)+ "/"+ to_string(_perc)+ "% Время:"+ to_string(time(0)-timestamp); (0 >= info.length())){ mpre("ОШИБКА составления строки состояния", __LINE__);
 								}else if([&](){ //mpre("Начало Items " +to_string(_thread), __LINE__); // Уведомление об изменениях
-									if(int _change = LearningAll(el, thread, _thread, clump_id, key, _BMF_DANO_EX, _BMF_ITOG_EX); false){ mpre("Расчет изменеений", __LINE__);
+									if([&](){ // Возможность прерывания на создание итогов
+										if(ARGV.end() == ARGV.find("-i")){ //mpre("Не многооконный режим", __LINE__);
+										}else if(string itog = ARGV.at("-i"); (0 < atoi(itog.c_str()))){ //mpre("Расчитываем итоги", __LINE__);
+										}else{ return true; mpre("Пропускаем расчеты (толко создание итогов)", __LINE__);
+										} return false; }()){ mpre("Пропускаем обучение только создание итогов", __LINE__);
+									}else if(int _change = LearningAll(el, thread, _thread, clump_id, key, _BMF_DANO_EX, _BMF_ITOG_EX); false){ mpre("Расчет изменеений", __LINE__);
 									}else if(pips_change += _change; false){ mpre("ОШИБКА получения количества пипсов", __LINE__);
 									}else if(0 == _change){ //mpre("Расчет "+ info, __LINE__);
 									}else if(0 >= ++change){ mpre("ОШИБКА установки флага изменения", __LINE__);
@@ -1507,9 +1519,10 @@ int main(int argc, char **argv){
 						}else if([&](){ pips_perc = float(pips_sum-pips_change)*100.0/pips_sum; return false; }()){ mpre("ОШИБКА расчета процента совпадения сигнала", __LINE__);
 						}else if([&](){ change_sum += change; return false; }()){ mpre("ОШИБКА расчета итоговой суммы изменений", __LINE__);
 						}else{ //std::cerr << endl << __LINE__ << " ЦИКЛ ОБУЧЕНИЯ " << to_string(change) << " из " << to_string(in.size()) << " Процент " << perc << "%";
+							proceed = true;
 							//std::cerr << " Итогов " << to_string(pips_change) << " Изменений сигналов " << to_string(pips_change) << " Процент " << to_string(pips_perc) << endl;
 						}
-					}while(change != 0 && ((0 == loop_max) || (loop < loop_max)));
+					}while(change != 0 && (loop++ < loop_max) && !(proceed = !proceed));
 				return false; }()){ mpre("ОШИБКА цикла обучения", __LINE__);
 			}else{ //mpre(BMF_DANO_EX.at(""), __LINE__, "Дано"); mpre(BMF_ITOG_EX.at(""), __LINE__, "Итог");
 			} return false; }); false){ mpre("ОШИБКА создания функции непосредственно расчета", __LINE__);
