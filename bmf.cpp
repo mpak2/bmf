@@ -1444,18 +1444,18 @@ int main(int argc, char **argv){
 			} return change; }); false){ mpre("ОШИБКА установки функции обучения", __LINE__);
 		}else if(Do = ([&](int thread, int _thread, int change = 0){ // Цикл повторений расчета
 			if(false){ mpre("ОШИБКА остановка выполнения", __LINE__);
-			}else if(int loop_max = [&](int loop_max = 0){ // Проверка количества эпох из командной строки
-				if(0 != loop_max){ mpre("ОШИБКА для проверки необходимо скинуть значения эпох", __LINE__);
-				}else if(string _loop_max = (ARGV.end() == ARGV.find("-e") ? "1" : ARGV.at("-e")); (0 >= _loop_max.length())){ mpre("ОШИБКА количество эпох не задано", __LINE__);
-				}else if(string::npos != _loop_max.find_last_not_of("0123456789")){ mpre("ОШИБКА формат количества эпох задан неправильно "+ _loop_max, __LINE__);
-				}else if(loop_max = atoi(_loop_max.c_str()); (0 >= loop_max)){ mpre("ОШИБКА количество эпох не достаточно для продолжения", __LINE__);
-				}else{ //mpre("Количество эпох установлено "+ to_string(loop_max), __LINE__);
-				} return loop_max; }(); (0 > loop_max)){ mpre("ОШИБКА количество эпох задано не верно -e", __LINE__);
+			}else if(int loop = [&](int loop = 0){ // Проверка количества эпох из командной строки
+				if(0 != loop){ mpre("ОШИБКА для проверки необходимо скинуть значения эпох", __LINE__);
+				}else if(string _loop = (ARGV.end() == ARGV.find("-e") ? "1" : ARGV.at("-e")); (0 >= _loop.length())){ mpre("ОШИБКА количество эпох не задано", __LINE__);
+				}else if(string::npos != _loop.find_last_not_of("0123456789")){ mpre("ОШИБКА формат количества эпох задан неправильно "+ _loop, __LINE__);
+				}else if(loop = atoi(_loop.c_str()); (0 >= loop)){ mpre("ОШИБКА количество эпох не достаточно для продолжения", __LINE__);
+				}else{ //mpre("Количество эпох установлено "+ to_string(loop), __LINE__);
+				} return loop; }(); (0 > loop)){ mpre("ОШИБКА количество эпох задано не верно -e", __LINE__);
 			}else if(TM3i _BMF_DANO_EX = BMF_DANO_EX; _BMF_DANO_EX.empty()){ mpre("ОШИБКА установки первоначальных исходников дано", __LINE__);
 			}else if(TM3i _BMF_ITOG_EX = BMF_ITOG_EX; _BMF_ITOG_EX.empty()){ mpre("ОШИБКА установки первоначальных итогов дано", __LINE__);
 			}else if(auto _in = in; _in.empty()){ mpre("ОШИБКА установки временного массива", __LINE__);
 			//}else if(true){ mpre(BMF_DANO_VALUES_EX, __LINE__, "Список дано");
-			}else if([&](int loop = 0, bool proceed = false){ // Обучение до состояния без ошибок
+			}else if([&](bool proceed = false){ // Обучение до состояния без ошибок
 					do{ // Расчет и обучение входящих параметров
 						if(change = 0; false){ mpre("ОШИБКА скидывания флага изменений", __LINE__);
 						}else if(int pips_sum = 0; false){ mpre("ОШИБКА обнуления суммы пипсов", __LINE__);
@@ -1520,9 +1520,8 @@ int main(int argc, char **argv){
 						}else if([&](){ change_sum += change; return false; }()){ mpre("ОШИБКА расчета итоговой суммы изменений", __LINE__);
 						}else{ //std::cerr << endl << __LINE__ << " ЦИКЛ ОБУЧЕНИЯ " << to_string(change) << " из " << to_string(in.size()) << " Процент " << perc << "%";
 							proceed = true;
-							//std::cerr << " Итогов " << to_string(pips_change) << " Изменений сигналов " << to_string(pips_change) << " Процент " << to_string(pips_perc) << endl;
 						}
-					}while(change != 0 && (loop++ < loop_max) && !(proceed = !proceed));
+					}while((change != 0) && (--loop > 0) && !(proceed = !proceed));
 				return false; }()){ mpre("ОШИБКА цикла обучения", __LINE__);
 			}else{ //mpre(BMF_DANO_EX.at(""), __LINE__, "Дано"); mpre(BMF_ITOG_EX.at(""), __LINE__, "Итог");
 			} return false; }); false){ mpre("ОШИБКА создания функции непосредственно расчета", __LINE__);
