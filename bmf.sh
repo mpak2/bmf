@@ -2,14 +2,14 @@
 
 #sudo apt install libsqlite3-dev
 
-#cat clump/dva.json | ./bimorph - -c -e 10 -r 0 ./2
+#cat clump/dva.json | ./bimorph - ./2 -c -e 10 -r 0
 #sqlite3 ./2 -column -header "SELECT * FROM mp_bmf_test ORDER BY id DESC LIMIT 10; -- SELECT COUNT(*) as step, SUM(change) as SumChange, MAX(bmf) as bmf FROM mp_bmf_test WHERE perc<10;"
-#sqlite3 ./2 -column -header "SELECT * FROM mp_bmf_index ORDER BY id DESC"
+##sqlite3 ./2 -column -header "SELECT * FROM mp_bmf_index ORDER BY id DESC"
 
 cat clump/tri.json | ./bimorph - ./3 -c -e 100
 sqlite3 ./3 -column -header "SELECT * FROM mp_bmf_test ORDER BY id DESC LIMIT 10; -- SELECT COUNT(*) as step, SUM(change) as SumChange, MAX(bmf) as bmf FROM mp_bmf_test WHERE perc<10;"
-#	#sqlite3 ./3 -column -header "SELECT * FROM mp_bmf_index ORDER BY id DESC"
-#	#./bimorph ./3 -j '[{"dano":{"Один":"0", "Два":"0", "Три":"0"}}]'
+##sqlite3 ./3 -column -header "SELECT * FROM mp_bmf_index ORDER BY id DESC"
+##./bimorph ./3 -j '[{"dano":{"Один":"0", "Два":"0", "Три":"0"}}]'
 
 #cat clump/iris.json | ./bimorph - clump/iris.sqlite -c -e 100
 #sqlite3 clump/iris.sqlite -column -header "SELECT * FROM mp_bmf_test ORDER BY id DESC LIMIT 10; -- SELECT COUNT(*) as step, SUM(change) as SumChange, MAX(bmf) as bmf FROM mp_bmf_test WHERE perc<10;"
