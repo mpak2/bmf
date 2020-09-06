@@ -298,7 +298,7 @@ TMs erb(TM3i& TABS, TMs values, bool debug = false){ // Поиск по инде
 			if(1 != values.size()){ //mpre("ОШИБКА полей для поиска больше одного", __LINE__);
 			}else if(values.end() == values.find("id")){ //mpre("Выборка только по id", __LINE__);
 			}else if(string id = values.at("id"); (0 >= id.length())){ //mpre("Значение id в выборке не установлено", __LINE__);
-			}else if(TABS.at("").end() == TABS.at("").find(atoi(id.c_str()))){ /*mpre(TABS.at(""), __LINE__, "Список");*/ mpre("ОШИБКА Запись по id не найдена "+ id, __LINE__);
+			}else if(TABS.at("").end() == TABS.at("").find(atoi(id.c_str()))){ mpre(TABS.at(""), __LINE__, "Список"); mpre(values, "условия", __LINE__); mpre("ОШИБКА Запись по id не найдена "+ id, __LINE__);
 			}else if(line = TABS.at("").at(atoi(id.c_str())); line.empty()){ mpre("ОШИБКА выборка по id пуста", __LINE__);
 			}else{ //mpre("ОШИБКА Выборка по идентификатору "+ id, __LINE__);
 			} return false;
