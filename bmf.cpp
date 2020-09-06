@@ -857,11 +857,11 @@ int main(int argc, char **argv){
 										}else if(("-" != _value.substr(0, 1)) && (0 == nn)){ //mpre("Не создаем положительный знак отрицания", __LINE__);
 										//}else if(ARGV.end() != ARGV.find("-t")){ mpre(values, __LINE__, "Значение"); mpre("ОШИБКА в многопоточном режиме недопустимо создание новых знаков "+ alias+ "_values_id="+ values.at("id")+ " name="+ to_string(nn), __LINE__);
 										}else if(vals = {{"id", Id((*BMF).at(""))}, {"clump_id", clump_id}, {alias+ "_values_id", values.at("id")}, {"name", to_string(nn)}, {"val", ""}, {"values", ""}}; vals.empty()){ mpre("ОШИБКА создания нового знака", __LINE__);
-										/*}else if(string itog = [&](string itog = ""){ // Проверка вставки в многопоточном режиме
+										}else if(string itog = [&](string itog = ""){ // Проверка вставки в многопоточном режиме
 											if(ARGV.end() == ARGV.find("-i")){ //mpre("В многооконном режиме вставка знаков запрещена", __LINE__);
 											}else if(string _itog = ARGV.at("-i"); "0" != itog){ //mpre("ОШИБКА пустой итог", __LINE__);
 											}else{ itog = _itog;
-											} return itog; }(); !itog.empty()){ mpre("ОШИБКА в многопоточном режиме вставка знаков запрещена", __LINE__);*/
+											} return itog; }(); !itog.empty()){ mpre("ОШИБКА в многопоточном режиме вставка знаков запрещена", __LINE__);
 										}else if(erb_insert(*BMF, vals.at("id"), vals); vals.empty()){ mpre("ОШИБКА обновления справочника знаков", __LINE__);
 										}else{ //mpre("ОШИБКА добавление глобального знака", __LINE__); //mpre(*BMF, __LINE__, "Список знаков"); mpre("Добавление глобального знака `"+ values["name"]+ "` ["+ vals.at("id")+ "] "+ to_string(nn), __LINE__); mpre(vals, __LINE__, "Знак"); //mpre("ОШИБКА добавления знака "+ alias+ " "+ vals.at("id"), __LINE__);
 										} return vals; }(); false){ mpre("ОШИБКА Добавления нового знака", __LINE__);
@@ -871,11 +871,11 @@ int main(int argc, char **argv){
 										}else if(_vals = (BMF_VALS.at("").end() == BMF_VALS.at("").find(atoi(vals.at("id").c_str())) ? TMs({}) : BMF_VALS.at("").at(atoi(vals.at("id").c_str()))); !_vals.empty()){ //mpre("Знак есть в локальной базе", __LINE__);
 										}else if(_vals = vals; _vals.empty()){ mpre("ОШИБКА копирования глобального значения", __LINE__); //mpre(_vals, __LINE__, "Знак `"+ values["name"]+ "` уже добавлен "+ to_string(nn));
 										//}else if(ARGV.end() != ARGV.find("-i")){ mpre(_vals, "Знак", __LINE__); mpre("ОШИБКА в многооконном режиме вставка знаков запрещена", __LINE__);
-										/*}else if(string itog = [&](string itog = ""){ // Проверка вставки в многопоточном режиме
+										}else if(string itog = [&](string itog = ""){ // Проверка вставки в многопоточном режиме
 											if(ARGV.end() == ARGV.find("-i")){ //mpre("В многооконном режиме вставка знаков запрещена", __LINE__);
 											}else if(string _itog = ARGV.at("-i"); "0" != itog){ //mpre("ОШИБКА пустой итог", __LINE__);
 											}else{ itog = _itog;
-											} return itog; }(); !itog.empty()){ mpre("ОШИБКА в многопоточном режиме вставка знаков запрещена", __LINE__);*/
+											} return itog; }(); !itog.empty()){ mpre("ОШИБКА в многопоточном режиме вставка знаков запрещена", __LINE__);
 										}else if(erb_insert(BMF_VALS, _vals.at("id"), _vals); _vals.empty()){ mpre("ОШИБКА обновления справочника знаков", __LINE__);
 										}else{ //mpre("Добавление глобального знака `"+ values["name"]+ "` "+ to_string(nn), __LINE__); mpre(_vals, __LINE__, "Знак"); mpre("ОШИБКА добавления знака "+ alias+ " "+ _vals.at("id"), __LINE__);
 										} return _vals; }(); false){ mpre("ОШИБКА Добавления локального знака", __LINE__);
@@ -1653,6 +1653,14 @@ int main(int argc, char **argv){
 				}else if([&](){ // Обновление
 					if(0 > index_id){ //mpre("Не обновляем вновь добавленный "+ to_string(id), __LINE__);
 					}else if("0" == index["id"]){ //mpre("Не обновляем удаленный морф", __LINE__);
+					}else if([&](){ // Проверка на изменения только свой итогa
+						if("mp_bmf_itog" != table){ //mpre("Ограничение только для итогов", __LINE__);
+						}else if(ARGV.end() == ARGV.find("-i")){ mpre("Итоги не установлены", __LINE__);
+						}else if(string itog_id = ARGV.at("-i"); itog_id.empty()){ mpre("Режим просмотра списков итогов", __LINE__);
+						}else if("0" == itog_id){ mpre("Режим создания итогов", __LINE__);
+						}else if(itog_id == index.at("id")){ mpre("Указанный итог "+ itog_id, __LINE__);
+						}else{ mpre("Ограничено изменение итогов " +itog_id, __LINE__); return true;
+						} return false; }()){ mpre("Изменения итога запрещено", __LINE__);
 					}else if([&](){ index = fk(table, {{"id", index["id"]}}, {}, index); return index.empty(); }()){ mpre(index, __LINE__, "ОШИБКА обновления морфа "+ to_string(id));
 					}else{ //mpre(index, __LINE__, "Обновление морфа");
 						count_update++;
