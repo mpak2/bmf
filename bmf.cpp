@@ -43,8 +43,9 @@
 //	#define CL_USE_DEPRECATED_OPENCL_2_0_APIS
 //#include "CL/cl2.hpp"
 
-using json = nlohmann::json;
-json in;
+#define pre(x) if(x){ printf("%d.%s\n", __LINE__, x) }
+
+using json = nlohmann::json; json in;
 
 using namespace std; //setlocale(LC_ALL, "ru_RU");
 
@@ -74,7 +75,7 @@ int main(int argc, char **argv){
 	string clump_id = ""; // Скопление если не указано то данные из php кода
 	int timestamp = time(0), // Расчет выполнения участков кода
 	values_length = 1024, // Ограничение размера истории
-	change_sum = -1, // Начальное значение количества расчетов
+	change_sum = 0, // Начальное значение количества расчетов
 	size_max = 1e6; // Максимально допустимое количество морфов в расчете
 
 	float perc = 0, pips_perc = 0; // Процент правильных ответов
@@ -1263,8 +1264,11 @@ int main(int argc, char **argv){
 						//}else if(string::npos != stairs.at("status").find_last_not_of("5")){ //mpre(STAIRS, "Лестница", __LINE__); mpre("Статус удаления не максимальный " +stairs.at("status"), __LINE__); //mpre(stairs["index_id"]+ " Не расчитываем результат для статуса "+ stairs["status"], __LINE__);
 						}else if([&](){ // Пропуск удаления лестницы
 							if("5" == stairs.at("status")){ return false; mpre("Всегда на пятом статусе", __LINE__);
-							}else if("3" != stairs.at("status")){ //mpre("Выходим на всех кроме пятого и третьего", __LINE__);
-							}else if(stairs.end() == stairs.find("promise")){ //mpre("Обучать нечему обещаний нет", __LINE__);
+							}else if("3" != stairs.at("status")){ //mpre("Всегда на пятом статусе", __LINE__);
+							//}else if(string::npos != stairs.at("status").find_last_not_of("32")){ mpre("Статусы на которых результат может совпадать", __LINE__);
+							}else if(stairs.end() == stairs.find("promise")){ return false; //mpre("Обучать нечему обещаний нет", __LINE__);
+							//}else if(stairs.end() == stairs.find("val")){ //mpre("Обучать нечему обещаний нет", __LINE__);
+							//}else if(stairs.at("promise") == stairs.at("val")){ return false; // Обучение совпало
 							}else{ //mpre("Третья стадия, но найдены обещания", __LINE__);
 							} return true; }()){ //mpre("Пропуск удаления лестницы", __LINE__);
 						}else if([&](){ // Сохранение результатов родителю
