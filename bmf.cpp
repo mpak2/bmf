@@ -43,7 +43,8 @@
 //	#define CL_USE_DEPRECATED_OPENCL_2_0_APIS
 //#include "CL/cl2.hpp"
 
-#define pre(x) if(x){ printf("%d.%s\n", __LINE__, x) }
+#define pre(x) if(x){ printf("%d.%s\n", __LINE__, x); }
+#define error(x) if(x){ printf("%d.ОШИБКА %s\n", __LINE__, x); exit(1); }
 
 using json = nlohmann::json; json in;
 
@@ -344,7 +345,7 @@ int main(int argc, char **argv){
 							}else{// std::cerr << __LINE__ << " Данные совпали << " << index["id"] << endl;
 								//mpre(index, __LINE__); mpre(_index, __LINE__);
 							}
-						} return check; }()){ std::cerr << __LINE__ << " ОШИБКА Даныне в справочниках не совпадают" << endl; Data(_TAB, __LINE__, name, comment); system("sleep 1"); exit(1);
+						} return check; }()){ std::cerr << __LINE__ << " ОШИБКА Даныне в справочниках не совпадают" << endl; Data(_TAB, __LINE__, name, comment); exit(1);
 					}else{// std::cerr << __LINE__ << " (Выборка данных) Запрос: " << sql << endl;
 					} return TAB;
 				}); return false; }()){ mpre("ОШИБКА установки функции выборки из БД", __LINE__);
@@ -367,7 +368,7 @@ int main(int argc, char **argv){
 				}); return false; }()){ mpre("ОШИБКА установки функции отображения данных в коде", __LINE__);
 			}else if([&](){ // Создание файла БД если его нет
 				if(access(dbname.c_str(), F_OK) == 0){ //mpre("Файл БД уже создан "+ clump_id, __LINE__); system("sleep 10");
-				}else if(system(("touch "+ dbname).c_str())){ mpre("ОШИБКА создания файла БД", __LINE__); system("pwd;");
+				}else if(system(("touch "+ dbname).c_str())){ mpre("ОШИБКА создания файла БД", __LINE__); //system("pwd;");
 				}else if(system(("chmod u+w "+ dbname).c_str())){ mpre("ОШИБКА назначения доступа файла БД", __LINE__);
 				}else{ mpre("Создание файла БД "+ dbname, __LINE__);
 				} return false; }()){ mpre("ОШИБКА создания файла БД", __LINE__);
@@ -419,7 +420,7 @@ int main(int argc, char **argv){
 					}else if([&](){ exec("DELETE FROM mp_bmf_itog_titles"); return false; }()){ mpre("ОШИБКА выполнения запроса на очистку морфорв", __LINE__);
 					//}else if([&](){ BMF_INDEX_EX[""] = Tab("SELECT * FROM `mp_bmf_index` -- WHERE `clump_id`='"+ clump_id+ "'"); return false; }()){ mpre("ОШИБКА выборки списка морфов из базы", __LINE__);
 					//}else if(0 < BMF_INDEX_EX.at("").size()){ mpre("ОШИБКА после удаления всех морфов в базе все еще остаются данные", __LINE__);
-					}else{ mpre("Очистка списка морфов по аргументу -c", __LINE__); system("sleep 1");
+					}else{ mpre("Очистка списка морфов по аргументу -c", __LINE__); //system("sleep 1");
 					} return false;
 				}()){ mpre("ОШИБКА выборки списка морфов", __LINE__);
 			}else if([&](){ BMF_CALC = Dataset(BMF_CALC, "BMF_CALC", "mp_bmf_calc", "Расчеты"); return BMF_CALC_POS.empty(); }()){ mpre("ОШИБКА выборки позиций расчетов", __LINE__);
@@ -1370,8 +1371,6 @@ int main(int argc, char **argv){
 			}else if(itog.end() == itog.find("itog_values_id")){ mpre(itog, __LINE__, "Итог"); mpre("ОШИБКА формата итога", __LINE__);
 			}else if(TMs index = [&](TMs index = {}){ // Добавление первоначального морфа
 				if(std::lock_guard<std::recursive_mutex> lock(mu); false){ mpre("ОШИБКА установки блокировки", __LINE__);
-				//}else if(BMF_ITOG_EX.at("").end() == BMF_ITOG_EX.at("").find(atoi(itog.at("id").c_str()))){ mpre("ОШИБКА локального морф не найден в глобальном списке", __LINE__);
-				//}else if(TMs bmf_itog = BMF_ITOG_EX.at("").at(atoi(itog.at("id").c_str())); bmf_itog.empty()){ mpre("ОШИБКА выборки глобального морфа", __LINE__);
 				}else if([&](){ // Выборка основного морфа
 					if(itog.end() == itog.find("index_id")){ //mpre("ОШИБКА поле с оснвоным морфом у итога не найдено", __LINE__);
 					}else if(int index_id = atoi(itog.at("index_id").c_str()); (0 == index_id)){ //mpre(itog, "Итог", __LINE__); mpre("ОШИБКА Морф отрицательный", __LINE__);
@@ -1388,12 +1387,16 @@ int main(int argc, char **argv){
 				}else if(erb_insert(BMF_ITOG_EX, itog.at("id"), itog); itog.empty()){ mpre("ОШИБКА индексирования итога", __LINE__);
 				}else{ //mpre(itog, "Итог", __LINE__); mpre(index, "Добавление первоначального морфа", __LINE__);
 				} return index; }(); index.empty()){ mpre("ОШИБКА морф связи не найден", __LINE__);
-			}else if(TMs values = [&](TMs values = {}){ // Значение
+			}else if([&](){ // Быстрая проверка
+				if(false){ pre("Пропуск быстрой проверки");
+				}else{ error("Быстрая проверка");
+				} return false; }()){ error("Быстрая проверка");
+			}else if(TMs values = [&](TMs values = {}){ // Выбор значения морфа
 				if("" == index.at("itog_values_id")){ mpre("ОШИБКА значение у итога не указано", __LINE__);
 				}else if(std::lock_guard<std::recursive_mutex> lock(mu); false){ mpre("ОШИБКА установки блокировки", __LINE__);
 				}else if(BMF_ITOG_VALUES_EX.at("").end() == BMF_ITOG_VALUES_EX.at("").find(atoi(index["itog_values_id"].c_str()))){ mpre("ОШИБКА значение не найдено", __LINE__);
 				}else if(values = BMF_ITOG_VALUES_EX.at("").at(atoi(index.at("itog_values_id").c_str())); values.empty()){ mpre("ОШИБКА выборки значения итога", __LINE__);
-				}else{ //mpre(values, __LINE__, "Значение итога");
+				}else{ //pre("Выборки значения морфа");
 				} return values; }(); values.empty()){ mpre("ОШИБКА получения значения", __LINE__);
 			}else if([&](){ // Обучение если не режим расчета
 				if(string _val = Learn(index, itog.at("val"), key, vmap, _BMF_DANO_EX, _BMF_ITOG_EX); (1 <= _val.length() >= 2)){ mpre("ОШИБКА обучения морфа значение не верная длинна результата", __LINE__);
@@ -1659,12 +1662,12 @@ int main(int argc, char **argv){
 					}else if("0" == index["id"]){ //mpre("Не обновляем удаленный морф", __LINE__);
 					}else if([&](){ // Проверка на изменения только свой итогa
 						if("mp_bmf_itog" != table){ //mpre("Ограничение только для итогов", __LINE__);
-						}else if(ARGV.end() == ARGV.find("-i")){ mpre("Итоги не установлены", __LINE__);
+						}else if(ARGV.end() == ARGV.find("-i")){ //mpre("Итоги не установлены", __LINE__);
 						}else if(string itog_id = ARGV.at("-i"); itog_id.empty()){ mpre("Режим просмотра списков итогов", __LINE__);
 						}else if("0" == itog_id){ mpre("Режим создания итогов", __LINE__);
 						}else if(itog_id == index.at("id")){ mpre("Указанный итог "+ itog_id, __LINE__);
-						}else{ mpre("Ограничено изменение итогов " +itog_id, __LINE__); return true;
-						} return false; }()){ mpre("Изменения итога запрещено", __LINE__);
+						}else{ //mpre("Ограничено изменение итогов " +itog_id, __LINE__); return true;
+						} return false; }()){ mpre("Изменения итога ограничено", __LINE__);
 					}else if([&](){ index = fk(table, {{"id", index["id"]}}, {}, index); return index.empty(); }()){ mpre(index, __LINE__, "ОШИБКА обновления морфа "+ to_string(id));
 					}else{ //mpre(index, __LINE__, "Обновление морфа");
 						count_update++;
@@ -1687,8 +1690,8 @@ int main(int argc, char **argv){
 			if(std::experimental::filesystem::perms p = std::experimental::filesystem::status(dbname).permissions(); false){ mpre("ОШИБКА Получение прав доступа к файлу", __LINE__);
 			}else if((p & std::experimental::filesystem::perms::others_write) != std::experimental::filesystem::perms::none){ //mpre("Права доступа заданы верно", __LINE__);
 			}else if(string cmd = "chmod a+w "+ dbname; (0 >= cmd.length())){ mpre("ОШИБКА задания комманды установки прав к файлу", __LINE__);
-			}else if(system(cmd.c_str()); false){ mpre("ОШИБКА установки полных прав доступа", __LINE__);
-			}else{ mpre("Установка прав доступа "+ cmd, __LINE__);
+			//}else if(system(cmd.c_str()); false){ mpre("ОШИБКА установки полных прав доступа", __LINE__);
+			}else{ mpre("ОШИБКА Установка прав доступа "+ cmd, __LINE__);
 			} return false; }()){ mpre("ОШИБКА установки прав досутпа к файлу", __LINE__);
 		}else if(std::experimental::filesystem::perms p = std::experimental::filesystem::status(dbname).permissions(); ((p & std::experimental::filesystem::perms::others_write) == std::experimental::filesystem::perms::none)){ mpre("ОШИБКА файл БД не доступен для записи $chmod u+w "+ dbname, __LINE__);
 		}else if([&](){ //mpre("Сохранение результатов в тест", __LINE__);
