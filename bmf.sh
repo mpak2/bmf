@@ -2,17 +2,17 @@
 
 #sudo apt install libsqlite3-dev
 
-#cat clump/dva.json | ./bimorph - ./2 -c -e 10 -r 0
+#cat clump/dva.json | ./bimorph - ./2 -c -epoch 10 -r 0
 #sqlite3 ./2 -column -header "SELECT * FROM mp_bmf_test ORDER BY id DESC LIMIT 10; -- SELECT COUNT(*) as step, SUM(change) as SumChange, MAX(bmf) as bmf FROM mp_bmf_test WHERE perc<10;"
 ##sqlite3 ./2 -column -header "SELECT * FROM mp_bmf_index ORDER BY id DESC"
 
-cat clump/tri.json | ./bimorph - ./3 -c -e 100
-sqlite3 ./3 -column -header "SELECT * FROM mp_bmf_test ORDER BY id DESC LIMIT 10; -- SELECT COUNT(*) as step, SUM(change) as SumChange, MAX(bmf) as bmf FROM mp_bmf_test WHERE perc<10;"
+#cat clump/tri.json | ./bimorph - ./3 -c -rand 1 -epoch 100
+#sqlite3 ./3 -column -header "SELECT * FROM mp_bmf_test ORDER BY id DESC LIMIT 10; -- SELECT COUNT(*) as step, SUM(change) as SumChange, MAX(bmf) as bmf FROM mp_bmf_test WHERE perc<10;"
 ##sqlite3 ./3 -column -header "SELECT * FROM mp_bmf_index ORDER BY id DESC"
 ##./bimorph ./3 -j '[{"dano":{"Один":"0", "Два":"0", "Три":"0"}}]'
 
-#cat clump/iris.json | ./bimorph - clump/iris.sqlite -c -e 100
-#sqlite3 clump/iris.sqlite -column -header "SELECT * FROM mp_bmf_test ORDER BY id DESC LIMIT 10; SELECT COUNT(*) AS count, MIN(duration) AS min_duration, AVG(duration) as avg_duration, MAX(duration) AS max_duration, AVG(bmf) as avg_bmf FROM mp_bmf_test;"
+cat clump/iris.json | ./bimorph - clump/iris.sqlite -c -epoch 100
+sqlite3 clump/iris.sqlite -column -header "SELECT * FROM mp_bmf_test ORDER BY id DESC LIMIT 10; SELECT COUNT(*) AS count, MIN(duration) AS min_duration, AVG(duration) as avg_duration, MAX(duration) AS max_duration, AVG(bmf) as avg_bmf FROM mp_bmf_test;"
 
 #	#sqlite3 clump/iris.sqlite -column -header "SELECT MAX(depth) FROM mp_bmf_index"
 #./bimorph clump/iris.sqlite -j '[{"dano":{"ДлиннаЧашелистика":"2.0","ШиринаЧашелистика":"4.0","ДлиннаЛепестка":"1.8","ШиринаЛепестка":"1.8"}}]'
@@ -45,7 +45,7 @@ if [ -f "./3" ]; then
 	sqlite3 ./3 "UPDATE mp_bmf_itog SET index_id=NULL";
 	sqlite3 ./3 "DELETE FROM mp_bmf_index;"
 fi
-	cat clump/tri.json | ./bimorph - 3 -r 0 -e 100
+	cat clump/tri.json | ./bimorph - 3 -r 0 -epoch 100
 if [ -f "./3" ]; then
 	sqlite3 3 -column -header "SELECT * FROM mp_bmf_test ORDER BY id DESC LIMIT 10; -- SELECT COUNT(*) as step, SUM(change) as SumChange, MAX(bmf) as bmf FROM mp_bmf_test WHERE perc<10;"
 fi
@@ -59,7 +59,7 @@ if [ -f "./2" ]; then
 	sqlite3 ./2 "DELETE FROM mp_bmf_itog; DELETE FROM mp_bmf_itog_values; DELETE FROM mp_bmf_itog_titles;"
 	sqlite3 ./2 "UPDATE SQLITE_SEQUENCE SET SEQ=0 WHERE NAME='mp_bmf_index';"
 fi
-cat clump/dva.json | ./bimorph - ./2 -e 5;
+cat clump/dva.json | ./bimorph - ./2 -epoch 5;
 if [ -f "./2" ]; then
 	sqlite3 2 -column -header "SELECT * FROM mp_bmf_test ORDER BY id DESC LIMIT 10; -- SELECT COUNT(*) as step, SUM(change) as change, MAX(bmf) as bmf FROM mp_bmf_test WHERE perc<10;"
 fi
