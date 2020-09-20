@@ -172,7 +172,7 @@ int main(int argc, char **argv){
 		}else if([&](){ // Версия программы
 			if(bmf::ARGV.end() == bmf::ARGV.find("-version")){ return false; //mpre("Пропускаем отображение версии", __LINE__);
 			}else{ std::cout << endl;
-				std::cout << "bimotph v5.1" << endl;
+				std::cout << "bimotph v5.2" << endl;
 				std::cout << "Copyright (C) 2017 биморф.рф" << endl;
 				std::cout << "Нет НИКАКИХ ГАРАНТИЙ до степени, разрешённой законом." << endl << endl;
 				std::cout << "Лицензия freemium https://ru.wikipedia.org/wiki/Freemium" << endl;
