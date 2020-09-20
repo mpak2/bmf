@@ -2,8 +2,8 @@
 
 #sudo apt install libsqlite3-dev
 
-cat clump/dva.json | ./bimorph - ./2 -c -epoch 10 -rand 0
-sqlite3 ./2 -column -header "SELECT * FROM mp_bmf_test ORDER BY id DESC LIMIT 10; -- SELECT COUNT(*) as step, SUM(change) as SumChange, MAX(bmf) as bmf FROM mp_bmf_test WHERE perc<10;"
+#cat clump/dva.json | ./bimorph - ./2 -c -epoch 10 -rand 0
+#sqlite3 ./2 -column -header "SELECT * FROM mp_bmf_test ORDER BY id DESC LIMIT 10; -- SELECT COUNT(*) as step, SUM(change) as SumChange, MAX(bmf) as bmf FROM mp_bmf_test WHERE perc<10;"
 ##sqlite3 ./2 -column -header "SELECT * FROM mp_bmf_index ORDER BY id DESC"
 
 #cat clump/tri.json | ./bimorph - ./3 -c -rand 1 -epoch 100
@@ -15,13 +15,13 @@ sqlite3 ./2 -column -header "SELECT * FROM mp_bmf_test ORDER BY id DESC LIMIT 10
 #sqlite3 clump/iris.sqlite -column -header "SELECT * FROM mp_bmf_test ORDER BY id DESC LIMIT 10; SELECT COUNT(*) AS count, MIN(duration) AS min_duration, AVG(duration) as avg_duration, MAX(duration) AS max_duration, AVG(bmf) as avg_bmf FROM mp_bmf_test;"
 
 #	#sqlite3 clump/iris.sqlite -column -header "SELECT MAX(depth) FROM mp_bmf_index"
-#./bimorph clump/iris.sqlite -j '[{"dano":{"ДлиннаЧашелистика":"2.0","ШиринаЧашелистика":"4.0","ДлиннаЛепестка":"1.8","ШиринаЛепестка":"1.8"}}]'
-#./bimorph clump/iris.sqlite -j '[{"dano":{"ДлиннаЧашелистика":"5.0","ШиринаЧашелистика":"3.3","ДлиннаЛепестка":"1.4","ШиринаЛепестка":"0.2"}}]'
-#./bimorph clump/iris.sqlite -j '[{"dano":{"ДлиннаЧашелистика":"5.7","ШиринаЧашелистика":"2.8","ДлиннаЛепестка":"4.1","ШиринаЛепестка":"1.3"}}]'
-#./bimorph clump/iris.sqlite -j '[{"dano":{"ДлиннаЧашелистика":"5.9","ШиринаЧашелистика":"3.0","ДлиннаЛепестка":"5.1","ШиринаЛепестка":"1.8"}}]'
-#./bimorph clump/iris.sqlite -dano '[{"dano":{"ДлиннаЧашелистика":"5.7","ШиринаЧашелистика":"2.8","ДлиннаЛепестка":"4.1","ШиринаЛепестка":"1.3"}},
-#											{"dano":{"ДлиннаЧашелистика":"5.0","ШиринаЧашелистика":"3.3","ДлиннаЛепестка":"1.4","ШиринаЛепестка":"0.2"}},
-#											{"dano":{"ДлиннаЧашелистика":"5.1","ШиринаЧашелистика":"3.8","ДлиннаЛепестка":"1.5","ШиринаЛепестка":"0.3"}}]'
+#./bimorph clump/iris.sqlite -dano '[{"dano":{"ДлиннаЧашелистика":"2.0","ШиринаЧашелистика":"4.0","ДлиннаЛепестка":"1.8","ШиринаЛепестка":"1.8"}}]'
+./bimorph clump/iris.sqlite -dano '[{"dano":{"ДлиннаЧашелистика":"6.3","ШиринаЧашелистика":"3.3","ДлиннаЛепестка":"6.0","ШиринаЛепестка":"2.5"}}]' # Iris-virginica
+#./bimorph clump/iris.sqlite -dano '[{"dano":{"ДлиннаЧашелистика":"7.0","ШиринаЧашелистика":"3.2","ДлиннаЛепестка":"4.7","ШиринаЛепестка":"1.4"}}]' # Iris-versicolor
+#./bimorph clump/iris.sqlite -dano '[{"dano":{"ДлиннаЧашелистика":"5.0","ШиринаЧашелистика":"3.2","ДлиннаЛепестка":"1.2","ШиринаЛепестка":"0.2"}}]' # Iris-setosa
+#./bimorph clump/iris.sqlite -dano '[{"dano":{"ДлиннаЧашелистика":"6.3","ШиринаЧашелистика":"3.3","ДлиннаЛепестка":"6.0","ШиринаЛепестка":"2.5"}},
+#											{"dano":{"ДлиннаЧашелистика":"7.0","ШиринаЧашелистика":"3.2","ДлиннаЛепестка":"4.7","ШиринаЛепестка":"1.4"}},
+#											{"dano":{"ДлиннаЧашелистика":"5.0","ШиринаЧашелистика":"3.2","ДлиннаЛепестка":"1.2","ШиринаЛепестка":"0.2"}}]'
 
 #cat clump/crc8.json | ./bimorph - clump/crc8.sqlite -c -r 0 -t 8
 #sqlite clump/crc8.sqlite -column -header "SELECT * FROM mp_bmf_test ORDER BY id DESC LIMIT 10; -- SELECT COUNT(*) as step, SUM(change) as SumChange, MAX(bmf) as bmf FROM mp_bmf_test WHERE perc<10;"

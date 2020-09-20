@@ -78,7 +78,6 @@ namespace bmf{ // Глобальные переменные
 
 	TMs CACHE; // Кеш результатов расчета
 	TMs CALCULATE; // Список формул для быстрых расчетов для каждого из итогов
-//	TMs MAP; // Список карт
 
 	TMs databases; // Список баз данных
 	TMs ARGV; // Массив параметров консоли
@@ -86,7 +85,7 @@ namespace bmf{ // Глобальные переменные
 
 	std::function<TMMi(string,TMMi)> Save; // Сохранение информации в базу
 	std::function<std::string(TMs)> Calculate; // Расчет строки для расчета польской нотации
-	std::function<std::string(std::string,int,TM3i&)> Calc; // Расчет строки польской нотации
+	std::function<std::string(std::string,TM3i&)> Calc; // Расчет строки польской нотации
 	std::function<TMs(TMs,TM3i&)> Tree; // История морфа
 	std::function<TMs(TMs)> Value; // История морфа
 	std::function<int(TMs,string,TM3i&)> Values; // Проверка наличия значений в БД
@@ -108,8 +107,6 @@ namespace bmf{ // Глобальные переменные
 }
 
 int main(int argc, char **argv){
-
-
 	if([&](){ // Список значений из консоли
 		if([&](){ for(int i = 0; i < argc; i++){ // Параметры значений консоли
 				if(0 >= i){ //mpre("Имя файла", __LINE__);
@@ -869,7 +866,7 @@ int main(int argc, char **argv){
 			}else{
 			} return false; }); false){ mpre("ОШИБКА установки значений", __LINE__);
 		}else if(bmf::Learn = ([&](TMs bmf_index, string val = "", int key, TM3i& _BMF_DANO_EX, TM3i& _BMF_ITOG_EX, TMs stair = {}){ //mpre("Обучение "+ index.at("id"), __LINE__);  //system("sleep 1"); // mpre(BMF_INDEX, __LINE__, "Список"); // if(remove){ mpre(row, __LINE__, "Ученик"); }
-			if(int rep = 1e9; 0 >= rep){ mpre("ОШИБКА установки предельного размера обучения для сети", __LINE__);
+			if(int rep = 2e9; 0 >= rep){ mpre("ОШИБКА установки предельного размера обучения для сети", __LINE__);
 			}else if(TMMi STAIRS = [&](TMMi STAIRS = {}){ // Требование к морфу
 				if(bmf_index.end() == bmf_index.find("id")){ mpre("ОШИБКА идентификатор у морка не установлен", __LINE__);
 				}else if(TMs stairs; false){ mpre("ОШИБКА создания первой ступени", __LINE__);
@@ -1018,7 +1015,7 @@ int main(int argc, char **argv){
 						}else if(string _val = ("0" == calc ? "1" : "0"); (0 >= _val.length())){ mpre("ОШИБКА нулевая длинна поля для значения stairs[calc]", __LINE__);
 						}else if(stairs_itr->second["revision"] = stairs["revision"] = "+"; stairs.empty()){ mpre("ОШИБКА установки доп информации по обучению", __LINE__);
 						}else if(bmf::CACHE[_index.at("id")] = _val; bmf::CACHE.empty()){ mpre("ОШИБКА установки кеша нового морфа", __LINE__);
-						}else{ mpre("Добавление нового морфа status=" +stairs.at("status") +" " +index.at("id") +" > "+ _index.at("id") +" _val=" +_val, __LINE__); //mpre(index, "Морф", __LINE__); mpre(stairs, "Ступень", __LINE__);
+						}else{ //mpre("Добавление нового морфа status=" +stairs.at("status") +" " +index.at("id") +" > "+ _index.at("id") +" _val=" +_val, __LINE__); //mpre(index, "Морф", __LINE__); mpre(stairs, "Ступень", __LINE__);
 						} return _index; }(); false){ mpre("ОШИБКА добавления морфа", __LINE__);
 					}else if(TMs stairs_next = [&](TMs stairs_next = {}){ // Добавление новой ступени
 						if(!_index.empty()){ //mpre("Пропуск добавления ступени морф уже добавлен", __LINE__);
@@ -1173,7 +1170,7 @@ int main(int argc, char **argv){
 				}}while(0 < STAIRS.size()); return false; }()){ err("Перебор всех элементов дерева для составления строки расчетов");
 			}else{ //Tree(bmf_index, BMF_INDEX_EX); mpre("Расчет строки польской нотации " +calculate, __LINE__);
 			}return calculate; }); false){ err("Создание функции расчета польской нотации");
-		}else if(bmf::Calc = ([&](std::string calculate, int key, TM3i& _BMF_DANO_EX, std::string calc = ""){ // Расчет калькуляции
+		}else if(bmf::Calc = ([&](std::string calculate, TM3i& _BMF_DANO_EX, std::string calc = ""){ // Расчет калькуляции
 			if(false){ pre("Пропуск расчета калькуляции");
 			//}else if(mpre("Формула расчета " +calculate, __LINE__); false){ err("Уведомление");
 			}else if(std::stack<string> vals = [&](std::stack<string> vals = {}, std::string c = "", std::string num = ""){ for(char c:calculate){ // Перебор значенийa
@@ -1255,8 +1252,7 @@ int main(int argc, char **argv){
 				} return calculate; }(); false){ err("Расчет формулы"); //mpre("Пропуск быстрой проверки calc=" +calc +" itog.at(val)=" +itog.at("val"), __LINE__);
 			}else if(std::string calc = [&](std::string calc = ""){ // Расчет совпадения
 				if(calculate.empty()){ err("Структура не создана");
-				}else if(calc = bmf::Calc(calculate, key, _BMF_DANO_EX); (1 != calc.length())){ mpre("ОШИБКА Расчета Калькуляции " +calc +" " +calculate, __LINE__);
-				//}else if(mpre("Калькуляция " +calculate, __LINE__); false){ err("Уведомление");
+				}else if(calc = bmf::Calc(calculate, _BMF_DANO_EX); (1 != calc.length())){ mpre("ОШИБКА Расчета Калькуляции " +calc +" " +calculate, __LINE__);
 				}else if(calc == itog.at("val")){ //pre("Не скидываем формулу, структура не меняется");
 				}else if(bmf::CALCULATE[itog.at("id")] = ""; bmf::CALCULATE.empty()){ err("Сбрасывание значения при обучении");
 				}else{ //pre("Обнуление формулы калькуляции");
@@ -1425,7 +1421,14 @@ int main(int argc, char **argv){
 				}else if(TMs dano = erb(BMF_DANO_EX, {{"id", index.at("dano_id")}}); dano.empty()){ mpre("ОШИБКА выборки исходника морфа", __LINE__);
 				}else if(dano.end() == dano.find("val")){ mpre("ОШИБКА поле исходника val не устанволено", __LINE__);
 				}else if("" == dano.at("val")){ mpre("ОШИБКА значение исходника морфа не задано", __LINE__);
-				}else if(index["val"] = bmf::Learn(index, "", 0, BMF_DANO_EX, BMF_ITOG_EX); index.empty()){ mpre("ОШИБКА расчета значения морфа", __LINE__);
+				//}else if(index["val"] = bmf::Learn(index, "", 0, BMF_DANO_EX, BMF_ITOG_EX); index.empty()){ mpre("ОШИБКА расчета значения морфа", __LINE__);
+				}else if(index["val"] = [&](std::string calc = ""){ // Быстрая проверка
+					if(std::string calculate = (bmf::CALCULATE.end() == bmf::CALCULATE.find(itog.at("id")) ? "" : bmf::CALCULATE.at(itog.at("id"))); false){ //pre("Удаленная ранее формула");
+					}else if(calculate = ("" == calculate ? bmf::Calculate(index) : calculate); calculate.empty()){ err("Расчет формулы калькуляции");
+					}else if(bmf::CALCULATE[itog.at("id")] = calculate; bmf::CALCULATE.empty()){ err("Сохранение значений калькуляции");
+					}else if(calc = bmf::Calc(calculate, BMF_DANO_EX); (1 != calc.length())){ mpre("ОШИБКА Расчета Калькуляции " +calc +" " +calculate, __LINE__);
+					}else{ //mpre("Быстрая проверка calculate="+ calculate, __LINE__);
+					} return calc; }(); (1 != index.at("val").length())){ err("Расчет формулы"); //mpre("Пропуск быстрой проверки calc=" +calc +" itog.at(val)=" +itog.at("val"), __LINE__);
 				}else if(mpre("Расчет "+ itog.at("id")+ " "+ itog_values.at("name")+ " ("+ itog.at("name")+ ") index["+ index.at("id")+ "]="+ index["val"] , __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
 				}else if(INDEX.insert(make_pair(atoi(itog.at("name").c_str()), index)); INDEX.empty()){ mpre("ОШИБКА добавления итогов к сортированному списку", __LINE__);
 				}else{ //mpre(itog, __LINE__, "Итог");
@@ -1470,14 +1473,10 @@ int main(int argc, char **argv){
 				}else if([&](){ for(auto &itog_values_itr:BMF_ITOG_VALUES_EX.at("")){ //for_each(BMF_ITOG_VALUES_EX.at("").begin(), BMF_ITOG_VALUES_EX.at("").end(), [&](auto &itog_values_itr){ // Расчет значений
 						if(BMF_INDEX_EX.at("").empty()){ //mpre("Установка первоначальных морфов", __LINE__);
 						}else if(TMs itog_values = itog_values_itr.second; itog_values.empty()){ mpre("ОШИБКА получения значения", __LINE__);
-						}else if(itog_values = bmf::Value(itog_values); itog_values.empty()){ mpre("ОШИБКА расчета значения", __LINE__);
-						}else if(itog_values_itr.second = itog_values; itog_values_itr.second.empty()){ mpre("ОШИБКА сохранения результатов расчета в справочник", __LINE__);
+						}else if(itog_values_itr.second = bmf::Value(itog_values); itog_values_itr.second.empty()){ mpre("ОШИБКА расчета значения", __LINE__);
 						}else{ //mpre(itog_values, __LINE__, "Расчетное значение"); //mpre("Расчетное значение `"+ itog_values["name"]+ "` "+ to_string(dec)+ " ("+ bin+ ")", __LINE__);
 						}
 					}; return false; }()){ mpre("Ошибка отображение результата расчета", __LINE__);
-				/*}else if([&](){ // Расчет значений
-					
-					return true; }()){ mpre("ОШИБКА расчета результата", __LINE__);*/
 				}else if([&](){ for(auto &itog_values_itr:BMF_ITOG_VALUES_EX.at("")){
 						if(TMs itog_values = itog_values_itr.second; itog_values.empty()){ mpre("ОШИБКА получения значения итога", __LINE__);
 						}else if(string name = itog_values.at("name"); (0 >= name.length())){ mpre("ОШИБКА слишком короткое имя параметра", __LINE__);
