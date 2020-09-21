@@ -626,9 +626,8 @@ int main(int argc, char **argv){
 				}else if(list += "," +index.at("dano_id") +";"; list.empty()){ mpre("ОШИБКА добавления исходника морфа в список", __LINE__);
 				}else{ //mpre(index, "Идентификатор list"+ list, __LINE__);
 				} return index; }(); index.empty()){ mpre("ОШИБКА получения морфа", __LINE__);
-			}else if([&](int pos = 0, int loop = 6.5e4){ while((string::npos != (pos = list.find_last_of(","))) && (loop-- > 0) && (1 < _DANO.size())){ // Исключение повторяющихся исходников
+			}else if([&](int pos = 0, int loop = 2e9){ while((string::npos != (pos = list.find_last_of(","))) && (loop-- > 0) && (1 < _DANO.size())){ // Исключение повторяющихся исходников
 					if(false){ mpre("Пропуск исключений повторений", __LINE__);
-					//}else if(mpre("Позиция запятой loop=" +to_string(loop) +" pos=" + to_string(pos) +" list=" +list, __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
 					}else if(int dano_id =atoi(list.substr(pos +1, list.length()-1).c_str()); (0 == dano_id)){ mpre("ОШИБКА получения идентификатор исходника " +list, __LINE__);
 					}else if(list =list.substr(0, pos); false){ mpre("ОШИБКА сокращение длинны списка", __LINE__);
 					}else if(_DANO.end() == _DANO.find(dano_id)){ mpre("ОШИБКА Исходник не найден в списке " +list +" "+ to_string(dano_id), __LINE__);
@@ -636,14 +635,26 @@ int main(int argc, char **argv){
 					}else{ //mpre("Идетификатор исходника "+ to_string(dano_id) +" list=" +list +" следующая=" +to_string(list.find_last_of(",")) + " "+ (string::npos != list.find_last_of(",") ? "1" : "0") +" size=" +to_string(_DANO.size()), __LINE__);
 					}
 				} return _DANO.empty(); }()){ mpre("ОШИБКА список не должен оставаться пустым", __LINE__);
-			}else if([&](int pos = 1, bool loop = false, bool erase = false){ do{
+			/*}else if(TMs dano = [&](TMs dano = {}){ // Исходник морфа
+				if(index.end() == index.find("dano_id")){ mpre("ОШИБКА поле исходника не найдено у морфа", __LINE__);
+				}else if(int dano_id = atoi(index.at("dano_id").c_str()); !dano_id){ mpre("ОШИБКА выборки номера исходника", __LINE__);
+				}else if(_BMF_DANO_EX.at("").end() == _BMF_DANO_EX.at("").find(dano_id)){ mpre("ОШИБКА исходник не найден в списке", __LINE__);
+				}else if(dano = _BMF_DANO_EX.at("").at(dano_id); dano.empty()){ mpre("ОШИБКА выбрки исходника морфа", __LINE__);
+				}else{ //mpre(dano, "Исходник морфа", __LINE__);
+				}return dano; }(); dano.empty()){ mpre("Исходник морфа не найден", __LINE__);
+			}else if(dano.end() == dano.find("values")){ mpre(index, "Морф", __LINE__); mpre("ОШИБКА поле истории не найдено у морфа", __LINE__);
+			}else if(std::string values = dano.at("values"); values.empty()){ mpre("ОШИБКА выборки истории морфа", __LINE__);
+			}else if(std::string char_last = values.substr(values.length()-1, 1); (1 != char_last.length())){ mpre("ОШИБКА выборки последнего символа основной истории", __LINE__);
+			}else if(std::string char_cur = values.substr(values.length()-2, 1); (1 != char_last.length())){ mpre("ОШИБКА выборки последнего символа основной истории", __LINE__);
+			}else if(bool shift = (char_last != char_cur); false){ mpre("ОШИБКА расчета изменений в основной истории", __LINE__);*/
+			}else if([&](int pos = 1, bool loop = false){ do{
 					for(auto dano_itr:_BMF_DANO_EX.at("")){ // Перебор исходных значений
 						if(1 >= _DANO.size()){ //mpre("Не удаляем последнее значение", __LINE__);
-						}else if(TMs dano = dano_itr.second; dano.empty()){ mpre("Уже удаленный исходник " +to_string(loop ? 1 : 0), __LINE__);
+						//}else if(2 > values.length()){ mpre("Длинны основной истории не достаточно для сравнения", __LINE__);
 						}else if(_DANO.end() == _DANO.find(dano_itr.first)){ //mpre("Уже удален " +dano.at("id"), __LINE__);
-						}else if(dano.end() == dano.find("values")){ mpre("ОШИБКА в исходнике не найдена история", __LINE__);
-						}else if(string values = dano.at("values"); (0 >= values.length())){ mpre("ОШИБКА выборки истории исходника", __LINE__);
-						}else if(int len = values.length(); (0 >= len)){ mpre("Пропуск расчетов", __LINE__);
+						}else if(dano_itr.second.end() == dano_itr.second.find("values")){ mpre("ОШИБКА в исходнике не найдена история", __LINE__);
+						}else if(string _values = dano_itr.second.at("values"); (0 >= _values.length())){ mpre("ОШИБКА выборки истории исходника", __LINE__);
+						}else if(int len = _values.length(); (0 >= len)){ mpre("Пропуск расчетов", __LINE__);
 						}else if(bool erase = [&](){ // Удаление неподходящего по длинне исходника
 							if(pos < len){ return false; //mpre("Позиция символа в пределах истории pos="+ to_string(pos) +" len="+ to_string(len), __LINE__);
 							}else if(_DANO.erase(dano_itr.first); false){ mpre("ОШИБКА удаления короткого значения истории", __LINE__);
@@ -651,19 +662,21 @@ int main(int argc, char **argv){
 							} return true; }()){ //mpre("Удаления исходника по длинне "+ dano.at("id"), __LINE__);
 						}else if(1 >= _DANO.size()){ //mpre("Не удаляем последнее значение", __LINE__);
 						}else if([&](){ // Удаление исходника
-							if(string char_last = values.substr(len -1, 1); (1 != char_last.length())){ mpre("ОШИБКА получения последнего символа", __LINE__);
-							}else if(string char_cur = values.substr(len -pos -1, 1); (1 != char_cur.length())){ mpre("ОШИБКА получения текущего символа", __LINE__);
-							}else if(char_last != char_cur){ //mpre("Подходящее значение", __LINE__);
+							if(string _char_last = _values.substr(len -1, 1); (1 != _char_last.length())){ mpre("ОШИБКА получения последнего символа", __LINE__);
+							}else if(string _char_cur = _values.substr(len -pos -1, 1); (1 != _char_cur.length())){ mpre("ОШИБКА получения текущего символа", __LINE__);
+							}else if(_char_last != _char_cur){ //mpre("Подходящее значение char_cur=" +char_cur +" char_last=" +char_last, __LINE__);
+							//}else if(shift != (_char_last != _char_cur)){ //mpre("Подходящее значение", __LINE__);
 							}else if(_DANO.erase(dano_itr.first); false){ mpre("ОШИБКА удаления короткого значения истории", __LINE__);
-							}else{ //mpre("Удаление исходника " +dano_itr.first, __LINE__);
+							}else{ //mpre(dano_itr.second, "Исходник " +char_cur +" " +char_last, __LINE__); mpre("Удаление исходника " +std::to_string(dano_itr.first), __LINE__);
 							} return false; }()){ mpre("ОШИБКА удаления по значению", __LINE__);
-						}else{ loop = true;
+						}else if(!(loop = true)){ mpre("ОШИБКА установки признака продолжения цикла", __LINE__);
+						}else{ //mpre("Продолжаем цикл", __LINE__);
 						}
 					}
 				}while((pos++ < bmf::values_length) && !(loop = !loop)); return false; }()){ mpre("ОШИБКА перебора значений", __LINE__);
 			}else if(_dano = [&](){ // Оставшееся значение
-				if(1 != _DANO.size()){ mpre("ОШИБКА ожидается одно значение в остатке подходящих значений", __LINE__);
-				}else if(auto dano_itr = _DANO.begin(); false){ mpre("ОШИБКА выборки оставшегося значения", __LINE__);
+				//if(1 != _DANO.size()){ mpre("ОШИБКА ожидается одно значение в остатке подходящих значений", __LINE__);
+				if(auto dano_itr = _DANO.rbegin(); false){ mpre("ОШИБКА выборки оставшегося значения", __LINE__);
 				}else if(_dano = dano_itr->second; _dano.empty()){ mpre("ОШИБКА выборки оставшегося значения", __LINE__);
 				}else{ //mpre(_dano, "Оставшееся значение", __LINE__);
 				} return _dano; }(); _dano.empty()){ mpre("ОШИБКА выборки оставшегося значения", __LINE__);
