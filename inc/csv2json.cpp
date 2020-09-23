@@ -98,7 +98,7 @@ int main(int argc, char **argv){
 				}else{ //mpre("Поле итога "+ field, __LINE__);
 				}
 			}return json.empty(); }()){ mpre("ОШИБКА добавления итоговых значений", __LINE__);
-		}else if([&](){ for(auto hidden_itr:hidden){ // Формирование списка итогов
+		}else if([&](){ for(auto hidden_itr:hidden){ // Удаление скрытых полей
 				if(std::string field = hidden_itr.second; field.empty()){ mpre("ОШИБКА получения поля итога", __LINE__);
 				}else if(csv.end() == csv.find(field)){ mpre("ОШИБКА поле не найдено в csv `"+ field +"`", __LINE__);
 				}else if(csv.erase(field); csv.empty()){ pre("ОШИБКА Удаление итога из данных");
