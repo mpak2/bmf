@@ -38,6 +38,13 @@
 #include <fstream>      // std::ifstream
 #include <stack>
 
+// Клиент сервер
+#include<sys/socket.h>
+#include<sys/types.h>
+#include<arpa/inet.h>
+#include<unistd.h>
+#include<stdlib.h>
+
 //#define CL_HPP_MINIMUM_OPENCL_VERSION 110
 //#define CL_HPP_TARGET_OPENCL_VERSION 210
 //#define CL_HPP_CL_1_2_DEFAULT_BUILD
@@ -65,6 +72,11 @@ TMMi BMF_CLUMP, DATABASES;//, BMF_INDEX, BMF_DANO, _BMF_DANO, _BMF_ITOG, BMF_ITO
 TM3i BMF_DANO_VALUES_EX, BMF_ITOG_VALUES_EX; // Значения позиций морфов
 TM3i BMF_DANO_TITLES_EX, BMF_ITOG_TITLES_EX; // Списки справочников
 
+void error( char *msg)
+{
+ perror(msg);
+ exit(EXIT_FAILURE);
+}
 
 namespace bmf{ // Глобальные переменные
 	int loop = 0; // Количество итераций скрипта
@@ -185,11 +197,11 @@ int main(int argc, char **argv){
 		} return true; }()){ exit(mpre("Остановка выполнения", __LINE__));
 	}else if(sqlite3* db = 0; false){ mpre("ОШИБКА установки идентификатора ошибки базы данных", __LINE__);
 	}else if(string dbname = [&](string dbname = ""){ // Имя базы данных
-		if(bmf::ARGV.end() == bmf::ARGV.find("-db")){ mpre("ОШИБКА БД для сохранения не задана -db", __LINE__);
+		if(bmf::ARGV.end() == bmf::ARGV.find("-db")){ //mpre("ОШИБКА БД для сохранения не задана -db", __LINE__);
 		}else if(0 >= bmf::ARGV.at("-db").length()){ mpre("База данных для сохранения не указана", __LINE__);
 		}else if(dbname = bmf::ARGV.at("-db"); (0 >= dbname.length())){ mpre("ОШИБКА имя файла для БД не задано", __LINE__);
 		}else{ //mpre("База данных"+ string, __LINE__);
-		} return dbname; }(); (0 >= dbname.length())){ mpre("ОШИБКА получения имени базы данных", __LINE__);
+		} return dbname; }(); false){ mpre("ОШИБКА получения имени базы данных", __LINE__);
 	}else if([&](){ // Подключение базы
 		if(bmf::exec = ([&](string sql){ // Запрос к БД
 			int result, sqlite_result, sleep = 30;
@@ -343,10 +355,10 @@ int main(int argc, char **argv){
 				}else{ std::cerr << __LINE__ << " Подключение родительской БД " << attach_database << endl;
 				} return false; }()){ mpre("ОШИБКА подключения баз данных", __LINE__);
 			}else if([&](){ // Получение пути до файла БД
-				if(int pos = dbname.rfind("/"); (0 > pos)){ mpre("Слешей в пути до скопления не найдено", __LINE__);
+				if(int pos = dbname.rfind("/"); (0 > pos)){ //mpre("Слешей в пути до скопления не найдено", __LINE__);
 				}else if(bmf::clump_id = dbname.substr(pos+1, dbname.length()); (0 >= bmf::clump_id.length())){ mpre("ОШИБКА сокращения пути до файла", __LINE__);
 				}else{ //mpre("Путь до БД сокращен "+ clump_id, __LINE__);
-				} return (0 >= bmf::clump_id.length()); }()){ mpre("ОШИБКА получения скопления", __LINE__);
+				} return false; }()){ mpre("ОШИБКА получения скопления", __LINE__);
 			}else if([&](){ // Получение текущего скопления
 				if("0" == bmf::clump_id){ mpre("Скопление не указано", __LINE__);
 				}else if(DATABASES = bmf::Tab("PRAGMA database_list"); DATABASES.empty()){ mpre("ОШИБКА получения списка подключенных таблиц", __LINE__);
@@ -358,7 +370,7 @@ int main(int argc, char **argv){
 				}else if(bmf::bmf_clump = bmf::fk("mp_bmf_clump", {{"id", bmf::clump_id}}, {}, {{"hide", "0"}}); bmf::bmf_clump.empty()){ mpre("ОШИБКА обновления видимости скопления", __LINE__);
 				}else if(bmf::exec("UPDATE mp_bmf_clump SET hide=1 WHERE id<>"+ bmf::clump_id); false){ mpre("ОШИБКА скрытия не активных скопления", __LINE__);
 				}else{ mpre("Скопление: `"+ bmf::bmf_clump["name"]+ "`", __LINE__);
-				} return (0 >= bmf::clump_id.length()); }()){ mpre("ОШИБКА получения скопления", __LINE__);
+				} return false; }()){ mpre("ОШИБКА получения скопления", __LINE__);
 			}else if([&](){ // Добавление таблиц в БД если они не созданы
 				if(bmf::exec("CREATE TABLE IF NOT EXISTS main.mp_bmf_index (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,`clump_id` INTEGER,`itog_values_id` INTEGER, `depth` INTEGER, `dimension` INTEGER,`dano_id` INTEGER,`itog_id` TEXT,`calc_pos_id` INTEGER,`index_id` INTEGER, `bmf-index` INTEGER)"); false){ mpre("ОШИБКА создания таблицы морфов", __LINE__);
 				}else if(bmf::exec("CREATE TABLE IF NOT EXISTS main.mp_bmf_dano (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,`time` INTEGER,`uid` INTEGER,`clump_id` INTEGER,`dano_values_id` INTEGER,`name` TEXT,`val` INTEGER,`values` TEXT)"); false){ mpre("ОШИБКА создания таблицы морфов", __LINE__);
@@ -792,23 +804,19 @@ int main(int argc, char **argv){
 									}else if(vals = {{"id", bmf::Id((*BMF).at(""))}, {"clump_id", bmf::clump_id}, {alias+ "_values_id", values.at("id")}, {"name", to_string(nn)}, {"val", ""}, {"values", ""}}; vals.empty()){ mpre("ОШИБКА создания нового знака", __LINE__);
 									}else if(string itog = [&](string itog = ""){ // Проверка вставки в многопоточном режиме
 										if(bmf::ARGV.end() == bmf::ARGV.find("-itog")){ //mpre("В многооконном режиме вставка знаков запрещена", __LINE__);
-										}else if(string _itog = bmf::ARGV.at("-itog"); "0" == _itog){ //mpre("ОШИБКА пустой итог", __LINE__);
-										}else{ itog = _itog;
+										}else if(string _itog = bmf::ARGV.at("-itog"); "0" != _itog){ itog = _itog;
+										}else if(std::string table = "mp_bmf_"+ alias; table.empty()){ mpre("ОШИБКА расчета имени таблицы", __LINE__);
+										}else if(vals = bmf::fk(table, {}, vals, {}); vals.empty()){ mpre(vals, __LINE__, "Знак"); mpre("ОШИБКА добавления знака", __LINE__);
+										}else{ mpre("Добавление знака " +alias +" " +vals.at("id"), __LINE__);
 										} return itog; }(); !itog.empty()){ mpre("ОШИБКА в многопоточном режиме вставка знаков запрещена "+ alias, __LINE__);
 									}else if(erb_insert(*BMF, vals.at("id"), vals); vals.empty()){ mpre("ОШИБКА обновления справочника знаков", __LINE__);
-									}else{ //mpre("ОШИБКА добавление глобального знака", __LINE__); //mpre(*BMF, __LINE__, "Список знаков"); mpre("Добавление глобального знака `"+ values["name"]+ "` ["+ vals.at("id")+ "] "+ to_string(nn), __LINE__); mpre(vals, __LINE__, "Знак"); //mpre("ОШИБКА добавления знака "+ alias+ " "+ vals.at("id"), __LINE__);
+									}else{ //mpre(vals, "Знак", __LINE__); mpre("Добавление глобального знака", __LINE__); //mpre("ОШИБКА добавление глобального знака", __LINE__); //mpre(*BMF, __LINE__, "Список знаков"); mpre("Добавление глобального знака `"+ values["name"]+ "` ["+ vals.at("id")+ "] "+ to_string(nn), __LINE__); mpre(vals, __LINE__, "Знак"); //mpre("ОШИБКА добавления знака "+ alias+ " "+ vals.at("id"), __LINE__);
 									} return vals; }(); false){ mpre("ОШИБКА Добавления нового знака", __LINE__);
 								}else if(TMs _vals = [&](TMs _vals = {}){ // Синхронизация глобального значения с локальным
 									if(vals.empty()){ //mpre("Не найден знак", __LINE__);
 									}else if(std::lock_guard<std::recursive_mutex> lock(mu); false){ mpre("ОШИБКА устанвоки блокировки", __LINE__);
 									}else if(_vals = (BMF_VALS.at("").end() == BMF_VALS.at("").find(atoi(vals.at("id").c_str())) ? TMs({}) : BMF_VALS.at("").at(atoi(vals.at("id").c_str()))); !_vals.empty()){ //mpre("Знак есть в локальной базе", __LINE__);
-									}else if(_vals = vals; _vals.empty()){ mpre("ОШИБКА копирования глобального значения", __LINE__); //mpre(_vals, __LINE__, "Знак `"+ values["name"]+ "` уже добавлен "+ to_string(nn));
-									//}else if(bmf::ARGV.end() != bmf::ARGV.find("-itog")){ mpre(_vals, "Знак", __LINE__); mpre("ОШИБКА в многооконном режиме вставка знаков запрещена", __LINE__);
-									}else if(string itog = [&](string itog = ""){ // Проверка вставки в многопоточном режиме
-										if(bmf::ARGV.end() == bmf::ARGV.find("-itog")){ //mpre("В многооконном режиме вставка знаков запрещена", __LINE__);
-										}else if(string _itog = bmf::ARGV.at("-itog"); "0" == _itog){ //mpre("ОШИБКА пустой итог", __LINE__);
-										}else{ itog = _itog;
-										} return itog; }(); !itog.empty()){ mpre("ОШИБКА в многопоточном режиме вставка знаков запрещена", __LINE__);
+									}else if(_vals = vals; _vals.empty()){ mpre("ОШИБКА копирования глобального значения в локальное", __LINE__); //mpre(_vals, __LINE__, "Знак `"+ values["name"]+ "` уже добавлен "+ to_string(nn));
 									}else if(erb_insert(BMF_VALS, _vals.at("id"), _vals); _vals.empty()){ mpre("ОШИБКА обновления справочника знаков", __LINE__);
 									}else{ //mpre("Добавление глобального знака `"+ values["name"]+ "` "+ to_string(nn), __LINE__); mpre(_vals, __LINE__, "Знак"); mpre("ОШИБКА добавления знака "+ alias+ " "+ _vals.at("id"), __LINE__);
 									} return _vals; }(); false){ mpre("ОШИБКА Добавления локального знака", __LINE__);
@@ -855,7 +863,7 @@ int main(int argc, char **argv){
 					}
 				}; return false; }()){ mpre("ОШИБКА расчета знаков", __LINE__);
 			}else if([&](){ // Сохранение данных в статическом справочнике
-				if(bool cache = true; !cache){ //mpre("Кеширование значений отключено " +to_string(key), __LINE__);
+				if(bool cache = false; !cache){ //mpre("Кеширование значений отключено " +to_string(key), __LINE__);
 				}else if([&](){ // Проверка и создание структуры alias
 					if(DANO.end() != DANO.find(alias)){ //mpre("Структура уже сохдана", __LINE__);
 					}else if(DANO.insert(make_pair(alias, TMMi({}))); DANO.empty()){ mpre("ОШИБКА добавления структуры алиаса", __LINE__);
@@ -869,7 +877,7 @@ int main(int argc, char **argv){
 				}else if([&](){ for(auto& vals_itr:BMF_VALS.at("")){ // Сохранение знаков в кеш
 						if(TMs vals = vals_itr.second; vals.empty()){ mpre("ОШИБКА получения знака", __LINE__);
 						}else if(vals.end() == vals.find("val")){ mpre("ОШИБКА значение у знака не задано", __LINE__);
-						}else if(string val = vals.at("val"); (1 != val.length())){ mpre(BMF_VALS.at(""), __LINE__, "Список знаков"); mpre(VALUE, __LINE__, "Значения"); mpre(vals, __LINE__, "Знак"); mpre("ОШИБКА выборки значения знака", __LINE__);
+						}else if(string val = vals.at("val"); (1 != val.length())){ mpre(vals, __LINE__, "Знак"); mpre("ОШИБКА выборки значения знака", __LINE__);
 						}else if(DANO.at(alias).at(key).insert(make_pair(vals.at("id"), val)); DANO.at(alias).at(key).empty()){ mpre("ОШИБКА сохранения значения знака", __LINE__);
 						}else{ //mpre("Загрузка знака "+ vals.at("id")+ " val="+ val, __LINE__);
 						}
@@ -1322,10 +1330,58 @@ int main(int argc, char **argv){
 				}else if(loop = atoi(_loop.c_str()); (0 >= loop)){ mpre("ОШИБКА количество эпох не достаточно для продолжения", __LINE__);
 				}else{ //mpre("Количество эпох установлено "+ to_string(loop), __LINE__);
 				} return loop; }(); (0 > bmf::loop)){ mpre("ОШИБКА количество эпох задано не верно -epoch", __LINE__);
-			}else if(TM3i _BMF_DANO_EX = BMF_DANO_EX; _BMF_DANO_EX.empty()){ mpre("ОШИБКА установки первоначальных исходников дано", __LINE__);
-			}else if(TM3i _BMF_ITOG_EX = BMF_ITOG_EX; _BMF_ITOG_EX.empty()){ mpre("ОШИБКА установки первоначальных итогов дано", __LINE__);
-			}else if(auto _in = in; _in.empty()){ mpre("ОШИБКА установки временного массива", __LINE__);
-			//}else if(true){ mpre(BMF_DANO_VALUES_EX, __LINE__, "Список дано");
+			}else if(TM3i _BMF_DANO_EX = BMF_DANO_EX; false){ mpre("ОШИБКА установки первоначальных исходников дано", __LINE__);
+			}else if(TM3i _BMF_ITOG_EX = BMF_ITOG_EX; false){ mpre("ОШИБКА установки первоначальных итогов дано", __LINE__);
+			}else if(int server = [&](std::string srv = ""){ // Запуск сервера
+				if(bmf::ARGV.end() == bmf::ARGV.find("-server")){ //mpre("Сервер в параметрах не указан", __LINE__);
+				}else if(int s = socket(AF_INET, SOCK_STREAM, 0); s<0){ err("Ошибка установки сокета");
+				}else if(struct sockaddr_in addr; false){ err("Структура соединения");
+				}else if(addr.sin_family = AF_INET; false){ err("Тип соединения");
+				}else if(addr.sin_port = htons(18666); false){ err("Порт соединения");
+				}else if(mpre("Ожидание соединения 127.0.0.1:18666", __LINE__); false){ err("Уведомление");
+				}else if(addr.sin_addr.s_addr = htonl(INADDR_ANY); false){ err("Адрес соединения");
+				}else if(bind(s, (struct sockaddr *)&addr, sizeof(addr)) < 0){ err("Установка прослушивания");
+				}else if([&](int loop = 2){ do{ // Получение соединения от клиентов
+					if(listen(s, 5)){ err("Отметка порта как пассивный - он будет слушать порт");
+					}else if(int s1 = accept(s, NULL, NULL); s1 < 0){ err("Прием соединения");
+					}else if(char buffer[1024]; false){ err("Данные из порта");
+					}else if(int counter = 0; false){ err("Счетчик");
+					}else if(memset(buffer, 0, sizeof(buffer)); false){ err("Сохранение в память");
+					}else if(int rc = recv(s1, buffer, 30, 0); rc == 0){ mpre("Отключен", __LINE__);
+					}else if(rc < 0){ err("Системная"); //if( errno == EINTR ){ continue; }
+					}else if(char response[] = "Hi, dear!"; false){ err("Текст ответа");
+					}else if(sendto( s1, response, sizeof(response), 0, (struct sockaddr *)&addr, sizeof(addr) ) < 0){ err("Ответ клиенту");
+					//}else if(char *ip = inet_ntoa(addr.sin_addr); false){ err("Получение удаленного адреса");
+					}else{ printf("%s\n", buffer);
+					}}while(--loop>0); return false; }()){ err("Ожидание ответа");
+				}else{ //mpre("Ответ отправлен `" +string(response) + "`", __LINE__); //cout<<"\n Сообщение от клиента : "<<buffer<<endl; //mpre("Сервер " +server, __LINE__);
+				} return 0; }(); false){ mpre("Остановка сервера ", __LINE__);
+			}else if(int client = [&](std::string clt = ""){ // Запуск сервера
+				if(bmf::ARGV.end() == bmf::ARGV.find("-client")){ //mpre("Сервер в параметрах не указан", __LINE__);
+				}else if(int s = socket( AF_INET, SOCK_STREAM, 0 ); s<0){ mpre("ОШИБКА обновления сокета", __LINE__);
+				}else if(struct sockaddr_in peer; false){ mpre("ОШИБКА создания структуры соединения", __LINE__);
+				}else if(peer.sin_family = AF_INET; false){ err("Установка типа соединения");
+				}else if(peer.sin_port = htons(18666); false){ err("Установка порта");
+				}else if(peer.sin_addr.s_addr = inet_addr("192.168.1.6"); false){ err("Установка адреса");
+				}else if(int result = connect( s, ( struct sockaddr * )&peer, sizeof( peer ) ); result){ err("Соединение с сервером");
+				}else if(string buf = "Hello, world! " +to_string(time(0)); false){ err("Данные для отправки");
+				}else if(result = send(s, buf.c_str(), buf.length(), 0); result <= 0){ err("Отправка данных");
+				}else if(shutdown(s, 1) < 0){ err("Error calling shutdown");
+				}else if(fd_set allreads = [&](fd_set allreads = {}){ FD_ZERO( &allreads ); FD_SET( 0, &allreads ); FD_SET( s, &allreads ); return allreads; }(); false){ err("Переменная соединений");
+				}else if([&](){ do{ // Ожидание ответа
+					if(fd_set readmask = allreads; false){ err("Первоначальное соединение");
+					}else if(select(s + 1, &readmask, NULL, NULL, NULL ) <= 0){ err("ОШИБКА выбора");
+					}else if(FD_ISSET( 0, &readmask )){ err("Нет ответа сервера");
+					}else if(!FD_ISSET( s, &readmask )){ err("Неизвестная ошибка");
+					}else if(char buffer[20]; false){ err("Буфер ответа");
+					}else if(memset(buffer, 0, 20*sizeof(char)); false){ err("Загрузка в память");
+					}else if(int result = recv( s, buffer, sizeof(buffer) - 1, 0 ); (0 == result)){ mpre("Отключение сервера", __LINE__);
+					}else if(result < 0){ err("Ответ сервера");
+					}else{ mpre("Ответ сервера: " +string(buffer), __LINE__);
+					} return 0; }while(false); }(); false){ err("Ответ");
+				}else{ //mpre("Соединение установлено", __LINE__);
+				} return 0; }(); false){ mpre("Остановка клиента "+ client, __LINE__);
+			}else if(auto _in = in; _in.empty()){ mpre("ОШИБКА выборки массива данных", __LINE__);
 			}else if([&](bool proceed = false){ // Обучение до состояния без ошибок
 					do{ // Расчет и обучение входящих параметров
 						if(change = 0; false){ mpre("ОШИБКА скидывания флага изменений", __LINE__);
@@ -1334,9 +1390,9 @@ int main(int argc, char **argv){
 						}else if([&](){ // Перемешивание
 							if(1 >= _in.size()){ //mpre("Не перемешиваем одно значение", __LINE__);
 							}else if(_in.is_object()){ mpre("Обьект не перемешиваем", __LINE__);
-							}else if(string random = (bmf::ARGV.end() == bmf::ARGV.find("-rand") ? "1" : bmf::ARGV.at("-rand")); (0 >= random.length())){ mpre("ОШИБКА аргумент перемешивания не задан -rand", __LINE__);
-							}else if(string::npos != random.find_last_not_of("0123456789")){ mpre("ОШИБКА формат перемешивания задан неправильно "+ random, __LINE__);
-							}else if("0" == random){ mpre("Перемешивание отключено -rand " +bmf::ARGV.at("-rand"), __LINE__);
+							}else if(string random = (bmf::ARGV.end() == bmf::ARGV.find("-rand") ? "0" : bmf::ARGV.at("-rand")); (0 > random.length())){ mpre("ОШИБКА аргумент перемешивания не задан -rand", __LINE__);
+							}else if(string::npos != random.find_last_not_of("01")){ mpre("ОШИБКА формат перемешивания задан неправильно "+ random, __LINE__);
+							}else if("0" == random){ mpre("Перемешивание отключено -rand=" +random, __LINE__);
 							}else if(std::random_device rd;  false){ mpre("ОШИБКА создания случайного значения", __LINE__);
 							}else if(std::mt19937 g(rd()); false){ mpre("ОШИБКА инициации случайного значения", __LINE__);
 							}else if(shuffle(_in.begin(), _in.end(), g); false){ mpre("ОШИБКА перемешивания массива", __LINE__);
@@ -1374,7 +1430,7 @@ int main(int argc, char **argv){
 								}else if([&](string mess = to_string(__LINE__)){ // Формирование и отображение информации
 									if(mess += " Время: " +to_string(time(0)-bmf::timestamp) +" Выборка: " +to_string(loop) +"/" +to_string(in.size()) +"/" +to_string(count); false){ mpre("ОШИБКА добавления информации о выборке", __LINE__);
 									}else if(mess += " Морфы: " +to_string(BMF_INDEX_EX.at("").size()) +"/" +to_string(change) +" " +to_string(bmf::perc) +"/" +to_string(_perc) +"%"; false){ mpre("ОШИБКА информация о морфе", __LINE__);
-									}else if(mess += " Итоги: " +to_string(BMF_ITOG_EX.at("").size()) +"/" +to_string(pips_sum) +"/" +to_string(pips_change) +" " +to_string(bmf::pips_perc) +"/" +to_string(_pips_perc) +"%"; false){ mpre("ОШИБКА информация об итогах", __LINE__);
+									}else if(mess += " Итоги: " +to_string(BMF_ITOG_EX.at("").size()) /*+"/" +to_string(pips_sum)*/ +"/" +to_string(pips_change) +" " +to_string(bmf::pips_perc) +"/" +to_string(_pips_perc) +"%"; false){ mpre("ОШИБКА информация об итогах", __LINE__);
 									}else if(std::lock_guard<std::recursive_mutex> locker(mu); false){ mpre("ОШИБКА блокировки вывода", __LINE__);
 									}else{ std::cerr << mess << endl;
 									} return false; }()){ mpre("ОШИБКА вывода информации о данных", __LINE__);
@@ -1396,8 +1452,7 @@ int main(int argc, char **argv){
 		}else{
 		} return false; }()){ mpre("ОШИБКА создания рабочих функций", __LINE__);
 	}else if([&](){ // Запуск расчетов
-		if(0 >= in.size()){ mpre("Данные для обучения не заданы", __LINE__); //mpre(in, __LINE__, "Данные");
-		}else if(int thread = [&](int thread = -1){ // Расчет количества потоков
+		if(int thread = [&](int thread = -1){ // Расчет количества потоков
 			if(string _thread = (bmf::ARGV.end() == bmf::ARGV.find("-thread") ? "0" : bmf::ARGV.at("-thread")); (0 >= _thread.length())){ mpre("Количество потоков не задано в консоли", __LINE__);
 			}else if(string::npos != _thread.find_first_not_of("0123456789")){ mpre("ОШИБКА формат количества потоков не число "+ _thread, __LINE__);
 			}else if(thread = atoi(_thread.c_str()); false){ mpre("ОШИБКА конвертации количества потоков в число", __LINE__);
@@ -1520,7 +1575,7 @@ int main(int argc, char **argv){
 		for(auto index_itr = ROW.begin(); index_itr != ROW.end(); index_itr++){ // Сохранение данных справочника
 			if(TMs index = index_itr->second; index.empty()){ mpre("ОШИБКА выборки значения итератора", __LINE__);
 			}else if(int index_id = index_itr->first; (0 == index_id)){ mpre("ОШИБКА получения ключа строки", __LINE__);
-			}else if([&](){ // Обновление
+			}else if([&](){ // Удаление
 				if("0" != index["id"]){ //mpre("Не удаляем идентификатор не пуст", __LINE__);
 				}else if(0 > index_id){ //mpre("Морф еще не сохранен в таблицу", __LINE__);
 				}else if([&](){ bmf::exec("DELETE FROM `"+ table+ "` WHERE id="+ to_string(index_id)); return false; }()){ mpre("ОШИБКА удаления морфа", __LINE__);
@@ -1533,7 +1588,7 @@ int main(int argc, char **argv){
 				}else if(std::string itog_id = [&](std::string itog_id = ""){ // Проверка на изменения только указанный итогa
 					if("mp_bmf_itog" != table){ //mpre("Ограничение только для итогов", __LINE__);
 					}else if(bmf::ARGV.end() == bmf::ARGV.find("-itog")){ //mpre("Итоги не установлены", __LINE__);
-					}else if("0" == bmf::ARGV.at("-itog")){ mpre("Режим создания итогов", __LINE__);
+					}else if("0" == bmf::ARGV.at("-itog")){ //mpre("Режим создания итогов", __LINE__);
 					}else if(itog_id = bmf::ARGV.at("-itog"); itog_id.empty()){ mpre("Режим просмотра списков итогов", __LINE__);
 					}else{ //mpre("Указан итог " +itog_id, __LINE__);
 					} return itog_id; }(); (!itog_id.empty() && (itog_id != index.at("id")))){ //mpre("Изменения итога ограничено " +index.at("id"), __LINE__);
