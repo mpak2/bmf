@@ -72,7 +72,7 @@ namespace bmf{ // Глобальные переменные
 	TMs bmf_clump; // Текущее скопление
 	int values_length = 1024; // Ограничение размера истории
 	int change_sum = 0; // Счетчик расчетов
-	int size_max = 1e6; // Максимально допустимое количество морфов в расчете
+	int size_max = 2e9; // Максимально допустимое количество морфов в расчете
 	float perc = 0; // Процент правильных прогнозов в примере
 	float pips_perc = 0; // Процент правильных прогнозов в бите
 
@@ -151,7 +151,7 @@ int main(int argc, char **argv){
 				std::cout << "-epoch		количество эпох выполнения при полном совпадении процесс обучения останавливается" << endl;
 				std::cout << "-db		файл sqlite базы данных в которых хранится модель" << endl;
 				std::cout << "-itog		номер итога для обучения" << endl;
-				//std::cout << "-split	делитель итога используется для распределения расчетов" << endl;
+				std::cout << "-split	делитель итога используется для пропуска итогов в расчетах пример: -split 3.2" << endl;
 				std::cout << "-rand		перемешивание списка для более равномерных результатов" << endl;
 				std::cout << "-version	показать информацию о версии" << endl;
 				std::cout << "-h		показать эту справку и выйти" << endl;
@@ -190,17 +190,20 @@ int main(int argc, char **argv){
 		}else if(dbname = bmf::ARGV.at("-db"); (0 >= dbname.length())){ mpre("ОШИБКА имя файла для БД не задано", __LINE__);
 		}else{ //mpre("База данных"+ string, __LINE__);
 		} return dbname; }(); (0 >= dbname.length())){ mpre("ОШИБКА получения имени базы данных", __LINE__);
-	}else if([&](){ // Подключение базы
+	}else if([&](bool pass = false){ // Подключение базы
 		if(bmf::exec = ([&](string sql){ // Запрос к БД
-			int result, sqlite_result, sleep = 30;
+			int result, sqlite_result, sleep = 20;
 			sqlite3_stmt* stmt; // Запрос к базе данныхa
+			char *error_report = NULL;
+			//char *mess[1024]; // Сообщение об ошибке
 			do{
-				if([&](){ sqlite_result = sqlite3_exec(db, sql.c_str(), 0, &stmt, 0); return (SQLITE_OK == sqlite_result); }()){ //mpre("Запрос выполнен без ошибок");
-				}else if([&](){ mpre("Повторный запрос к БД через "+ to_string(sleep *= 2) +" сек.", __LINE__); mpre("Запрос "+ sql, __LINE__); return false; }()){ mpre("ОШИБКА уведомления", __LINE__);
-				}else if([&](){ int request = system(("sleep "+ to_string(sleep)).c_str()); return (0 != request); }()){ mpre("Выход из запроса", __LINE__); exit(1);
-				}else{ //mpre("Повторный запрос к БД", __LINE__);
+				if(sqlite_result = sqlite3_exec(db, sql.c_str(), 0, &stmt, &error_report); (SQLITE_OK == sqlite_result)){ //mpre("Запрос выполнен без ошибок");
+				}else if("COMMIT TRANSACTION" == sql){ mpre("COMMIT TRANSACTION Не повторяем", __LINE__);
+				}else if([&](){ mpre("Запрос "+ sql, __LINE__); mpre("Ошибка " + std::string(error_report), __LINE__); mpre("Повторный запрос к БД через "+ to_string(sleep += 10) +" сек.", __LINE__); return false; }()){ mpre("ОШИБКА уведомления", __LINE__);
+				}else if(int request = system(("sleep "+ to_string(sleep)).c_str()); (0 != request)){ mpre("Отмена запроса", __LINE__); exit(1);
+				}else{ pass = true; //mpre("Повторный запрос к БД", __LINE__);
 				}
-			}while(SQLITE_OK != sqlite_result);
+			}while(SQLITE_OK != sqlite_result && !(pass = !pass));
 			return stmt; }); false){ mpre("ОШИБКА установки функции запроса к БД", __LINE__);
 		}else if(bmf::prepare = ([&](string sql){ // Запрос к БД
 			int result, sqlite_result, sleep = 30;
@@ -360,15 +363,15 @@ int main(int argc, char **argv){
 				}else{ mpre("Скопление: `"+ bmf::bmf_clump["name"]+ "`", __LINE__);
 				} return (0 >= bmf::clump_id.length()); }()){ mpre("ОШИБКА получения скопления", __LINE__);
 			}else if([&](){ // Добавление таблиц в БД если они не созданы
-				if(bmf::exec("CREATE TABLE IF NOT EXISTS main.mp_bmf_index (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,`clump_id` INTEGER,`itog_values_id` INTEGER, `depth` INTEGER, `dimension` INTEGER,`dano_id` INTEGER,`itog_id` TEXT,`calc_pos_id` INTEGER,`index_id` INTEGER, `bmf-index` INTEGER)"); false){ mpre("ОШИБКА создания таблицы морфов", __LINE__);
-				}else if(bmf::exec("CREATE TABLE IF NOT EXISTS main.mp_bmf_dano (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,`time` INTEGER,`uid` INTEGER,`clump_id` INTEGER,`dano_values_id` INTEGER,`name` TEXT,`val` INTEGER,`values` TEXT)"); false){ mpre("ОШИБКА создания таблицы морфов", __LINE__);
+				if(bmf::exec("CREATE TABLE IF NOT EXISTS main.mp_bmf_index (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,`clump_id` INTEGER,`itog_values_id` INTEGER, `depth` INTEGER, `dimension` INTEGER,`dano_id` INTEGER,`itog_id` INTEGER,`calc_pos_id` INTEGER,`index_id` INTEGER, `bmf-index` INTEGER, FOREIGN KEY (index_id) REFERENCES mp_bmf_index(id), FOREIGN KEY (`bmf-index`) REFERENCES mp_bmf_index(id))"); false){ mpre("ОШИБКА создания таблицы морфов", __LINE__);
+				}else if(bmf::exec("CREATE TABLE IF NOT EXISTS main.mp_bmf_dano (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,`time` INTEGER,`uid` INTEGER,`clump_id` INTEGER,`dano_values_id` INTEGER,`name` TEXT,`val` INTEGER,`values` TEXT, UNIQUE(dano_values_id, name))"); false){ mpre("ОШИБКА создания таблицы морфов", __LINE__);
 				}else if(bmf::exec("CREATE INDEX IF NOT EXISTS `bmf_dano-clump_id-dano_values_id` ON mp_bmf_dano(clump_id,dano_values_id);"); false){ mpre("ОШИБКА создания индекса", __LINE__);
-				}else if(bmf::exec("CREATE TABLE IF NOT EXISTS main.mp_bmf_itog (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,`time` INTEGER,`clump_id` INTEGER,`index_id` INTEGER,`itog_values_id` INTEGER,`name` TEXT,`val` INTEGER,`values` TEXT)"); false){ mpre("ОШИБКА создания таблицы морфов", __LINE__);
+				}else if(bmf::exec("CREATE TABLE IF NOT EXISTS main.mp_bmf_itog (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,`time` INTEGER,`clump_id` INTEGER,`index_id` INTEGER,`itog_values_id` INTEGER,`name` TEXT,`val` INTEGER,`values` TEXT, UNIQUE(itog_values_id, name))"); false){ mpre("ОШИБКА создания таблицы морфов", __LINE__);
 				}else if(bmf::exec("CREATE INDEX IF NOT EXISTS `bmf_itog-clump_id-itog_values_id` ON mp_bmf_itog(clump_id,itog_values_id);"); false){ mpre("ОШИБКА создания индекса", __LINE__);
-				}else if(bmf::exec("CREATE TABLE IF NOT EXISTS main.mp_bmf_dano_values (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,`time` INTEGER ,`uid` INTEGER ,`clump_id` INTEGER ,`index_type_id` INTEGER ,`name` TEXT ,`value` TEXT ,`old` INTEGER ,`shift` INTEGER ,`dano_values_option_id` INTEGER ,`bin` TEXT)"); false){ mpre("ОШИБКА создания значений дано", __LINE__);
-				}else if(bmf::exec("CREATE TABLE IF NOT EXISTS main.mp_bmf_itog_values (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,`time` INTEGER,`index_type_id` INTEGER,`clump_id` INTEGER,`name` TEXT,`value` INTEGER,`itog_values_option_id` INTEGER,`bin` INTEGER)"); false){ mpre("ОШИБКА создания значения итога", __LINE__);
-				}else if(bmf::exec("CREATE TABLE IF NOT EXISTS main.mp_bmf_itog_titles (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,`time` INTEGER, `clump_id` INTEGER, `itog_values_id` INTEGER, `value` INTEGER, `name` INTEGER, `text` TEXT)"); false){ mpre("ОШИБКА создания значения итога", __LINE__);
-				}else if(bmf::exec("CREATE TABLE IF NOT EXISTS main.mp_bmf_dano_titles (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,`time` INTEGER, `clump_id` INTEGER, `dano_values_id` INTEGER, `value` INTEGER, `name` INTEGER, `text` TEXT)"); false){ mpre("ОШИБКА создания значения итога", __LINE__);
+				}else if(bmf::exec("CREATE TABLE IF NOT EXISTS main.mp_bmf_dano_values (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,`time` INTEGER ,`uid` INTEGER ,`clump_id` INTEGER ,`index_type_id` INTEGER ,`name` TEXT ,`value` TEXT ,`old` INTEGER ,`shift` INTEGER ,`dano_values_option_id` INTEGER ,`bin` TEXT, UNIQUE(name))"); false){ mpre("ОШИБКА создания значений дано", __LINE__);
+				}else if(bmf::exec("CREATE TABLE IF NOT EXISTS main.mp_bmf_itog_values (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,`time` INTEGER,`index_type_id` INTEGER,`clump_id` INTEGER,`name` TEXT,`value` INTEGER,`itog_values_option_id` INTEGER,`bin` INTEGER, UNIQUE(name))"); false){ mpre("ОШИБКА создания значения итога", __LINE__);
+				}else if(bmf::exec("CREATE TABLE IF NOT EXISTS main.mp_bmf_itog_titles (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,`time` INTEGER, `clump_id` INTEGER, `itog_values_id` INTEGER, `value` INTEGER, `name` INTEGER, `text` TEXT, UNIQUE(itog_values_id,name))"); false){ mpre("ОШИБКА создания значения итога", __LINE__);
+				}else if(bmf::exec("CREATE TABLE IF NOT EXISTS main.mp_bmf_dano_titles (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,`time` INTEGER, `clump_id` INTEGER, `dano_values_id` INTEGER, `value` INTEGER, `name` INTEGER, `text` TEXT, UNIQUE(dano_values_id,name))"); false){ mpre("ОШИБКА создания значения итога", __LINE__);
 				}else{ return false;
 				} return true; }()){ mpre("ОШИБКА подключения БД созвездия и создания таблиц", __LINE__);
 			}else if([&](){ // Очищение списка морфов
@@ -385,11 +388,11 @@ int main(int argc, char **argv){
 					}else{ mpre("Очистка списка морфов по аргументу -c", __LINE__); //system("sleep 1");
 					} return false;
 				}()){ mpre("ОШИБКА выборки списка морфов", __LINE__);
-			}else if([&](){ BMF_CALC = bmf::Dataset(BMF_CALC, "BMF_CALC", "mp_bmf_calc", "Расчеты"); return BMF_CALC_POS.empty(); }()){ mpre("ОШИБКА выборки позиций расчетов", __LINE__);
-			}else if([&](){ BMF_CALC_ORIENT = bmf::Dataset(BMF_CALC_ORIENT, "BMF_CALC_ORIENT", "mp_bmf_calc_orient", "Направления"); return BMF_CALC_ORIENT.empty(); }()){ mpre("ОШИБКА выборки направлений расчетов", __LINE__);
-			}else if([&](){ BMF_CALC_POS = bmf::Dataset(BMF_CALC_POS, "BMF_CALC_POS", "mp_bmf_calc_pos", "Позиции"); return BMF_CALC_POS.empty(); }()){ mpre("ОШИБКА выборки позиций расчетов", __LINE__);
-			}else if([&](){ BMF_CALC_VAL = bmf::Dataset(BMF_CALC_VAL, "BMF_CALC_VAL", "mp_bmf_calc_val", "Знаки"); return BMF_CALC_VAL.empty(); }()){ mpre("ОШИБКА выборки значений расчетов", __LINE__);
-			}else if([&](){ BMF_INDEX_TYPE = bmf::Dataset(BMF_INDEX_TYPE, "BMF_INDEX_TYPE", "mp_bmf_index_type", "Тип значения"); return BMF_INDEX_TYPE.empty(); }()){ mpre("ОШИБКА выборки типа значений", __LINE__);
+			//}else if([&](){ BMF_CALC = bmf::Dataset(BMF_CALC, "BMF_CALC", "mp_bmf_calc", "Расчеты"); return BMF_CALC_POS.empty(); }()){ mpre("ОШИБКА выборки позиций расчетов", __LINE__);
+			//}else if([&](){ BMF_CALC_ORIENT = bmf::Dataset(BMF_CALC_ORIENT, "BMF_CALC_ORIENT", "mp_bmf_calc_orient", "Направления"); return BMF_CALC_ORIENT.empty(); }()){ mpre("ОШИБКА выборки направлений расчетов", __LINE__);
+			//}else if([&](){ BMF_CALC_POS = bmf::Dataset(BMF_CALC_POS, "BMF_CALC_POS", "mp_bmf_calc_pos", "Позиции"); return BMF_CALC_POS.empty(); }()){ mpre("ОШИБКА выборки позиций расчетов", __LINE__);
+			//}else if([&](){ BMF_CALC_VAL = bmf::Dataset(BMF_CALC_VAL, "BMF_CALC_VAL", "mp_bmf_calc_val", "Знаки"); return BMF_CALC_VAL.empty(); }()){ mpre("ОШИБКА выборки значений расчетов", __LINE__);
+			//}else if([&](){ BMF_INDEX_TYPE = bmf::Dataset(BMF_INDEX_TYPE, "BMF_INDEX_TYPE", "mp_bmf_index_type", "Тип значения"); return BMF_INDEX_TYPE.empty(); }()){ mpre("ОШИБКА выборки типа значений", __LINE__);
 			}else if([&](){ TMMi DANO = bmf::Tab("SELECT * FROM `mp_bmf_dano` -- WHERE `clump_id`='"+ bmf::clump_id+ "'"); BMF_DANO_EX[""] = DANO; return false; }()){ mpre("ОШИБКА получения дано скопления", __LINE__);
 			}else if([&](){ TMMi DANO_VALUES = bmf::Tab("SELECT * FROM `mp_bmf_dano_values` -- WHERE `clump_id`='"+ bmf::clump_id+ "'"); BMF_DANO_VALUES_EX[""] = DANO_VALUES; return false; }()){ mpre("ОШИБКА получения дано значений", __LINE__);
 			}else if([&](){ TMMi DANO_TITLES = bmf::Tab("SELECT * FROM `mp_bmf_dano_titles` -- WHERE `clump_id`='"+ bmf::clump_id+ "'"); BMF_DANO_TITLES_EX[""] = DANO_TITLES; return false; }()){ mpre("ОШИБКА получения дано справочника", __LINE__);
@@ -1298,6 +1301,16 @@ int main(int argc, char **argv){
 						}else if(bmf::ARGV.at("-itog") == itog.at("id")){ //mpre("Указанный итог равен текущему "+ itog["id"], __LINE__);
 						}else{ return true;
 						} return false; }()){ //mpre("Пропускаем ["+ itog["id"]+ "] != "+ to_string(itog_id), __LINE__);
+					}else if([&](bool pass = false){ // Пропускаем по делителю
+						if(bmf::ARGV.end() == bmf::ARGV.find("-split")){ //mpre("Делитель не задан", __LINE__);
+						}else if(std::string split = bmf::ARGV.at("-split"); split.empty()){ mpre("ОШИБКА получения делителя", __LINE__);
+						}else if(int npos = split.find("."); false){ mpre("ОШИБКА расчета точки в делителе", __LINE__);
+						}else if(int divider = atoi((std::string::npos == npos) ? split.c_str() : split.substr(0, npos).c_str()); !divider){ mpre("ОШИБКА получения делителя " +split, __LINE__);
+						}else if(int remains = atoi((std::string::npos == npos) ? string("0").c_str() : split.substr(npos+1, split.length()).c_str()); (0 > remains)){ mpre("ОШИБКА получения остатка", __LINE__);
+						}else if(int itog_id = atoi(itog.at("id").c_str()); !itog_id){ mpre("ОШИБКА расчета идентификатора итога", __LINE__);
+						}else if(pass = (abs(itog_id)%divider != remains); false){ mpre("ОШИБКА расчета условий выхода", __LINE__);
+						}else{ //mpre("Расчета делителя divider=" + to_string(divider)+" remains=" +to_string(remains) +" " +bmf::ARGV.at("-split"), __LINE__);
+						}return pass; }()){ //mpre("Пропуск " +itog.at("id") +" по делителю " +(bmf::ARGV.end() == bmf::ARGV.find("-split") ? "" : bmf::ARGV.at("-split")), __LINE__);
 					//}else if(int index_id = atoi(itog.at("index_id").c_str()); (0 > index_id)){ mpre("ОШИБКА отрицательный итог", __LINE__);
 					}else if([&](){ // Пропуск потоков
 						if(bmf::ARGV.end() == bmf::ARGV.find("-thread")){ // Беспотоковый режим
@@ -1547,6 +1560,7 @@ int main(int argc, char **argv){
 					}else{ //mpre("ОШИБКА расчета изменений ранее добавленных морфов", __LINE__);
 					}return pass; }()){ //mpre(index, "Морф", __LINE__); mpre("Не сохраняем морф", __LINE__);
 				}else if(index = bmf::fk(table, {{"id", index["id"]}}, {}, index); index.empty()){ mpre(index, __LINE__, "ОШИБКА обновления морфа");
+				}else if(ROW.find(index_id)->second = index; index.empty()){ mpre(index, __LINE__, "Сохраняем в справочник");
 				}else{ //mpre(index, __LINE__, "Обновление морфа");
 					count_update++;
 				} return false; }()){ mpre("ОШИБКА обновления значения морфа", __LINE__);
@@ -1554,10 +1568,10 @@ int main(int argc, char **argv){
 				if(0 < index_id){ //mpre("Не добавляем морф (создан ранее)", __LINE__);
 				}else if("0" == index["id"]){ //mpre("Не обновляем удаленный морф", __LINE__);
 				}else if(index = bmf::fk(table, {}, index, {}); index.empty()){ mpre("ОШИБКА сохранения нового значения в базу", __LINE__);
+				}else if(ROW.find(index_id)->second = index; index.empty()){ mpre(index, __LINE__, "Сохраняем в справочник");
 				}else{ //mpre(index, __LINE__, "Добавление нового морфа "+ to_string(index_id));
 					count_insert++;
 				} return false; }()){ mpre("ОШИБКА добавления нового морфа", __LINE__);
-			}else if(ROW.find(index_id)->second = index; index.empty()){ mpre(index, __LINE__, "Сохраняем в справочник");
 			}else{ //exit(mpre(ROW, __LINE__, "Обновление "+ to_string(index_id)));
 			}
 		} mpre("Данные таблицы `"+ table+ "` удалений: "+ to_string(count_delete)+ " обновлений: "+ to_string(count_update)+ " добавлений: "+ to_string(count_insert), __LINE__);
@@ -1572,8 +1586,8 @@ int main(int argc, char **argv){
 			}else if(TMs test = bmf::fk("mp_bmf_test", {}, {{"time", to_string(bmf::timestamp)}, {"date", date}, {"size", to_string(in.size())}, {"change", to_string(bmf::change_sum)}, {"duration", to_string(time(0)-bmf::timestamp)}, {"clump", bmf::clump_id}, {"loop", to_string(bmf::loop)}, {"perc", to_string(bmf::perc)}, {"pips", to_string(bmf::pips_perc)}, {"bmf", to_string(BMF_INDEX_EX.at("").size())}, {"args", arg.dump()}}, {}); test.empty()){ mpre("ОШИБКА сохранения результатов тестов", __LINE__);
 			}else{ //mpre("Сохранение статистики id "+ test["id"], __LINE__);
 			} return false; }()){ mpre("ОШИБКА сохранения теста", __LINE__);
-		}else if(bmf::exec("BEGIN TRANSACTION"); false){ mpre("ОШИБКА запуска начала транзакции", __LINE__);
 		}else if(std::cerr << endl; false){ err("Отделяем отчет проелом");
+		}else if(bmf::exec("BEGIN TRANSACTION"); false){ mpre("ОШИБКА запуска начала транзакции", __LINE__);
 		}else if(TMMi _BMF_DANO = bmf::Save("mp_bmf_dano", BMF_DANO_EX.at("")); _BMF_DANO.empty()){ mpre("ОШИБКА сохранения исходных данных", __LINE__);
 		}else if(TMMi _BMF_ITOG = bmf::Save("mp_bmf_itog", BMF_ITOG_EX.at("")); false){ mpre("ОШИБКА сохранения итоговых данных", __LINE__);
 		}else if(TMMi _BMF_DANO_VALUES = bmf::Save("mp_bmf_dano_values", BMF_DANO_VALUES_EX.at("")); _BMF_DANO_VALUES.empty()){ mpre("ОШИБКА сохранения изначальных значений", __LINE__);

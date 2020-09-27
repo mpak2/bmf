@@ -8,7 +8,7 @@
 #include <ctime>
 
 #include <sqlite3.h>
-#include "inc/json.hpp"
+#include "json.hpp"
 
 #define pre(x) if(x) printf("%d.%s\n", __LINE__, x)
 
@@ -52,7 +52,7 @@ int main(int argc, char **argv){
 				TEST.insert(make_pair(std::to_string(i), std::to_string(i)));
 			} return TEST; }(); TEST.empty()){ mpre("ОШИБКА формирования списка нужных", __LINE__);
 		//}else if(true){ dump(TAB, __LINE__);
-		}else if(std::string text = [&](std::string text = "Id,SalePrice\n"){ for(auto tab_itr:TAB){
+		}else if(std::string text = [&](std::string text = "id,SalePrice\n"){ for(auto tab_itr:TAB){
 				if(tab_itr.second.end() == tab_itr.second.find("_id")){ mpre("ОШИБКА поле идентификатора не найдено в данных", __LINE__);
 				}else if(std::string id = tab_itr.second.at("_id"); id.empty()){ mpre("ОШИБКА выборки идентификатора", __LINE__);
 				}else if(tab_itr.second.end() == tab_itr.second.find("price")){ mpre("ОШИБКА поле цены не найдено в данных", __LINE__);
@@ -102,6 +102,7 @@ int main(int argc, char **argv){
 		} return file_name; }(); file_name.empty()){ mpre("ОШИБКА имя файла не указано", __LINE__);
 	}else if(std::ifstream fin(file_name); !fin){ mpre("ОШИБКА Подключения файла "+ file_name, __LINE__);
 	}else if(std::map<std::string,std::string> titles; false){ mpre("ОШИБКА получения заголовков полей", __LINE__);
+	}else if(sqlite3* db = 0; false){ mpre("ОШИБКА установки идентификатора ошибки базы данных", __LINE__);
 	}else if(std::map<int, std::map<std::string, std::string>> CSV = [&](std::map<int, std::map<std::string, std::string>> CSV = {}){ while(!fin.eof()){ //mpre("Проверка", __LINE__);
 			if(std::string line; false){ mpre("Срока данных", __LINE__);
 	//}else if(mpre("Проверка "+ file_name, __LINE__); false){ pre("Уведомление");
@@ -126,15 +127,7 @@ int main(int argc, char **argv){
 				}else if(csv.insert(make_pair(tab, val)); csv.empty()){ mpre("ОШИБКА добавления пары в массив", __LINE__);
 				}else{ //pre(csv, __LINE__); //mpre("Пара key=" + key+" val=" +val, __LINE__);
 				}} return false; }()){ mpre("ОШИБКА устанвоки пар заголовок:значение", __LINE__);
-			}else if(CSV.insert(make_pair(CSV.size(), csv)); CSV.empty()){ mpre("ОШИБКА добавления новой строки", __LINE__);
-			}else{ //pre(csv, __LINE__); //mpre("Загружаемая строка "+ line, __LINE__);
-			}
-		} return CSV; }(); CSV.empty()){ mpre("ОШИБКА обработки файла", __LINE__);
-	}else if(nlohmann::json JSON = CSV; false){ mpre("ОШИБКА обьявления данных json", __LINE__);
-	}else if(sqlite3* db = 0; false){ mpre("ОШИБКА установки идентификатора ошибки базы данных", __LINE__);
-	}else if([&](int loop = 3){ for(auto csv_itr:CSV){ // Поэлементная обработка csv
-			if(false){ mpre("Пропуск расчетов", __LINE__);
-			}else if(std::map<std::string, std::string> csv = csv_itr.second; csv.empty()){ mpre("ОШИБКА получения массива данных", __LINE__);
+			//}else if(CSV.insert(make_pair(CSV.size(), csv)); CSV.empty()){ mpre("ОШИБКА добавления новой строки", __LINE__);
 			}else if(std::string id = [&](std::string id = ""){ // Выборка идентификатора
 				if(csv.end() == csv.find("Id")){ dump(csv, __LINE__); mpre("ОШИБКА поле Id не найдено в свойствах примера", __LINE__);
 				}else if(id = csv.at("Id"); id.empty()){ dump(csv, __LINE__); mpre("ОШИБКА выборки идентификатора примера", __LINE__);
@@ -185,9 +178,16 @@ int main(int argc, char **argv){
 				}else if(SQLITE_OK != sqlite3_close(db)){ mpre(" ОШИБКА закрытия базы данных "+ dbname, __LINE__);
 				}else{ mpre("Сохранение данных в файл бд: "+ dbname+ " таблицу: mp_bmf_submission", __LINE__);
 				} return false; }()){ mpre("ОШИБКА сохранения результатов", __LINE__);
+			}else{ //pre(csv, __LINE__); //mpre("Загружаемая строка "+ line, __LINE__);
+			}
+		} return CSV; }(); CSV.empty()){ mpre("ОШИБКА обработки файла", __LINE__);
+	//}else if(nlohmann::json JSON = CSV; false){ mpre("ОШИБКА обьявления данных json", __LINE__);
+	/*}else if([&](int loop = 3){ for(auto csv_itr:CSV){ // Поэлементная обработка csv
+			if(false){ mpre("Пропуск расчетов", __LINE__);
+			}else if(std::map<std::string, std::string> csv = csv_itr.second; csv.empty()){ mpre("ОШИБКА получения массива данных", __LINE__);
 			}else{ mpre("Итоговая цена id=" +id +" " +price, __LINE__);
 			}
-		} return false; }()){ mpre("ОШИБКА обработки csv построчно", __LINE__);
+		} return false; }()){ mpre("ОШИБКА обработки csv построчно", __LINE__);*/
 	}else{ mpre("Количество CSV строк в файле "+ std::to_string(CSV.size()), __LINE__);
 	}
 }
