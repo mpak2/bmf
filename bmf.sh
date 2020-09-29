@@ -14,7 +14,7 @@
 ##./bimorph ./3 -j '[{"dano":{"Один":"0", "Два":"0", "Три":"0"}}]'
 
 #cat clump/iris.json | ./bimorph - clump/iris.sqlite -itog 0 -split 10.1
-cat clump/iris.json | ./bimorph - clump/iris.sqlite -epoch 100 -split 2.1
+cat clump/iris.json | ./bimorph - clump/iris.sqlite -c -epoch 100
 sqlite3 clump/iris.sqlite -column -header "SELECT * FROM mp_bmf_test ORDER BY id DESC LIMIT 10; SELECT COUNT(*) AS count, MIN(duration) AS min_duration, AVG(duration) as avg_duration, MAX(duration) AS max_duration, AVG(bmf) as avg_bmf FROM mp_bmf_test;"
 
 #	#sqlite3 clump/iris.sqlite -column -header "SELECT MAX(depth) FROM mp_bmf_index"

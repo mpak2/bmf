@@ -401,7 +401,7 @@ int main(int argc, char **argv){
 				}else if(abs(itog_itr.first)%divider != remains){ //mpre("Делитель не совпадает", __LINE__);
 				}else if(itog_itr.second.end() == itog_itr.second.find("id")){ mpre("ОШИБКА идентификатор итога не установлен", __LINE__);
 				}else if(SPLIT += "," + itog_itr.second.at("id"); SPLIT.empty()){ mpre("ОШИБКА добавления номера итога", __LINE__);
-				}else{ mpre("Список итогов для выборки " +SPLIT, __LINE__);
+				}else{ //mpre("Список итогов для выборки " +SPLIT, __LINE__);
 				}}return (SPLIT.empty() ? "1=1" : "itog_id IN (0" +SPLIT +")"); }(); SPLIT.empty()){ mpre("ОШИБКА выборки списка морфов по делителю", __LINE__);
 			}else if([&](){ // Получение списка итогов
 				if(bmf::ARGV.end() == bmf::ARGV.find("-itog")){ //mpre("Режим расчета не указан итог", __LINE__);
