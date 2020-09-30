@@ -17,13 +17,6 @@ int main(int argc, char **argv){
 		if(std::cerr << line << " " << mess << std::endl; false){ printf("%d.ОШИБКА\n", __LINE__);
 		}else{ //print_r("Сообщение об ошибке", __LINE__);
 		} return false; }; false){ mpre("ОШИБКА установки функции", __LINE__);
-	}else if(std::function<int(std::map<std::string, std::string>,int)> dump = [&](std::map<std::string, std::string> row, int line){ // Функция вывода сообщений
-		if(std::cerr << " => " << "( // __" << std::to_string(line) << "__ " << "\n"; false){ mpre("ОШИБКА отображение заголовка", __LINE__);
-		}else if([&](){ for(auto itr = row.begin(); itr != row.end(); itr++){
-				std::cerr << "\t[" << itr->first << "]=>" << itr->second << "," << std::endl;
-			}; std::cerr << ")\n"; return false; }()){ mpre("ОШИБКА отображения массива", __LINE__);
-		}else{
-		} return false; }; false){ mpre("ОШИБКА установки функции", __LINE__);
 	}else if(std::string file_name = [&](std::string file_name = ""){ // Получение имени файла csv из консоли
 		if(2 > argc){ mpre("Параметров консоли меньше двух", __LINE__);
 		}else if(file_name = argv[1]; file_name.empty()){ mpre("ОШИБКА получения имени csv файла", __LINE__);
@@ -59,12 +52,10 @@ int main(int argc, char **argv){
 	}else if(mpre("Файл CSV `" + file_name+ "` Итоговые поля `" +str +"` Разбить по строкам " +std::to_string(line) +" Скрыть поля `" +hide +"`", __LINE__)){ mpre("ОШИБКА уведомления", __LINE__);
 	}else if(std::ifstream fin(file_name); !fin){ mpre("ОШИБКА Подключения файла "+ file_name, __LINE__);
 	}else if(std::map<std::string,std::string> titles; false){ mpre("ОШИБКА получения заголовков полей", __LINE__);
-	}else if(int pos = file_name.find("."); false){ mpre("ОШИБКА нахождения позиции точки в имени файла", __LINE__);
-	}else if(std::string file_dir = (std::string::npos == pos ? file_name : file_name.substr(0, pos)); file_dir.empty()){ mpre("ОШИБКА Директория для записи", __LINE__);
-	}else if([&](std::string MNIST = "", int loop = 2e9, int lines = 0){ while(!fin.eof() && (loop-- > 0)){ //mpre("Проверка", __LINE__);
-			if(std::string ln; false){ mpre("Срока данных", __LINE__);
-			}else if(getline(fin, ln); ln.empty()){ pre("Пустая строка");
-			}else if(std::istringstream iss(ln); false){ mpre("ОШИБКА создания массива", __LINE__);
+	}else if(std::map<int, std::map<std::string, std::string>> CSV = [&](std::map<int, std::map<std::string, std::string>> CSV = {}, int loop = 2e9){ while(!fin.eof() && (loop-- > 0)){ //mpre("Проверка", __LINE__);
+			if(std::string line; false){ mpre("Срока данных", __LINE__);
+			}else if(getline(fin, line); line.empty()){ pre("Пустая строка");
+			}else if(std::istringstream iss(line); false){ mpre("ОШИБКА создания массива", __LINE__);
 			}else if(std::map<std::string, std::string> data; false){ mpre("ОШИБКА Создание списка значений", __LINE__);
 			}else if([&]{ std::string str; while(std::getline(iss, str, ',')){ data.insert(make_pair(std::to_string(data.size()), str)); } return data.empty(); }()){ mpre("ОШИБКА разделения строк", __LINE__);
 			}else if([&](bool pass = false){ // Установка заголовков
@@ -87,61 +78,57 @@ int main(int argc, char **argv){
 					}else{ //mpre("ОШИБКА Нормализация числа " +val, __LINE__);
 					} return false; }()){ mpre("ОШИБКА нормализации", __LINE__);*/
 				}else if(csv.insert(make_pair(key, val)); csv.empty()){ mpre("ОШИБКА добавления пары в массив", __LINE__);
-				}else{ //dump(csv, __LINE__); //mpre("Пара key=" + key+" val=" +val, __LINE__);
+				}else{ //pre(csv, __LINE__); //mpre("Пара key=" + key+" val=" +val, __LINE__);
 				}} return false; }()){ mpre("ОШИБКА устанвоки пар заголовок:значение", __LINE__);
-			//}else if(CSV.insert(make_pair(CSV.size(), csv)); CSV.empty()){ mpre("ОШИБКА добавления новой строки", __LINE__);
-			}else if(int delta = [&](int delta = 0){ // Получаем дельту
-				if(csv.end() == csv.find("delta")){ mpre("ОШИБКА дельта в данных не найдена", __LINE__);
-				}else if(delta = atoi(csv.at("delta").c_str()); !delta){ mpre("ОШИБКА получения дельты " +csv.at("delta"), __LINE__);
-				//}else if(csv.erase("delta"); false){ mpre("ОШИБКА удаления дельты из данных", __LINE__);
-				}else{ //mpre("ОШИБКА получения дельты", __LINE__);
-				}return delta; }(); (1 != delta)){ //mpre("Пропускаем " +csv.at("delta"), __LINE__);
-			}else if(nlohmann::json json; false){ pre("ОШИБКА загрузки в json");
-			}else if([&](){ for(auto itog_itr:itog){ // Формирование списка итогов
-					if(std::string field = itog_itr.second; field.empty()){ mpre("ОШИБКА получения поля итога", __LINE__);
-					}else if(csv.end() == csv.find(field)){ mpre("ОШИБКА поле не найдено в csv `"+ field +"`", __LINE__);
-					}else if(json["itog"][field] = csv.at(field); (json.end() == json.find("itog"))){ mpre("ОШИБКА добавления итога", __LINE__);
-					}else if(csv.erase(field); csv.empty()){ pre("Удаление итога из данных");
-					}else{ //mpre("Поле итога "+ field, __LINE__);
-					}
-				}return json.empty(); }()){ mpre("ОШИБКА добавления итоговых значений", __LINE__);
-			}else if([&](){ for(auto hidden_itr:hidden){ // Удаление скрытых полей
-					if(std::string field = hidden_itr.second; field.empty()){ mpre("ОШИБКА получения поля итога", __LINE__);
-					}else if(csv.end() == csv.find(field)){ mpre("ОШИБКА поле не найдено в csv `"+ field +"`", __LINE__);
-					}else if(csv.erase(field); csv.empty()){ pre("ОШИБКА Удаление итога из данных");
-					}else{ //mpre("Скрытие поля "+ field, __LINE__);
-					}
-				}return json.empty(); }()){ mpre("ОШИБКА добавления итоговых значений", __LINE__);
-			}else if(json["dano"] = csv; json.empty()){ pre("Загрузка исходников");
-			}else if(std::string mnist = json.dump(); mnist.empty()){ pre("Установка в строку");
-			}else if(MNIST += (MNIST.empty() ? "\t" : ",\n\t") +(mnist); MNIST.empty()){ pre("ОШИБКА добавления в список");
-			}else if([&](){ // Записываем в файл
-				if(lines += 1; !lines){ pre("Количество линий");
-				//}else if((lines == CSV.size()) && (!line && !(lines%line))){
-				}else if([&](bool pass = false){ // Пропуск записи
-					if(fin.eof()){ //mpre("Последняя строка", __LINE__);
-					}else if(0 == line){ pass = true; //mpre("Не указан делитель", __LINE__);
-					}else if(0 != lines%line){ pass = true; //mpre("Совпадение делителя", __LINE__);
-					}else{ //mpre("ОШИБКА расчета пропуска " +(pass ? "Пропускаем" : "Записываем в файл"), __LINE__);
-					} return pass; }()){ //mpre("Условие пропуска записи файла " +std::to_string(lines) + " size " +std::to_string(CSV.size()), __LINE__);
-				//}else if(true){ mpre("Записываем в файл "+ std::to_string(lines)+ " разбивка " +std::to_string(line) + " " +std::to_string(lines%line), __LINE__);
-				}else if(std::string num = (0 < line ? std::to_string(lines/line) : ""); false){ mpre("ОШИБКА расчета номера файла", __LINE__);
-				}else if(std::string filename = file_dir +(num.empty() ? "" : "/"+ num) +".json"; filename.empty()){ pre("ОШИБКА составления имени файла");
-				}else if(std::ofstream fin(filename); !fin){ mpre("ОШИБКА Записи в файл "+ filename, __LINE__);
-				}else if(fin << "[\n" << MNIST << "\n]\n"; false){ pre("Запись");
-				}else if(fin.close(); false){ pre("ОШИБКА закрытия файла");
-				}else if(MNIST.clear(); false){ pre("Обнуляем список");
-				}else{ mpre("Записываем в файл " +filename, __LINE__); //std::cout << "[\n" << MNIST << "\n]";
-				} return false; }()){ pre("Выгрузка данных");
+			}else if(CSV.insert(make_pair(CSV.size(), csv)); CSV.empty()){ mpre("ОШИБКА добавления новой строки", __LINE__);
 			}else{ //pre(csv, __LINE__); //mpre("Загружаемая строка "+ line, __LINE__);
 			}
-		} return false; }()){ mpre("ОШИБКА обработки файла", __LINE__);
-	//}else if(nlohmann::json JSON = CSV; false){ mpre("ОШИБКА обьявления данных json", __LINE__);
-	/*}else if(std::string MNIST = [&](std::string MNIST = "", int lines = 0){ for(auto csv_itr:CSV){ // Формирование файла csv
+		} return CSV; }(); CSV.empty()){ mpre("ОШИБКА обработки файла", __LINE__);
+	}else if(nlohmann::json JSON = CSV; false){ mpre("ОШИБКА обьявления данных json", __LINE__);
+	}else if(int pos = file_name.find("."); false){ mpre("ОШИБКА нахождения позиции точки в имени файла", __LINE__);
+	}else if(std::string file_dir = (std::string::npos == pos ? file_name : file_name.substr(0, pos)); file_dir.empty()){ mpre("ОШИБКА Директория для записи", __LINE__);
+	}else if(std::string MNIST = [&](std::string MNIST = "", int lines = 0){ for(auto csv_itr:CSV){ // Формирование файла csv
 		if(std::map<std::string, std::string> csv = csv_itr.second; csv.empty()){ pre("ОШИБКА получения данных строки");
+		}else if(nlohmann::json json; false){ pre("ОШИБКА загрузки в json");
+		}else if([&](){ for(auto itog_itr:itog){ // Формирование списка итогов
+				if(std::string field = itog_itr.second; field.empty()){ mpre("ОШИБКА получения поля итога", __LINE__);
+				}else if(csv.end() == csv.find(field)){ mpre("ОШИБКА поле не найдено в csv `"+ field +"`", __LINE__);
+				}else if(json["itog"][field] = csv.at(field); (json.end() == json.find("itog"))){ mpre("ОШИБКА добавления итога", __LINE__);
+				}else if(csv.erase(field); csv.empty()){ pre("Удаление итога из данных");
+				}else{ //mpre("Поле итога "+ field, __LINE__);
+				}
+			}return json.empty(); }()){ mpre("ОШИБКА добавления итоговых значений", __LINE__);
+		}else if([&](){ for(auto hidden_itr:hidden){ // Формирование списка итогов
+				if(std::string field = hidden_itr.second; field.empty()){ mpre("ОШИБКА получения поля итога", __LINE__);
+				}else if(csv.end() == csv.find(field)){ mpre("ОШИБКА поле не найдено в csv `"+ field +"`", __LINE__);
+				}else if(csv.erase(field); csv.empty()){ pre("ОШИБКА Удаление итога из данных");
+				}else{ //mpre("Скрытие поля "+ field, __LINE__);
+				}
+			}return json.empty(); }()){ mpre("ОШИБКА добавления итоговых значений", __LINE__);
+		}else if(json["dano"] = csv; json.empty()){ pre("Загрузка исходников");
+		}else if(std::string mnist = json.dump(); mnist.empty()){ pre("Установка в строку");
+		}else if(MNIST += (MNIST.empty() ? "\t" : ",\n\t") +(mnist); MNIST.empty()){ pre("ОШИБКА добавления в список");
+		}else if([&](){ // Записываем в файл
+			if(lines += 1; !lines){ pre("Количество линий");
+			//}else if((lines == CSV.size()) && (!line && !(lines%line))){
+			}else if([&](bool pass = false){ // Пропуск записи
+				if(lines == CSV.size()){ //mpre("Последняя строка", __LINE__);
+				}else if(0 == line){ pass = true; //mpre("Не указан делитель", __LINE__);
+				}else if(0 != lines%line){ pass = true; //mpre("Совпадение делителя", __LINE__);
+				}else{ //mpre("ОШИБКА расчета пропуска " +(pass ? "Пропускаем" : "Записываем в файл"), __LINE__);
+				} return pass; }()){ //mpre("Условие пропуска записи файла " +std::to_string(lines) + " size " +std::to_string(CSV.size()), __LINE__);
+			//}else if(true){ mpre("Записываем в файл "+ std::to_string(lines)+ " разбивка " +std::to_string(line) + " " +std::to_string(lines%line), __LINE__);
+			}else if(std::string num = (0 < line ? std::to_string(lines/line) : ""); false){ mpre("ОШИБКА расчета номера файла", __LINE__);
+			}else if(std::string filename = file_dir +(num.empty() ? "" : "/"+ num) +".json"; filename.empty()){ pre("ОШИБКА составления имени файла");
+			}else if(std::ofstream fin(filename); !fin){ mpre("ОШИБКА Записи в файл "+ filename, __LINE__);
+			}else if(fin << "[\n" << MNIST << "\n]\n"; false){ pre("Запись");
+			}else if(fin.close(); false){ pre("ОШИБКА закрытия файла");
+			}else if(MNIST.clear(); false){ pre("Обнуляем список");
+			}else{ mpre("Записываем в файл " +filename, __LINE__); //std::cout << "[\n" << MNIST << "\n]";
+			} return false; }()){ pre("Выгрузка данных");
 		}else{
-		}} return MNIST; }(); !MNIST.empty()){ pre("ОШИБКА записи данных в файл");*/
-	}else{ mpre("Данные сохранены", __LINE__);
+		}} return MNIST; }(); !MNIST.empty()){ pre("ОШИБКА записи данных в файл");
+	}else{ mpre("Количество CSV строк в файле "+ std::to_string(CSV.size()), __LINE__);
 	}
 }
 
