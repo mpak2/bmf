@@ -3,13 +3,15 @@
 #sudo apt install libsqlite3-dev
 
 #./bimorph -server 53000
+cat clump/tri.json | ./bimorph - ./3; sqlite3 ./3 "SELECT * FROM mp_bmf_index"
 
-#cat clump/dva.json | ./bimorph - ./2 -c
+#mv ./2 /tmp
+#cat clump/dva.json | ./bimorph - ./2
 #sqlite3 ./2 -column -header "SELECT * FROM mp_bmf_test ORDER BY id DESC LIMIT 10; -- SELECT COUNT(*) as step, SUM(change) as SumChange, MAX(bmf) as bmf FROM mp_bmf_test WHERE perc<10;"
 ##sqlite3 ./2 -column -header "SELECT * FROM mp_bmf_index ORDER BY id DESC"
 
-cat clump/tri.json | ./bimorph - ./3
-sqlite3 ./3 -column -header "SELECT * FROM mp_bmf_test ORDER BY id DESC LIMIT 10; -- SELECT COUNT(*) as step, SUM(change) as SumChange, MAX(bmf) as bmf FROM mp_bmf_test WHERE perc<10;"
+#cat clump/tri.json | ./bimorph - ./3
+#sqlite3 ./3 -column -header "SELECT * FROM mp_bmf_test ORDER BY id DESC LIMIT 10; -- SELECT COUNT(*) as step, SUM(change) as SumChange, MAX(bmf) as bmf FROM mp_bmf_test WHERE perc<10;"
 ##sqlite3 ./3 -column -header "SELECT * FROM mp_bmf_index ORDER BY id DESC"
 ##./bimorph ./3 -j '[{"dano":{"Один":"0", "Два":"0", "Три":"0"}}]'
 
