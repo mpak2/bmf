@@ -1448,17 +1448,29 @@ int main(int argc, char **argv){
 		} return false; }()){ mpre("ОШИБКА создания рабочих функций", __LINE__);
 	}else if(int epoch = [&](int epoch = 0){
 		if(bmf::ARGV.end() == bmf::ARGV.find("-epoch")){ //mpre("Эпохи в консоли не заданы", __LINE__);
-		}else if(int epoch = atoi(bmf::ARGV.at("-epoch").c_str()); false){ mpre("ОШИБКА выборки максимального количества эпох расчетов", __LINE__);
+		}else if(epoch = atoi(bmf::ARGV.at("-epoch").c_str()); false){ mpre("ОШИБКА выборки максимального количества эпох расчетов", __LINE__);
 		}else{ //mpre("Количество эпох указанных в консоли "+ to_string(epoch), __LINE__);
 		}return epoch; }(); false){ mpre("ОШИБКА количество эпох не может быть нулевым", __LINE__);
-	}else if(int loop = [&](int loop = 0){ // Количетсво повторенийa
+	}else if(int loop = [&](int epoch, int loop = 0){ // Количетсво повторенийa
 		if(bmf::ARGV.end() == bmf::ARGV.find("-epoch")){ loop = 1; mpre("Количество эпох не указано расчитываем без повторений", __LINE__);
 		}else if(!epoch){ loop = -1; mpre("Указано нулевое количество эпох расчитываем до полного совпадения", __LINE__);
-		}else if(loop = epoch){ mpre("Берем число эпох из указанных в консоли", __LINE__);
+		}else if(loop = epoch){ mpre("Максимальное количество повторений эпох " +to_string(loop), __LINE__);
 		}else{ mpre("ОШИБКА расчтеа количества повторений", __LINE__);
-		}return loop; }(); false){ mpre("ОШИБКА расчета колчиества повторений", __LINE__);
+		}return loop; }(epoch); false){ mpre("ОШИБКА расчета колчиества повторений", __LINE__);
 	}else if([&](){ // Расчет исходников
-		if(TM3i DANO = {}; false){ mpre("ОШИБКА создания временного хранилища результатов исходника", __LINE__);
+		if([&](){ // Перемешивание
+			if(1 >= in.size()){ //mpre("Не перемешиваем одно значение", __LINE__);
+			}else if(in.is_object()){ mpre("Обьект не перемешиваем", __LINE__);
+			}else if(string random = (bmf::ARGV.end() == bmf::ARGV.find("-rand") ? "0" : bmf::ARGV.at("-rand")); (0 >= random.length())){ mpre("ОШИБКА аргумент перемешивания не задан -rand", __LINE__);
+			}else if(string::npos != random.find_last_not_of("0123456789")){ mpre("ОШИБКА формат перемешивания задан неправильно "+ random, __LINE__);
+			}else if("0" == random){ mpre("Перемешивание отключено -rand " +random, __LINE__);
+			}else if(std::random_device rd;  false){ mpre("ОШИБКА создания случайного значения", __LINE__);
+			}else if(std::mt19937 g(rd()); false){ mpre("ОШИБКА инициации случайного значения", __LINE__);
+			}else if(shuffle(in.begin(), in.end(), g); false){ mpre("ОШИБКА перемешивания массива", __LINE__);
+			}else if(std::lock_guard<std::recursive_mutex> lock(mu); false){ mpre("ОШИБКА перемешивания массива входящих значений", __LINE__);
+			}else{ mpre("Перемешиваем список -rand "+ random, __LINE__);
+			} return false; }()){ mpre("ОШИБКА перемешивания списка", __LINE__);
+		}else if(TM3i DANO = {}; false){ mpre("ОШИБКА создания временного хранилища результатов исходника", __LINE__);
 		}else if(TM3i ITOG = {}; false){ mpre("ОШИБКА создания временного хранилища результатов итогов", __LINE__);
 		}else if(TM3i _BMF_DANO_EX = BMF_DANO_EX; _BMF_DANO_EX.empty()){ mpre("ОШИБКА установки первоначальных исходников дано", __LINE__);
 		}else if(TM3i _BMF_ITOG_EX = BMF_ITOG_EX; _BMF_ITOG_EX.empty()){ mpre("ОШИБКА установки первоначальных итогов дано", __LINE__);
@@ -1624,9 +1636,9 @@ int main(int argc, char **argv){
 			}}return false; }()){ mpre("ОШИБКА расчета карты модели", __LINE__);
 		}else{ //mpre(DANO, "Расчет итогов", __LINE__);
 		}return bmf::DANO.empty(); }()){ mpre("ОШИБКА расчета исходников", __LINE__);
-	}else if([&](int loop, bool pass = false){ do{
+	}else if(int errors = [&](int errors = 0, bool pass = false){ do{
 		if(false){ mpre("Пропуск расчетов эпох", __LINE__);
-		}else if(int errors = [&](int errors = 0){ for(auto &js:in.items()){ // Сравнение результата расчета
+		}else if(int err = [&](int err = 0){ for(auto &js:in.items()){ // Сравнение результата расчета
 			if(false){ mpre("Пропуск сравнения результатов", __LINE__);
 			}else if(auto el = js.value(); el.empty()){ mpre("ОШИБКА элемент не найден", __LINE__);
 			}else if(int key = atoi(js.key().c_str()); (0 > key)){ mpre("ОШИБКА расчета номера обучающего примера", __LINE__);
@@ -1681,24 +1693,24 @@ int main(int argc, char **argv){
 					if(static int _key; false){ mpre("Счетчик примера", __LINE__);
 					}else if(_key == key){ //mpre("Не выводим уведомление", __LINE__);
 					}else if(_key = key; false){ mpre("Установка текущего примера", __LINE__);
-					}else{ mpre("### Пример " +to_string(key) +" ###", __LINE__);
+					}else{ mpre("############## Пример " +to_string(key) +" ##############", __LINE__);
 					}return false; }()){ mpre("ОШИБКА вывода информации о строке", __LINE__);
 				}else if(learn == calc){ mpre("Расчет itog[" +itog.at("id") +"]=" +calc, __LINE__);
 				}else if(auto microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА установки времени начала обучения", __LINE__);
 				}else if(string _calc = bmf::Learn(index, learn, key); (1 <= _calc.length() >= 2)){ mpre("ОШИБКА обучения морфа значение не верная длинна результата", __LINE__);
 				}else if(microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9 -microtime; false){ mpre("ОШИБКА установки времени окончания обучения", __LINE__);
-				}else if(mpre("Обучение itog[" +itog.at("id") +"]=>" +learn +" " +to_string(microtime),__LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
-				}else if(errors+=1; !errors){ mpre("Инкремент ошибок", __LINE__);
+				}else if(mpre("Обучение itog[" +itog.at("id") +"]~" +learn +" " +to_string(microtime),__LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
+				}else if(err+=1; !err){ mpre("Инкремент ошибок", __LINE__);
 				}else{ //mpre("Обучение сигнала " +to_string(key) +" itog[" +itog.at("id") +"]", __LINE__);
 				}}return false; }()){ mpre("ОШИБКА сравнения результата расчета", __LINE__);
 			//}else if(std::cerr << endl; false){ mpre("Пустая строка", __LINE__);
 			}else{
-			}}return errors; }(); (0 > errors)){ mpre("ОШИБКА првоерки списка итогов", __LINE__);
-		}else if(!errors){ mpre("Ошибок не обнаружено количество Эпох обучения "+ to_string(epoch -loop) +" Размер модели " +to_string(BMF_INDEX_EX.at("").size()) +" морфов Время "+ to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 -bmf::microtime) +" сек", __LINE__);
+			}}return err; }(); (0 > err)){ mpre("ОШИБКА проверки списка итогов", __LINE__);
+		}else if(errors += err; !err){ mpre("Ошибок не обнаружено количество Эпох обучения "+ to_string(epoch -loop) +" Размер модели " +to_string(BMF_INDEX_EX.at("").size()) +" морфов Время "+ to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 -bmf::microtime) +" сек", __LINE__);
 		}else if(--loop == 0){ mpre("Остановка по максимальному количеству эпох", __LINE__);
 		}else{ mpre("Результаты расчета эпохи " +to_string(errors) +" ошибок\n", __LINE__);
 			pass = true;
-		}}while(!(pass = !pass)); return false; }(loop)){ mpre("ОШИБКА перебора эпох", __LINE__);
+		}}while(!(pass = !pass)); return errors; }(); false){ mpre("ОШИБКА перебора эпох", __LINE__);
 	}else if([&](){ // Вывод итоговых значений
 		if(bmf::ARGV.end() == bmf::ARGV.find("-dano")){ //mpre("Данные для расчета не указаны", __LINE__);
 		}else if(nlohmann::json _in = ("" == bmf::ARGV.at("-dano") ? in : nlohmann::json::parse(bmf::ARGV.at("-dano"))); false){ mpre("ОШИБКА разбора строки атрибута -dano", __LINE__);
@@ -1816,7 +1828,8 @@ int main(int argc, char **argv){
 			if(bmf::exec("CREATE TABLE IF NOT EXISTS mp_bmf_test (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,`time` INTEGER, `date` TEXT, `size` INTEGER, `args` TEXT, `change` INTEGER, `duration` INTEGER, `bmf` INTEGER, `loop` INTEGER, `perc` REAL, `pips` REAL, `clump` TEXT)"); false){ mpre("ОШИБКА создания значения итога", __LINE__);
 			}else if(string date = [&](string date = ""){ char mbstr[100]; time_t t = time(nullptr); std::strftime(mbstr, sizeof(mbstr), "%c", std::localtime(&t)); date = string(mbstr); return date; }(); (0 >= date.length())){ mpre("ОШИБКА расчета времени", __LINE__);
 			}else if(nlohmann::json arg = [&](nlohmann::json arg = {}){ arg = bmf::ARGV; arg.erase("-"); arg.erase("-dano"); return arg; }(); arg.empty()){ mpre("ОШИБКА получения строки аргументов", __LINE__);
-			}else if(TMs test = bmf::fk("mp_bmf_test", {}, {{"time", to_string(bmf::timestamp)}, {"date", date}, {"size", to_string(in.size())}, {"change", to_string(bmf::change_sum)}, {"duration", to_string(time(0)-bmf::timestamp)}, {"clump", bmf::clump_id}, {"loop", to_string(bmf::loop)}, {"perc", to_string(bmf::perc)}, {"pips", to_string(bmf::pips_perc)}, {"bmf", to_string(BMF_INDEX_EX.at("").size())}, {"args", arg.dump()}}, {}); test.empty()){ mpre("ОШИБКА сохранения результатов тестов", __LINE__);
+			}else if(auto microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9 -bmf::microtime; false){ mpre("ОШИБКА расчета времени", __LINE__);
+			}else if(TMs test = bmf::fk("mp_bmf_test", {}, {{"time", to_string(bmf::timestamp)}, {"date", date}, {"size", to_string(in.size())}, {"change", to_string(errors)}, {"duration", to_string(microtime)}, {"clump", bmf::clump_id}, {"loop", to_string(epoch) +"/" +to_string(epoch-loop)}, {"perc", to_string(bmf::perc)}, {"pips", to_string(bmf::pips_perc)}, {"bmf", to_string(BMF_INDEX_EX.at("").size())}, {"args", arg.dump()}}, {}); test.empty()){ mpre("ОШИБКА сохранения результатов тестов", __LINE__);
 			}else{ //mpre("Сохранение статистики id "+ test["id"], __LINE__);
 			} return false; }()){ mpre("ОШИБКА сохранения теста", __LINE__);
 		}else if(std::cerr << endl; false){ err("Отделяем отчет проелом");

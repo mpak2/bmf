@@ -3,7 +3,7 @@
 #sudo apt install libsqlite3-dev
 
 #./bimorph -server 53000
-cat clump/tri.json | ./bimorph - ./3; sqlite3 ./3 "SELECT * FROM mp_bmf_index"
+#cat clump/tri.json | ./bimorph - ./3; sqlite3 ./3 "SELECT * FROM mp_bmf_index"
 
 #mv ./2 /tmp
 #cat clump/dva.json | ./bimorph - ./2
@@ -16,9 +16,9 @@ cat clump/tri.json | ./bimorph - ./3; sqlite3 ./3 "SELECT * FROM mp_bmf_index"
 ##./bimorph ./3 -j '[{"dano":{"Один":"0", "Два":"0", "Три":"0"}}]'
 
 #mv clump/iris.sqlite /tmp/
-#cat clump/iris.json | ./bimorph - clump/iris.sqlite -itog 0 -split 10.1
+cat clump/iris.json | ./bimorph - clump/iris.sqlite -c -rand 1 -epoch 100
 #cat clump/iris.json | ./bimorph - clump/iris.sqlite
-#sqlite3 clump/iris.sqlite -column -header "SELECT * FROM mp_bmf_test ORDER BY id DESC LIMIT 10; SELECT COUNT(*) AS count, MIN(duration) AS min_duration, AVG(duration) as avg_duration, MAX(duration) AS max_duration, AVG(bmf) as avg_bmf FROM mp_bmf_test;"
+sqlite3 clump/iris.sqlite -column -header "SELECT * FROM mp_bmf_test ORDER BY id DESC LIMIT 10; SELECT COUNT(*) AS count, MIN(duration) AS min_duration, AVG(duration) as avg_duration, MAX(duration) AS max_duration, AVG(bmf) as avg_bmf FROM mp_bmf_test;"
 
 #	#sqlite3 clump/iris.sqlite -column -header "SELECT MAX(depth) FROM mp_bmf_index"
 #./bimorph clump/iris.sqlite -dano '[{"dano":{"ДлиннаЧашелистика":"2.0","ШиринаЧашелистика":"4.0","ДлиннаЛепестка":"1.8","ШиринаЛепестка":"1.8"}}]'
