@@ -26,7 +26,7 @@ services:
       replicas: 1
     restart: always
   bmf:
-    image: bmf:latest
+    image: mpak2/bmf:latest
     ports:
       - 1080:80
     environment:
@@ -37,20 +37,4 @@ services:
     deploy:
       replicas: 1
     restart: always
-#volumes:
-#  grusterfs:
-#    name: "glusterfs"
-#    driver: glusterfs
-#networks:
-#  default:
-#    external:
-#      name: nginx
-#instances:
-#  - name: bmf
-#    dns:
-#      - bmf
-#      - localhost
-#    ip:
-#      - 127.0.0.1
-
 

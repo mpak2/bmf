@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#apt-get install libncurses5-dev
+
 clear
 echo "=== Сборка bmf ==="
 # g++ cparse/builtin-features.o cparse/shunting-yard.o bmf.cpp -lstdc++ -Wreturn-local-addr -lsqlite3 -Wwrite-strings -std=c++11 -lm -o bmf && ./bmf
