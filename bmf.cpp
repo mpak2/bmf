@@ -97,7 +97,7 @@ namespace bmf{ // Глобальные переменные
 	int timestamp =  time(0); // Расчет выполнения участков кода
 	auto microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9;
 
-	std::function<TMMi(string,TMMi)> Save; // Сохранение информации в базу
+	std::function<TMMi(string,TMMi&)> Save; // Сохранение информации в базу
 	std::function<std::string(TMs)> Calculate; // Расчет строки для расчета польской нотации
 	std::function<std::string(std::string,TM3i&)> Calc; // Расчет строки польской нотации
 	std::function<TMs(TMs,TM3i&,int)> Tree; // История морфа
@@ -126,7 +126,6 @@ int main(int argc, char **argv){
 	if(false){ mpre("ОШИБКА", __LINE__);
 	}else if(setlocale(LC_ALL, "LC_ALL=C.UTF-8"); false){ mpre("ОШИБКА установки кирилицы", __LINE__);
 	//}else if([&](){ char i[80]; do{ scanf ("%c",&i); }while(!(i == 'Y')||(i == 'N')); return false; }()){ mpre("ОШИБКА проверки", __LINE__);
-	}else if(sqlite3* db = 0; false){ mpre("ОШИБКА установки идентификатора ошибки базы данных", __LINE__);
 	}else if([&](){ // Список значений из консоли
 		if([&](){ for(int i = 0; i < argc; i++){ // Параметры значений консоли
 				if(0 >= i){ //mpre("Имя файла", __LINE__);
@@ -209,6 +208,7 @@ int main(int argc, char **argv){
 		}else if(dbname = bmf::ARGV.at("-db"); (0 >= dbname.length())){ mpre("ОШИБКА имя файла для БД не задано", __LINE__);
 		}else{ //mpre("База данных"+ string, __LINE__);
 		} return dbname; }(); (0 >= dbname.length())){ mpre("ОШИБКА получения имени базы данных", __LINE__);
+	}else if(sqlite3* db = 0; false){ mpre("ОШИБКА установки идентификатора ошибки базы данных", __LINE__);
 	}else if([&](){ // Подключение базы
 		if(bmf::exec = ([&](string sql, bool pass = false, int sleep = 0){ // Запрос к БД
 			sqlite3_stmt* stmt; // Запрос к базе данныхa
@@ -1361,15 +1361,13 @@ int main(int argc, char **argv){
 				fprintf(stderr, "] (%.1f %%) %s\r", val*100, mess.c_str());
 				std::cerr.flush();
 			}; false){ mpre("ОШИБКА создания функции отображения прогресса", __LINE__);
-		}else if(bmf::Save = ([&](string table, TMMi INDEX, int count_insert = 0, int count_update = 0, int count_delete = 0, TMMi ROW = {}, int progress = 0){ // Расчет значения формулы
+		}else if(bmf::Save = ([&](string table, TMMi& INDEX, int count_insert = 0, int count_update = 0, int count_delete = 0, TMMi ROW = {}, int progress = 0){ // Расчет значения формулы
 			int remains = INDEX.size()%1000;
 			for(auto index_itr = INDEX.rbegin(); index_itr != INDEX.rend(); index_itr++){ // Сохранение данных справочника
 				if(TMs index = index_itr->second; index.empty()){ mpre("ОШИБКА выборки значения итератора", __LINE__);
-				//}else if(int res = ++progress%remains; false){ mpre("ОШИБКА расчета остатка сравнения", __LINE__);
 				}else if([&](){ // Прогресс
-					if(int res = ++progress%remains; false){ //mpre("Расчет остатка для сравнения при выводе", __LINE__);
-					}else if(res && (1 != progress)){ //mpre("Отображаем прогресс первый, последний и кратный тысячи разы", __LINE__);
-					}else if(bmf::Progress("Анализ изменений " +table, (float)progress/INDEX.size(), __LINE__); false){ mpre("ОШИБКА Индикатор прогресса", __LINE__);
+					if(progress++ && progress%1000 && (progress != INDEX.size())){ //mpre("Отображаем прогресс первый, последний и кратный тысячи разы", __LINE__);
+					}else if(bmf::Progress("Анализ изменений " +to_string(progress) +" " +table, (float)progress/INDEX.size(), __LINE__); false){ mpre("ОШИБКА Индикатор прогресса", __LINE__);
 					}else{ //mpre("Изменение прогресса не каждый раз а только через 1000 итераций", __LINE__);
 					}return false; }()){ mpre("ОШИБКА отображения информации", __LINE__);
 				}else if(int index_id = index_itr->first; (0 == index_id)){ mpre("ОШИБКА получения ключа строки", __LINE__);
@@ -1818,9 +1816,8 @@ int main(int argc, char **argv){
 		}else if([&](int progress = 0){ for(auto &index_itr:_BMF_INDEX){ //for_each(_BMF_INDEX.begin(), _BMF_INDEX.end(), [&](auto &index_itr){ // Правка связей
 				if(TMs index = index_itr.second; index.empty()){ mpre("ОШИБКА получения морфа из итератора", __LINE__);
 				}else if([&](){ // Прогресс
-					if(int res = progress%remains; false){ //mpre("Расчет остатка для сравнения при выводе", __LINE__);
-					}else if(!progress++ | !res){ //mpre("Отображаем прогресс первый, последний и кратный тысячи разы", __LINE__);
-					}else if(bmf::Progress("Обновление модели Связей:" +to_string(progress), (float)progress/_BMF_INDEX.size(), __LINE__); false){ mpre("ОШИБКА Индикатор прогресса", __LINE__);
+					if(progress++ && progress%1000 && (progress != _BMF_INDEX.size())){ //mpre("Отображаем прогресс первый, последний и кратный тысячи разы", __LINE__);
+					}else if(bmf::Progress("Обновление модели " +to_string(progress), (float)progress/_BMF_INDEX.size(), __LINE__); false){ mpre("ОШИБКА Индикатор прогресса", __LINE__);
 					}else{ //mpre("Изменение прогресса не каждый раз а только через 1000 итераций", __LINE__);
 					}return false; }()){ mpre("ОШИБКА отображения информации", __LINE__);
 				}else if(TMs _index = index_itr.second; _index.empty()){ mpre("ОШИБКА получения морфа из итератора", __LINE__);
@@ -1899,9 +1896,9 @@ int main(int argc, char **argv){
 				}
 			} return false; }()){ mpre("ОШИБКА правки связей морфов", __LINE__);
 		}else if(bmf::exec("COMMIT TRANSACTION"); false){ mpre("ОШИБКА начала сессии к БД", __LINE__);
-		}else{ std::cerr << endl; //mpre(_BMF_INDEX, __LINE__, "Сохранение");
 		} return false; }()){ mpre("ОШИБКА установки ключей", __LINE__);
-	}else{
+	}else if(int result = sqlite3_close_v2(db); (SQLITE_OK != result)){ mpre("Не удалось закрыть соединение с БД", __LINE__);
+	}else{ std::cerr << endl; //mpre(_BMF_INDEX, __LINE__, "Сохранение");
 	}
 }
 
