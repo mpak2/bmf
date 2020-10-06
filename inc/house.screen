@@ -1,0 +1,16 @@
+termcapinfo xterm 'Co#256:AB=\E[48;5;%dm:AF=\E[38;5;%dm'
+
+screen -t cmd 1 bash 
+split -v
+
+focus
+screen -t win2 2 htop
+focus
+
+split
+focus
+screen -t win3 3 bash
+
+split
+focus
+screen -t win4 4 bash
