@@ -83,7 +83,9 @@ namespace bmf{ // Глобальные переменные
 	int change_sum = 0; // Счетчик расчетов
 	int size_max = 2e9; // Максимально допустимое количество морфов в расчете
 	float perc = 0; // Процент правильных прогнозов в примере
-	float pips_perc = 0; // Процент правильных прогнозов в бите
+	float pips_perc = -1; // Процент правильных прогнозов в бите
+	float pips_first = -1; // Процент правильных прогнозов в бите
+	float pips_last = -1; // Процент правильных прогнозов в бите
 
 	TMs CACHE; // Кеш результатов расчета
 	TMs COUNT; // Кеш результатов расчета
@@ -1366,8 +1368,8 @@ int main(int argc, char **argv){
 			for(auto index_itr = INDEX.rbegin(); index_itr != INDEX.rend(); index_itr++){ // Сохранение данных справочника
 				if(TMs index = index_itr->second; index.empty()){ mpre("ОШИБКА выборки значения итератора", __LINE__);
 				}else if([&](){ // Прогресс
-					if(progress++ && progress%1000 && (progress != INDEX.size())){ //mpre("Отображаем прогресс первый, последний и кратный тысячи разы", __LINE__);
-					}else if(bmf::Progress("Анализ изменений " +to_string(progress) +" " +table, (float)progress/INDEX.size(), __LINE__); false){ mpre("ОШИБКА Индикатор прогресса", __LINE__);
+					if(progress++ && progress%10000 && (progress != INDEX.size())){ //mpre("Отображаем прогресс первый, последний и кратный тысячи разы", __LINE__);
+					}else if(bmf::Progress("Анализ изменений " +table +" " +to_string(progress), (float)progress/INDEX.size(), __LINE__); false){ mpre("ОШИБКА Индикатор прогресса", __LINE__);
 					}else{ //mpre("Изменение прогресса не каждый раз а только через 1000 итераций", __LINE__);
 					}return false; }()){ mpre("ОШИБКА отображения информации", __LINE__);
 				}else if(int index_id = index_itr->first; (0 == index_id)){ mpre("ОШИБКА получения ключа строки", __LINE__);
@@ -1483,7 +1485,7 @@ int main(int argc, char **argv){
 				}else{ mpre("Бит " +dano.at("id") +" " +bitmap + " length=" +to_string(bitmap.length()), __LINE__);
 				} return false; }()){ err("Отображение результатов");
 			}else if(bmf::DANO[atoi(dano.at("id").c_str())] = bit; bmf::DANO.empty()){ err("Сохранение карты");
-			}else if(bmf::Progress("Индекс исхоных сигналов", (float)++progress/_BMF_DANO_EX.at("").size(), __LINE__); false){ mpre("Индикатор прогресса", __LINE__);
+			}else if(bmf::Progress("Индекс исходных сигналов", (float)++progress/_BMF_DANO_EX.at("").size(), __LINE__); false){ mpre("Индикатор прогресса", __LINE__);
 			}else{ //mpre(dano_itr.second, "Исходник", __LINE__);
 			} } std::cerr << endl; return false; }()){ mpre("ОШИБКА составления двоичной карты", __LINE__);
 		//}else if(mpre("Расчет итоговых сигналов " +to_string(BMF_ITOG_EX.at("").size()), __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
@@ -1626,9 +1628,8 @@ int main(int argc, char **argv){
 	//}else if(mpre("Опа", __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
 	}else if(int errors = [&](int errors = 0, bool pass = false){ do{
 		if(false){ mpre("Пропуск расчетов эпох", __LINE__);
-		}else if(int err = [&](int err = 0, int progress = 0){ for(auto &js:in.items()){ // Сравнение результата расчета
-			if(false){ mpre("Пропуск сравнения результатов", __LINE__);
-			}else if(auto el = js.value(); el.empty()){ mpre("ОШИБКА элемент не найден", __LINE__);
+		}else if(int err = [&](int err = 0, int progress = 0, int count = 0){ for(auto &js:in.items()){ // Сравнение результата расчета
+			if(auto el = js.value(); el.empty()){ mpre("ОШИБКА элемент не найден", __LINE__);
 			}else if(int key = atoi(js.key().c_str()); (0 > key)){ mpre("ОШИБКА расчета номера обучающего примера", __LINE__);
 			}else if([&](){ for(auto &dano_itr:BMF_DANO_EX.at("")){ // Проверка списка итогов
 				if(TMs dano = dano_itr.second; dano.empty()){ mpre("ОШИБКА выборки итога", __LINE__);
@@ -1681,11 +1682,12 @@ int main(int argc, char **argv){
 					} return index; }(); index.empty()){ mpre("ОШИБКА морф связи не найден", __LINE__);
 				}else if(bmf::MAPS.end() == bmf::MAPS.find(atoi(index.at("id").c_str()))){ mpre("ОШИБКА в картах не найден расчет морфа", __LINE__);
 				}else if(boost::dynamic_bitset<> INDEX = bmf::MAPS.at(atoi(index.at("id").c_str())); INDEX.empty()){ mpre("ОШИБКА выборки расчета морфа", __LINE__);
-				}else if(std::string vals = [&](std::string vals = ""){ boost::to_string(ITOG, vals); return vals; }(); vals.empty()){ err("Строка результата");
+				}else if(std::string vals = [&](std::string vals = ""){ boost::to_string(ITOG, vals); return vals; }(); vals.empty()){ mpre("ОШИБКА Строка результата", __LINE__);
 				}else if(ITOG.size() != in.size()){ mpre("ОШИБКА размер итогов не совпадает с количеством обучающих примеров", __LINE__);
 				}else if(INDEX.size() != in.size()){ mpre("ОШИБКА размер карты не совпадает с количеством обучающих примеров", __LINE__);
 				}else if(std::string learn = (ITOG.test(key) ? "1" : "0"); (1 != learn.length())){ mpre("ОШИБКА получения бит", __LINE__);
 				}else if(std::string calc = (INDEX.test(key) ? "1" : "0"); (1 != calc.length())){ mpre("ОШИБКА получения расчета", __LINE__);
+				}else if(!++count){ mpre("ОШИБКА инкремента счетчика", __LINE__);
 				}else if([&](){ // Обучение
 					if(learn == calc){ //mpre("Сравнение itog[" +itog.at("id") +"]=" +calc, __LINE__);
 					}else if(string _calc = bmf::Learn(index, learn, key); (1 <= _calc.length() >= 2)){ mpre("ОШИБКА обучения морфа значение не верная длинна результата", __LINE__);
@@ -1695,12 +1697,16 @@ int main(int argc, char **argv){
 				//}else if(mpre("Обучение itog[" +itog.at("id") +"]~" +learn +" " +to_string(microtime),__LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
 				}else{ //mpre("Обучение сигнала " +to_string(key) +" itog[" +itog.at("id") +"]", __LINE__);
 				} } return false; }(); false){ mpre("ОШИБКА сравнения результата расчета", __LINE__);
-			}else if(bmf::Progress("Эпох:" +to_string(loop) +" Пример:" +to_string(progress) +" Ошибок:"+ to_string(err), (float)++progress/in.size(), __LINE__); false){ mpre("Индикатор прогресса", __LINE__);
+			}else if([&](){ // Расчет процента бит
+				if(!bmf::loop){ bmf::pips_first = (float)err/count; //mpre("Расчет процента первой эпохи", __LINE__);
+				}else{ bmf::pips_last = (float)err/count; //mpre("Расчет процента последней эпохи", __LINE__);
+				}return false; }()){ mpre("ОШИБКА расчета процента бит", __LINE__);
+			}else if(bmf::Progress("Эпоха:" +to_string(bmf::loop+1) +" Примеров:" +to_string(progress) +" Ошибок:"+ to_string(err), (float)++progress/in.size(), __LINE__); false){ mpre("Индикатор прогресса", __LINE__);
 			}else{
 			}}return err; }(); (0 > err)){ mpre("ОШИБКА проверки списка итогов", __LINE__);
 		}else if(std::cerr << endl; false){ mpre("Пробел за прогрессом", __LINE__);
 		}else if(errors += err; !err){ //mpre("Ошибок не обнаружено количество Эпох обучения "+ to_string(epoch -loop) +" Размер модели " +to_string(BMF_INDEX_EX.at("").size()) +" морфов Время "+ to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 -bmf::microtime) +" сек", __LINE__);
-		}else if(--loop == 0){ //mpre("Остановка по максимальному количеству эпох", __LINE__);
+		}else if(++bmf::loop >= loop){ //mpre("Остановка по максимальному количеству эпох", __LINE__);
 		}else{ //mpre("Результаты расчета Общее количество/Последней эпохи " +to_string(errors) +"/" +to_string(err) +"\n", __LINE__);
 			pass = true;
 		} }while(!(pass = !pass)); return errors; }(); false){ mpre("ОШИБКА перебора эпох", __LINE__);
@@ -1762,7 +1768,14 @@ int main(int argc, char **argv){
 			}else if(string date = [&](string date = ""){ char mbstr[100]; time_t t = time(nullptr); std::strftime(mbstr, sizeof(mbstr), "%c", std::localtime(&t)); date = string(mbstr); return date; }(); (0 >= date.length())){ mpre("ОШИБКА расчета времени", __LINE__);
 			}else if(nlohmann::json arg = [&](nlohmann::json arg = {}){ arg = bmf::ARGV; arg.erase("-"); arg.erase("-dano"); return arg; }(); arg.empty()){ mpre("ОШИБКА получения строки аргументов", __LINE__);
 			}else if(auto microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9 -bmf::microtime; false){ mpre("ОШИБКА расчета времени", __LINE__);
-			}else if(TMs test = bmf::fk("mp_bmf_test", {}, {{"time", to_string(bmf::timestamp)}, {"date", date}, {"size", to_string(in.size())}, {"change", to_string(errors)}, {"duration", to_string(microtime)}, {"clump", bmf::clump_id}, {"loop", to_string(epoch) +"/" +to_string(epoch-loop)}, {"perc", to_string(bmf::perc)}, {"pips", to_string(bmf::pips_perc)}, {"bmf", to_string(BMF_INDEX_EX.at("").size())}, {"args", arg.dump()}}, {}); test.empty()){ mpre("ОШИБКА сохранения результатов тестов", __LINE__);
+			//}else if(std::string pips = to_string(bmf::pips_first); false){ mpre("ОШИБКА получения процента", __LINE__);
+			}else if(std::string pips = [&](string pips = ""){ // Процент побитно
+				if(std::string pips1 = [&](std::string pips1 = ""){ char first[10]; sprintf(first, "%0.4f", bmf::pips_first); pips1 = first; return pips1; }(); false){ mpre("ОШИБКА получения первого процента", __LINE__);
+				}else if(std::string pips2 = [&](std::string pips2 = ""){ char last[10]; sprintf(last, "%0.4f", bmf::pips_last); pips2 = last; return pips2; }(); false){ mpre("ОШИБКА получения первого процента", __LINE__);
+				}else if(pips = pips1 +(0 > bmf::pips_last ? "" : "/" +pips2); pips.empty()){ mpre("ОШИБКА расчета побитового процента", __LINE__);
+				}else{ //mpre("Процент побитно "+ pips, __LINE__);
+				}return pips; }(); false){ mpre("ОШИБКА получения процента побитно", __LINE__);
+			}else if(TMs test = bmf::fk("mp_bmf_test", {}, {{"time", to_string(bmf::timestamp)}, {"date", date}, {"size", to_string(in.size())}, {"change", to_string(errors)}, {"duration", to_string(microtime)}, {"clump", bmf::clump_id}, {"loop", to_string(epoch) +"/" +to_string(bmf::loop)}, {"perc", to_string(bmf::perc)}, {"pips", pips}, {"bmf", to_string(BMF_INDEX_EX.at("").size())}, {"args", arg.dump()}}, {}); test.empty()){ mpre("ОШИБКА сохранения результатов тестов", __LINE__);
 			}else{ //mpre("Сохранение статистики id "+ test["id"], __LINE__);
 			} return false; }()){ mpre("ОШИБКА сохранения теста", __LINE__);
 		//}else if(std::cerr << endl; false){ err("Отделяем отчет проелом");
@@ -1817,7 +1830,7 @@ int main(int argc, char **argv){
 				if(TMs index = index_itr.second; index.empty()){ mpre("ОШИБКА получения морфа из итератора", __LINE__);
 				}else if([&](){ // Прогресс
 					if(progress++ && progress%1000 && (progress != _BMF_INDEX.size())){ //mpre("Отображаем прогресс первый, последний и кратный тысячи разы", __LINE__);
-					}else if(bmf::Progress("Обновление модели " +to_string(progress), (float)progress/_BMF_INDEX.size(), __LINE__); false){ mpre("ОШИБКА Индикатор прогресса", __LINE__);
+					}else if(bmf::Progress("Уточнение модели " +to_string(progress), (float)progress/_BMF_INDEX.size(), __LINE__); false){ mpre("ОШИБКА Индикатор прогресса", __LINE__);
 					}else{ //mpre("Изменение прогресса не каждый раз а только через 1000 итераций", __LINE__);
 					}return false; }()){ mpre("ОШИБКА отображения информации", __LINE__);
 				}else if(TMs _index = index_itr.second; _index.empty()){ mpre("ОШИБКА получения морфа из итератора", __LINE__);
