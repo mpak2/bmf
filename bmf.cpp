@@ -1624,8 +1624,8 @@ int main(int argc, char **argv){
 		}return false; }()){ mpre("ОШИБКА расчета исходников", __LINE__);
 	//}else if(mpre("Опа", __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
 	}else if(int errors = [&](int errors = 0, bool pass = false){ do{
-		if(false){ mpre("Пропуск расчетов эпох", __LINE__);
-		}else if(int err = [&](int err = 0, int progress = 0, int count = 0){ for(auto &js:in.items()){ // Сравнение результата расчета
+		if(int count = 0; false){ mpre("Обнуление счетчика", __LINE__);
+		}else if(int err = [&](int err = 0, int progress = 0){ for(auto &js:in.items()){ // Сравнение результата расчета
 			if(auto el = js.value(); el.empty()){ mpre("ОШИБКА элемент не найден", __LINE__);
 			}else if(int key = atoi(js.key().c_str()); (0 > key)){ mpre("ОШИБКА расчета номера обучающего примера", __LINE__);
 			}else if([&](){ for(auto &dano_itr:BMF_DANO_EX.at("")){ // Проверка списка итогов
@@ -1694,13 +1694,13 @@ int main(int argc, char **argv){
 				//}else if(mpre("Обучение itog[" +itog.at("id") +"]~" +learn +" " +to_string(microtime),__LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
 				}else{ //mpre("Обучение сигнала " +to_string(key) +" itog[" +itog.at("id") +"]", __LINE__);
 				} } return false; }(); false){ mpre("ОШИБКА сравнения результата расчета", __LINE__);
-			}else if([&](){ // Расчет процента бит
-				if(!bmf::loop){ bmf::pips_first = (err ? (float)count/err : 1); //mpre("Расчет процента первой эпохи", __LINE__);
-				}else{ bmf::pips_last = (err ? (float)count/err : 1); //mpre("Расчет процента последней эпохи", __LINE__);
-				}return false; }()){ mpre("ОШИБКА расчета процента бит", __LINE__);
 			}else if(bmf::Progress("Эпоха:" +to_string(bmf::loop+1) +" Примеров:" +to_string(progress) +" Ошибок:"+ to_string(err), (float)++progress/in.size(), __LINE__); false){ mpre("Индикатор прогресса", __LINE__);
 			}else{
 			}}return err; }(); (0 > err)){ mpre("ОШИБКА проверки списка итогов", __LINE__);
+		}else if([&](){ // Расчет процента бит
+			if(!bmf::loop){ bmf::pips_first = (err ? (float)(count-err)/count : 1); //mpre("Расчет процента первой эпохи err=" +to_string(err) +" count=" +to_string(count), __LINE__);
+			}else{ bmf::pips_last = (err ? (float)(count-err)/count : 1); //mpre("Расчет процента последней эпохи", __LINE__);
+			}return false; }()){ mpre("ОШИБКА расчета процента бит", __LINE__);
 		}else if(std::cerr << endl; false){ mpre("Пробел за прогрессом", __LINE__);
 		}else if(errors += err; !err){ //mpre("Ошибок не обнаружено количество Эпох обучения "+ to_string(epoch -loop) +" Размер модели " +to_string(BMF_INDEX_EX.at("").size()) +" морфов Время "+ to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 -bmf::microtime) +" сек", __LINE__);
 		}else if(++bmf::loop >= loop){ //mpre("Остановка по максимальному количеству эпох", __LINE__);
