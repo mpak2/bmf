@@ -1823,7 +1823,7 @@ int main(int argc, char **argv){
 				if(TMs index = index_itr.second; index.empty()){ mpre("ОШИБКА получения морфа из итератора", __LINE__);
 				}else if([&](){ // Прогресс
 					if(progress++ && progress%1000 && (progress != _BMF_INDEX.size())){ //mpre("Отображаем прогресс первый, последний и кратный тысячи разы", __LINE__);
-					}else if(bmf::Progress("Уточнение модели " +to_string(progress), (float)progress/_BMF_INDEX.size(), __LINE__); false){ mpre("ОШИБКА Индикатор прогресса", __LINE__);
+					}else if(bmf::Progress("Сохранение изменений модели " +to_string(progress), (float)progress/_BMF_INDEX.size(), __LINE__); false){ mpre("ОШИБКА Индикатор прогресса", __LINE__);
 					}else{ //mpre("Изменение прогресса не каждый раз а только через 1000 итераций", __LINE__);
 					}return false; }()){ mpre("ОШИБКА отображения информации", __LINE__);
 				}else if(TMs _index = index_itr.second; _index.empty()){ mpre("ОШИБКА получения морфа из итератора", __LINE__);
