@@ -44,18 +44,20 @@ int main(int argc, char **argv){
 		}while(std::string::npos != npos); return itog; }(str); itog.empty()){ mpre("ОШИБКА список итогов не сформирован", __LINE__);
 	}else if(int line = (3 < argc ? atoi(argv[3]) : 0); (0 > line)){ mpre("ОШИБКА расчета количества строк", __LINE__);
 	}else if(std::string hide = [&](std::string hide = ""){
-		if(4 > argc){ mpre("ОШИБКА укажите имя поля итога", __LINE__);
+		if(4 <= argc){ //mpre("Не указано поле скрытых полей", __LINE__);
 		}else if(hide = argv[4]; hide.empty()){ mpre("ОШИБКА выборки имени поля итога", __LINE__);
 		}else{ //mpre("Строка итога "+ str, __LINE__);
-		} return hide; }(); hide.empty()){ mpre("ОШИБКА строка итога не указана", __LINE__);
-	}else if(std::map<std::string, std::string> hidden = [&](std::string hide, std::map<std::string, std::string> hidden = {}, int npos = 0){ do{ // Список итогов
-			if(npos = hide.find(","); false){ mpre("ОШИБКА получения позиии запятой в строке", __LINE__);
+		} return hide; }(); false){ mpre("ОШИБКА строка скрытых полей не указана", __LINE__);
+	}else if(std::map<std::string, std::string> hidden = [&](std::string hide, std::map<std::string, std::string> hidden = {}, int npos = 0, bool pass = false){ do{ // Список итогов
+			if(hide.empty()){ //mpre("Не указан список скрытых полей", __LINE__);
+			}else if(npos = hide.find(","); false){ mpre("ОШИБКА получения позиии запятой в строке", __LINE__);
 			}else if(std::string field = (std::string::npos == npos ? hide : hide.substr(0, npos)); field.empty()){ mpre("ОШИБКА получения части строки str=" +str, __LINE__);
 			}else if(hide = hide.substr(npos+1, hide.length()); false){ mpre("ОШИБКА удаления поля из строки", __LINE__);
 			}else if(hidden.insert(make_pair(field, field)); hidden.empty()){ mpre("ОШИБКА добавления поля в список", __LINE__);
-			}else{ //mpre("Поле итога field="+ field+ " hide=" +str, __LINE__);
+			}else{ pass = true; //mpre("Поле итога field="+ field+ " hide=" +str, __LINE__);
 			}
-		}while(std::string::npos != npos); return hidden; }(hide); hidden.empty()){ mpre("ОШИБКА список скрытых полей не сформирован", __LINE__);
+		}while(!(pass = !pass)); return hidden; }(hide); false){ mpre("ОШИБКА список скрытых полей не сформирован", __LINE__);
+	//}else if(mpre("Проверка", __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
 	}else if(mpre("Файл CSV `" + file_name+ "` Итоговые поля `" +str +"` Разбить по строкам " +std::to_string(line) +" Скрыть поля `" +hide +"`", __LINE__)){ mpre("ОШИБКА уведомления", __LINE__);
 	}else if(std::ifstream fin(file_name); !fin){ mpre("ОШИБКА Подключения файла "+ file_name, __LINE__);
 	}else if(std::map<std::string,std::string> titles; false){ mpre("ОШИБКА получения заголовков полей", __LINE__);
@@ -90,12 +92,12 @@ int main(int argc, char **argv){
 				}else{ //dump(csv, __LINE__); //mpre("Пара key=" + key+" val=" +val, __LINE__);
 				}} return false; }()){ mpre("ОШИБКА устанвоки пар заголовок:значение", __LINE__);
 			//}else if(CSV.insert(make_pair(CSV.size(), csv)); CSV.empty()){ mpre("ОШИБКА добавления новой строки", __LINE__);
-			}else if(int delta = [&](int delta = 0){ // Получаем дельту
+			/*}else if(int delta = [&](int delta = 0){ // Получаем дельту
 				if(csv.end() == csv.find("delta")){ mpre("ОШИБКА дельта в данных не найдена", __LINE__);
 				}else if(delta = atoi(csv.at("delta").c_str()); !delta){ mpre("ОШИБКА получения дельты " +csv.at("delta"), __LINE__);
 				//}else if(csv.erase("delta"); false){ mpre("ОШИБКА удаления дельты из данных", __LINE__);
 				}else{ //mpre("ОШИБКА получения дельты", __LINE__);
-				}return delta; }(); (1 != delta)){ //mpre("Пропускаем " +csv.at("delta"), __LINE__);
+				}return delta; }(); (1 != delta)){ //mpre("Пропускаем " +csv.at("delta"), __LINE__);*/
 			}else if(nlohmann::json json; false){ pre("ОШИБКА загрузки в json");
 			}else if([&](){ for(auto itog_itr:itog){ // Формирование списка итогов
 					if(std::string field = itog_itr.second; field.empty()){ mpre("ОШИБКА получения поля итога", __LINE__);

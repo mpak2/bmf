@@ -1014,7 +1014,7 @@ int main(int argc, char **argv){
 							}else if(nn = (NN.empty() ? -1 : NN.begin()->first-1); (0 <= nn)){ mpre("ОШИБКА нахождения следующего номера "+ to_string(nn), __LINE__);
 							}else if(bmf_titles = {{"id", bmf::Id(BMF_TITLES.at(""))}, {"clump_id", bmf::clump_id}, {alias+ "_values_id", values["id"]}, {"value", to_string(nn)}, {"name", value}}; bmf_titles.empty()){ mpre("ОШИБКА получения нового заголовка", __LINE__);
 							}else if(erb_insert(BMF_TITLES, bmf_titles["id"], bmf_titles); BMF_TITLES.empty()){ mpre("ОШИБКА добавления заголовка в справочник", __LINE__);
-							}else{ //mpre(bmf_titles, __LINE__, "Значение следующего заголовка `"+ value+ "` "+ to_string(nn));
+							}else{ //mpre(bmf_titles, __LINE__, "Значение следующего заголовка `"+ value+ "` "+ to_string(nn)); mpre("Поле "+ val_itr.first, __LINE__); mpre("ОШИБКА добавление заголовока value ===>" +value +"<=== key=" +to_string(key), __LINE__);
 							} return nn; }(); (0 < nn)){ mpre("ОШИБКА определения номера заголовока `"+ value+ "`", __LINE__);
 						}else{ //mpre(bmf_titles, __LINE__, "Заголовок"); mpre("ОШИБКА Установлено наличие заголовка", __LINE__);
 						} return bmf_titles; }(); false){ mpre("ОШИБКА получения заголовка", __LINE__);
@@ -1695,8 +1695,8 @@ int main(int argc, char **argv){
 				}else{ //mpre("Обучение сигнала " +to_string(key) +" itog[" +itog.at("id") +"]", __LINE__);
 				} } return false; }(); false){ mpre("ОШИБКА сравнения результата расчета", __LINE__);
 			}else if([&](){ // Расчет процента бит
-				if(!bmf::loop){ bmf::pips_first = (float)err/count; //mpre("Расчет процента первой эпохи", __LINE__);
-				}else{ bmf::pips_last = (float)err/count; //mpre("Расчет процента последней эпохи", __LINE__);
+				if(!bmf::loop){ bmf::pips_first = (err ? (float)count/err : 1); //mpre("Расчет процента первой эпохи", __LINE__);
+				}else{ bmf::pips_last = (err ? (float)count/err : 1); //mpre("Расчет процента последней эпохи", __LINE__);
 				}return false; }()){ mpre("ОШИБКА расчета процента бит", __LINE__);
 			}else if(bmf::Progress("Эпоха:" +to_string(bmf::loop+1) +" Примеров:" +to_string(progress) +" Ошибок:"+ to_string(err), (float)++progress/in.size(), __LINE__); false){ mpre("Индикатор прогресса", __LINE__);
 			}else{
