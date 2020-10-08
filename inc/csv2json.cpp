@@ -88,6 +88,17 @@ int main(int argc, char **argv){
 					}else if(val = val.substr(0, npos); val.empty()){ mpre("ОШИБКА нормализации числа", __LINE__);
 					}else{ //mpre("ОШИБКА Нормализация числа " +val, __LINE__);
 					} return false; }()){ mpre("ОШИБКА нормализации", __LINE__);*/
+				//}else if(std::replace(str.begin(), str.end(), 's', 'd'); false){ mpre("ОШИБКА замены переноса строки", __LINE__);
+				}else if([&](){ // Замена переноса строки в значении
+					if(int npos = key.find("\r"); (std::string::npos == npos)){ //mpre("Перенос не найден", __LINE__);
+					}else if(key.erase(npos, 1); false){ mpre("ОШИБКА замены переноса в ключе", __LINE__);
+					}else{ //mpre("Замена переноса в ключе `" + key+"`", __LINE__);
+					} return false; }()){ mpre("ОШИБКА замены переноса строки", __LINE__);
+				}else if([&](){ // Замена переноса строки в значении
+					if(int npos = val.find("\r"); (std::string::npos == npos)){ //mpre("Перенос не найден", __LINE__);
+					}else if(val.erase(npos, 1); false){ mpre("ОШИБКА замены переноса в значении", __LINE__);
+					}else{ //mpre("Замена переноса в значении `" + val+"`", __LINE__);
+					} return false; }()){ mpre("ОШИБКА замены переноса строки", __LINE__);
 				}else if(csv.insert(make_pair(key, val)); csv.empty()){ mpre("ОШИБКА добавления пары в массив", __LINE__);
 				}else{ //dump(csv, __LINE__); //mpre("Пара key=" + key+" val=" +val, __LINE__);
 				}} return false; }()){ mpre("ОШИБКА устанвоки пар заголовок:значение", __LINE__);
