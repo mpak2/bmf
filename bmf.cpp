@@ -1705,7 +1705,7 @@ int main(int argc, char **argv){
 			}else{
 			}}return err; }(); (0 > err)){ mpre("ОШИБКА проверки списка итогов", __LINE__);
 		}else if([&](){ // Расчет процента бит
-			if(!bmf::loop){ bmf::pips_first = (err ? (float)(count-err)/count : 1); //mpre("Расчет процента первой эпохи err=" +to_string(err) +" count=" +to_string(count), __LINE__);
+			if(1 == bmf::loop){ bmf::pips_first = (err ? (float)(count-err)/count : 1); //mpre("Расчет процента первой эпохи err=" +to_string(err) +" count=" +to_string(count), __LINE__);
 			}else{ bmf::pips_last = (err ? (float)(count-err)/count : 1); //mpre("Расчет процента последней эпохи", __LINE__);
 			}return false; }()){ mpre("ОШИБКА расчета процента бит", __LINE__);
 		}else if(std::cerr << endl; false){ mpre("Пробел за прогрессом", __LINE__);
