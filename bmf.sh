@@ -7,16 +7,16 @@
 #cat clump/house.json | ./bimorph - clump/house.sqlite -epoch 100 #2>/dev/null
 
 #mv ./2 /tmp
-#cat clump/dva.json | ./bimorph - ./2
+#cat clump/dva.json | ./bimorph - -c ./2 -epoch 10
 #sqlite3 ./2 -column -header "SELECT * FROM mp_bmf_test ORDER BY id DESC LIMIT 10; -- SELECT COUNT(*) as step, SUM(change) as SumChange, MAX(bmf) as bmf FROM mp_bmf_test WHERE perc<10;"
-##sqlite3 ./2 -column -header "SELECT * FROM mp_bmf_index ORDER BY id DESC"
+#sqlite3 ./2 -column -header "SELECT * FROM mp_bmf_index ORDER BY id DESC"
 
 #cat clump/tri.json | ./bimorph - ./3
 #sqlite3 ./3 -column -header "SELECT * FROM mp_bmf_test ORDER BY id DESC LIMIT 10; -- SELECT COUNT(*) as step, SUM(change) as SumChange, MAX(bmf) as bmf FROM mp_bmf_test WHERE perc<10;"
 ##sqlite3 ./3 -column -header "SELECT * FROM mp_bmf_index ORDER BY id DESC"
 ##./bimorph ./3 -j '[{"dano":{"Один":"0", "Два":"0", "Три":"0"}}]'
 
-cat clump/iris.json | ./bimorph - clump/iris.sqlite -c -epoch 3 # ?cache=shared
+cat clump/iris.json | ./bimorph - clump/iris.sqlite -c -rand 1 -epoch 100 # ?cache=shared
 sqlite3 clump/iris.sqlite -column -header "SELECT * FROM mp_bmf_test ORDER BY id DESC LIMIT 10; SELECT COUNT(*) AS count, MIN(duration) AS min_duration, AVG(duration) as avg_duration, MAX(duration) AS max_duration, AVG('index') as avg_bmf FROM mp_bmf_test;"
 
 #	#sqlite3 clump/iris.sqlite -column -header "SELECT MAX(depth) FROM mp_bmf_index"
