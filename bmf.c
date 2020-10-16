@@ -30,7 +30,7 @@ int mpre(TMs row, int line, string comment = "", string prefix = "", string key 
 	return mpre(row, line, comment);
 }
 
-int mpre(TMMi TAB, int line, string comment = ""){
+int mpre(TMMi& TAB, int line, string comment = ""){
 	std::cerr << "Array";
 	if(std::lock_guard<std::recursive_mutex> lock(mu); false){ mpre("ОШИБКА блокировки", __LINE__);
 	}else if(line > 0){
@@ -91,9 +91,8 @@ int mpre(TM3i& TABS, int line, string comment = ""){
 
 
 
-TMMi rb(TMMi &TAB, TMs values, bool debug = false){
-	std::lock_guard<std::recursive_mutex> lock(mu);
-	TMMi LIST;
+TMMi rb(TMMi& TAB, TMs values, bool debug = false, TMMi LIST = {}){
+	//std::lock_guard<std::recursive_mutex> lock(mu);
 	for(auto &tab_itr:TAB){
 		bool keep = true; int id = tab_itr.first;
 		TMs row = tab_itr.second;
@@ -126,9 +125,11 @@ int Crc32(const char *message) {
 	} return ~crc;
 }
 
-TMs erb(TMMi& TAB, TMs values, bool debug = false){ // Поиск по неиднексированной таблице
-	TMs row;
-	if(std::lock_guard<std::recursive_mutex> lock(mu); false){ mpre("ОШИБКА установки блокировки", __LINE__);
+TMs erb(TMMi& TAB, TMs values, bool debug = false, TMs row = {}){ // Поиск по неиднексированной таблице
+	if(false){ mpre("ОШИБКА уведомления", __LINE__);
+	//}else if(std::lock_guard<std::recursive_mutex> lock(mu); false){ mpre("ОШИБКА установки блокировки", __LINE__);
+	//}else if(mpre("Проверка", __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
+	}else if(TAB.empty()){ //mpre("Пустой список", __LINE__);
 	}else if(TMMi LIST = rb(TAB, values); false){ std::cerr << __LINE__ << " Получение списка подходящих под условия элементов" << endl;
 	}else if(LIST.size() > 1){ mpre(values, __LINE__, "Условия"); mpre(LIST, __LINE__, "Список выборки"); std::cerr << __LINE__ << " Количество элементов в выборке "+ to_string(LIST.size())+ " более одного" << endl; mpre("ОШИБКА выборки", __LINE__); // data(LIST, __LINE__); return row;
 	}else if(LIST.empty()){// std::cerr << __LINE__ << " Список выборки пуст" << endl; mpre(values, __LINE__); return row;
@@ -139,9 +140,10 @@ TMs erb(TMMi& TAB, TMs values, bool debug = false){ // Поиск по неид�
 }
 
 TMs erb_insert(TM3i& TABS, string id, TMs index){ //mpre("Добавление индекса "+ id, __LINE__);
-	if(index.end() == index.find("id")){ mpre("ОШИБКА у элемента не найдено поле id", __LINE__);
+	if(TABS.end() == TABS.find("")){ //mpre("Данные не сохраняем", __LINE__);
+	}else if(index.end() == index.find("id")){ mpre("ОШИБКА у элемента не найдено поле id", __LINE__);
 	}else if(index.at("id") != id){ mpre("ОШИБКА значение id с полем морфа не совпадает", __LINE__);
-	}else if(std::lock_guard<std::recursive_mutex> lock(mu); false){ mpre("ОШИБКА установки блокировки", __LINE__);
+	//}else if(std::lock_guard<std::recursive_mutex> lock(mu); false){ mpre("ОШИБКА установки блокировки", __LINE__);
 	}else if([&](){ for(auto& tabs_itr:TABS){ // Удаление индексов
 			TMs fields; string values = "";
 			if(string field = tabs_itr.first; (0 >= field.length())){ //mpre("Список значений", __LINE__);
@@ -221,11 +223,11 @@ TMs erb_insert(TM3i& TABS, string id, TMs index){ //mpre("Добавление �
 	} return index;
 }
 
-TMMi rb(TM3i& TABS, TMs values, bool debug = false){
-	TMMi LIST; string fields = ""; //clock_t t;
+TMMi rb(TM3i& TABS, TMs values, bool debug = false, TMMi LIST = {}){
 	if(values.empty()){ mpre("ОШИБКА запрос с пустыми результатами", __LINE__);
+	}else if(TABS.end() == TABS.find("")){ //mpre("Данные отсутствуют", __LINE__);
 	}else if(TABS.at("").empty()){ //mpre("Пропускаем пустые массивы", __LINE__);
-	}else if(0 < fields.length()){ mpre("ОШИБКА значение полня должно быть пустым", __LINE__);
+	}else if(string fields = ""; 0 < fields.length()){ mpre("ОШИБКА значение полня должно быть пустым", __LINE__);
 	}else if(std::lock_guard<std::recursive_mutex> lock(mu); false){ mpre("ОШИБКА блокировки", __LINE__);
 	}else if([&](){ for(auto& values_itr:values){ // Поле индекса
 			if(string field = values_itr.first; (0 >= field.length())){ mpre("ОШИБКА получения имени поля", __LINE__);
@@ -288,12 +290,13 @@ TMMi rb(TM3i& TABS, TMs values, bool debug = false){
 		}else{ //mpre(LIST, __LINE__, "Результат совпадения с индексами");
 		} return false; }()){ mpre("ОШИБКА формирования списка результатов", __LINE__);
 	}else{ //mpre(LIST, __LINE__, "Результат выборки"); //mpre("ОШИБКА формирования списка индексов", __LINE__);
-	} return LIST;
+	}return LIST;
 }
 
-TMs erb(TM3i& TABS, TMs values, bool debug = false){ // Поиск по индексированной таблице
-	TMs line;
-	if(std::lock_guard<std::recursive_mutex> lock(mu); false){ mpre("ОШИБКА установки блокировки", __LINE__);
+TMs erb(TM3i& TABS, TMs values, bool debug = false, TMs line = {}){ // Поиск по индексированной таблице
+	if(false){ mpre("ОШИБКА уведомления", __LINE__);
+	//}else if(std::lock_guard<std::recursive_mutex> lock(mu); false){ mpre("ОШИБКА установки блокировки", __LINE__);
+	}else if(TABS.empty()){ //mpre("Справочкник пуст", __LINE__);
 	}else if([&](){ // Получение значения выборки по идентификатору
 			if(1 != values.size()){ //mpre("ОШИБКА полей для поиска больше одного", __LINE__);
 			}else if(values.end() == values.find("id")){ //mpre("Выборка только по id", __LINE__);
@@ -315,7 +318,7 @@ TMs erb(TM3i& TABS, TMs values, bool debug = false){ // Поиск по инде
 		}else{ //mpre(values, __LINE__, "Список требований"); mpre("Выборка erb", __LINE__);
 		} return false; }()){ mpre("ОШИБКА выборки не по идентификатору", __LINE__);
 	}else{ //mpre(values, __LINE__, "Значения"); mpre(line, __LINE__, "Результат"); mpre(TABS, __LINE__, "Список"); //mpre("ОШИБКА выборка из индексированной таблицы", __LINE__);
-	} return line;
+	}return line;
 }
 
 TMMi BMF_CALC = { // Расчеты
