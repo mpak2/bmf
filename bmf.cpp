@@ -117,8 +117,8 @@ namespace bmf{ // Глобальные переменные
 	std::function<int(nlohmann::json,int,int,int,TM3i&,TM3i&)> LearningAll; // Обучение
 	std::function<string(TMs,string,int)> Learn; // Рерасчет морфа
 
-	std::function<sqlite3_stmt*(string)> exec; // Выполнение запроса к БД
-	std::function<sqlite3_stmt*(string)> prepare; // Таблица с интервалами времени
+	std::function<int(string)> exec; // Выполнение запроса к БД
+	std::function<int(string)> prepare; // Таблица с интервалами времени
 	std::function<TMs(string,TMs,TMs,TMs)> fk; // Сохранение информации в базу
 	std::function<TMMi(string)> Tab; // Выборка таблицы из БД
 	std::function<string(TM3i&)> Id; // Расчет локального идентификатора
@@ -216,24 +216,21 @@ int main(int argc, char **argv){
 		}else{ //mpre("База данных"+ string, __LINE__);
 		}return false; }()){ mpre("ОШИБКА получения имени базы данных", __LINE__);
 	}else if([&](){ // Функции БД
-		if(bmf::exec = ([&](string sql, bool pass = false, int sleep = 0){ // Запрос к БД
-			do{
-				if(char *error_report = NULL; false){ mpre("ОШИБКА Установки строки ошибки", __LINE__);
-				}else if(int result = sqlite3_exec(bmf::db, sql.c_str(), 0, 0, &error_report); (SQLITE_OK == result)){ //mpre("Запрос выполнен без ошибок " +sql, __LINE__);
-				}else if("COMMIT TRANSACTION" == sql){ mpre("COMMIT TRANSACTION Не повторяем", __LINE__);
-				}else if([&](){ mpre("Запрос: "+ sql, __LINE__); mpre("Ошибка: " + std::string(error_report), __LINE__); mpre("Повторный запрос к БД через "+ to_string(sleep += 10) +" сек.", __LINE__); return false; }()){ mpre("ОШИБКА уведомления", __LINE__);
-				}else if(int request = system(("sleep "+ to_string(sleep)).c_str()); (0 != request)){ mpre("Отмена запроса", __LINE__); exit(1);
-				}else{ pass = true; //mpre("Повторный запрос к БД", __LINE__);
-				}
-			}while(!(pass = !pass));
-			return bmf::stmt; }); false){ mpre("ОШИБКА установки функции запроса к БД", __LINE__);
-		}else if(bmf::prepare = ([&](string sql, bool repeat = false, int sleep =30){ do{ // Запрос к БД
-			if(int sqlite_result = sqlite3_prepare_v2(bmf::db, sql.c_str(), -1, &bmf::stmt, 0); (SQLITE_OK == sqlite_result)){ //mpre("Запрос выполнен без ошибок");
+		if(bmf::exec = ([&](string sql, bool pass = false, int sleep = 0, int result = 1){ do{ // Запрос к БД
+			if(char *error_report = NULL; false){ mpre("ОШИБКА Установки строки ошибки", __LINE__);
+			}else if(result = sqlite3_exec(bmf::db, sql.c_str(), 0, 0, &error_report); (SQLITE_OK == result)){ //mpre("Запрос выполнен без ошибок " +sql, __LINE__);
+			}else if("COMMIT TRANSACTION" == sql){ mpre("COMMIT TRANSACTION Не повторяем", __LINE__);
+			}else if([&](){ mpre("Запрос: "+ sql, __LINE__); mpre("Ошибка: " + std::string(error_report), __LINE__); mpre("Повторный запрос к БД через "+ to_string(sleep += 10) +" сек.", __LINE__); return false; }()){ mpre("ОШИБКА уведомления", __LINE__);
+			}else if(int request = system(("sleep "+ to_string(sleep)).c_str()); (0 != request)){ mpre("Отмена запроса", __LINE__); exit(1);
+			}else{ pass = true; //mpre("Повторный запрос к БД", __LINE__);
+			} }while(!(pass = !pass)); return result; }); false){ mpre("ОШИБКА установки функции запроса к БД", __LINE__);
+		}else if(bmf::prepare = ([&](string sql, bool repeat = false, int result = 1, int sleep =30){ do{ // Запрос к БД
+			if(result = sqlite3_prepare_v2(bmf::db, sql.c_str(), -1, &bmf::stmt, 0); (SQLITE_OK == result)){ //mpre("Запрос выполнен без ошибок");
 			}else if([&](){ mpre("Запрос "+ sql, __LINE__); mpre("БД вернула ошибку `" +string(sqlite3_errmsg(bmf::db)) +"`", __LINE__); mpre("Повторная выбрка из БД через "+ to_string(sleep *= 2), __LINE__); return false; }()){ mpre("ОШИБКА уведомления", __LINE__);
 			}else if(int request = system(("sleep "+ to_string(sleep)).c_str()); (0 != request)){ mpre("Выход из запроса", __LINE__); exit(1);
 			}else if(repeat = true; false){ mpre("Установка повтора", __LINE__);
 			}else{ //mpre("Повторный запрос к БД", __LINE__);
-			} }while(repeat); return bmf::stmt; }); false){ mpre("ОШИБКА установки функции запроса к БД", __LINE__);
+			} }while(repeat); return result; }); false){ mpre("ОШИБКА установки функции запроса к БД", __LINE__);
 		}else if(bmf::fk = ([&](string table, TMs where, TMs insert, TMs update, TMs row = {}){ // Обновление базы данных
 			if([&](){
 				if(where.empty()){// std::cerr << __LINE__ << " Условие на выборку записей не указано" << endl;
@@ -276,7 +273,7 @@ int main(int argc, char **argv){
 						values += separ+ "'"+ val+ "'";
 					} sql += "("+ fields+ ") VALUES ("+ values+ ")";
 					return sql; }(); (0 >= sql.length())){ std::cerr << __LINE__ << " Запрос добавления новой записи в БД" << endl;
-				}else if(bmf::stmt = bmf::exec(sql); false){ mpre("ОШИБКА выполнения запроса к БД", __LINE__); //std::cerr << __LINE__ << " ОШИБКА выполнения запроса к базе данных: " << sql << " >> " << sqlite3_errmsg(db) << endl;// return false;
+				}else if(bmf::exec(sql)){ mpre("ОШИБКА выполнения запроса к БД", __LINE__); //std::cerr << __LINE__ << " ОШИБКА выполнения запроса к базе данных: " << sql << " >> " << sqlite3_errmsg(db) << endl;// return false;
 				}else if(rowid = sqlite3_last_insert_rowid(bmf::db); false){ mpre("ОШИБКА получения идентификатора последней установленной записи", __LINE__); //std::cerr << __LINE__ << " Идентификатор последней установленной записи << " << rowid << endl;
 				}else if(sql = "SELECT * FROM `"+ table+ "` WHERE id="+ to_string(rowid); sql.empty()){ mpre("ОШИБКА установки запроса на выборку", __LINE__); //std::cerr << __LINE__ << " Запрос на выборку внось установленной записи" << endl;
 				}else if(TMMi TAB = bmf::Tab(sql); TAB.empty()){ mpre("ОШИБКА выборки списка", __LINE__);
@@ -309,7 +306,7 @@ int main(int argc, char **argv){
 			}else{// mpre(where, __LINE__); mpre(insert, __LINE__); mpre(update, __LINE__);
 			}return row; }); false){ mpre("ОШИБКА обьявления функции Crc32", __LINE__);
 		}else if(bmf::Tab = ([&](string sql, TMMi TAB = {}){ // Выборка таблицы
-			if(bmf::stmt = bmf::prepare(sql); false){ mpre("ОШИБКА запроса к БД", __LINE__);
+			if(bmf::prepare(sql)){ mpre("ОШИБКА запроса к БД", __LINE__);
 			}else if(int count = sqlite3_column_count(bmf::stmt); false){ std::cerr << " ОШИБКА расчета количества записей в таблице";
 			}else if([&](int id = 0){ while(SQLITE_ROW == sqlite3_step(bmf::stmt)){
 					TMs row; string row_id; char *val;
@@ -353,7 +350,7 @@ int main(int argc, char **argv){
 	}else if([&](){ // Подключение базы
 		if(std::experimental::filesystem::perms p = std::experimental::filesystem::status(bmf::dbname).permissions(); ((p & std::experimental::filesystem::perms::owner_write) == std::experimental::filesystem::perms::none)){ mpre("ОШИБКА файл БД не доступен для записи $chmod u+w "+ bmf::dbname, __LINE__);
 		}else if(SQLITE_OK != sqlite3_open(bmf::dbname.c_str(), &bmf::db)){ std::cerr << __LINE__ << " ОШИБКА открытия базы данных << " << bmf::dbname << endl;
-		}else if(bmf::exec("PRAGMA journal_mode = MEMORY"); false){ mpre("Контроль доступа в памяти", __LINE__);
+		}else if(bmf::exec("PRAGMA journal_mode=WAL;"); false){ mpre("Контроль доступа в памяти", __LINE__);
 		//}else if(){ mpre("Не удалось закрыть соединение с БД", __LINE__);
 		}else if([&](){ // Получение пути до файла БД
 			if(int pos = bmf::dbname.rfind("/"); (0 > pos)){ //mpre("Слешей в пути до скопления не найдено", __LINE__);
@@ -1151,6 +1148,19 @@ int main(int argc, char **argv){
 					}else if(_stairs = _STAIRS.at(direct); false){ mpre("ОШИБКА выбора направления перехода direct=" +to_string(direct), __LINE__);
 					}else{ //mpre("Выбор направления " +index.at("id") +" count_1=" +to_string(count_1) +" count_0=" +to_string(count_0) +" vd=" +to_string(vd) +" v1=" +to_string(v1) +" v0=" +to_string(v0) +" " +directions +"[" +to_string(pos) +"]=" +direction, __LINE__);
 					}return _stairs; }(); false){ mpre("ОШИБКА выбора направления развития", __LINE__);
+				}else if([&](){ // Проверка согласованности данных
+					if(_stairs.empty()){ //mpre("Только в прямом направлении", __LINE__);
+					}else if(stairs.end() == stairs.find("parent")){ mpre("ОШИБКА поле родителя не задано", __LINE__);
+					}else if(std::string vals1 = [&](std::string map = ""){ boost::to_string(maps1, map); return map; }(); vals1.empty()){ mpre("ОШИБКА установки значения морфа", __LINE__);
+					}else if(std::string vals0 = [&](std::string map = ""){ boost::to_string(maps0, map); return map; }(); vals0.empty()){ mpre("ОШИБКА установки значения морфа", __LINE__);
+					}else if(boost::dynamic_bitset<> _maps1 = maps1; _maps1.empty()){ mpre("Создание копии старшей карты", __LINE__);
+					}else if(boost::dynamic_bitset<> _maps0 = maps0; _maps0.empty()){ mpre("Создание копии младшей карты", __LINE__);
+					}else if("index_id" == stairs.at("parent") ? _maps1.flip() : _maps0.flip(); false){ mpre("ОШИБКА инвертирования сигнала", __LINE__);
+					}else if(boost::dynamic_bitset<> maps = ("index_id" == stairs.at("parent") ? _maps1&_maps0 : _maps1|_maps0); maps.empty()){ mpre("ОШИБКА расчета значения", __LINE__);
+					}else if(std::string map = [&](std::string map = ""){ boost::to_string(maps, map); return map; }(); map.empty()){ mpre("ОШИБКА установки значения морфа", __LINE__);
+					}else if(map == index["map"]){ //mpre("Данные корректны", __LINE__);
+					}else{ mpre("ОШИБКА Проверки согласованности данных " +index.at("id"), __LINE__);
+					}return false; }()){ mpre("ОШИБКА проверка согласованности данных", __LINE__);
 				}else if([&](){ // Добавление нового морфа
 					if(_stairs.end() == _stairs.find("index_id")){ //mpre("Поле морфа в направлении не найдено", __LINE__);
 					}else if(std::string index_id = _stairs.at("index_id"); !index_id.empty()){ //mpre("Не пусой идентификатор морфа перехода не создаем новый", __LINE__);
@@ -1194,8 +1204,6 @@ int main(int argc, char **argv){
 					} return false; }()){ mpre("ОШИБКА Добавление морфа", __LINE__);
 				}else if([&](){ // Расчет значения морфа
 					if(stairs.end() == stairs.find("parent")){ mpre("ОШИБКА поле родителя не задано", __LINE__);
-					}else if(std::string vals1 = [&](std::string vals = ""){ boost::to_string(maps1, vals); return vals; }(); vals1.empty()){ err("Строка старшей связи");
-					}else if(std::string vals0 = [&](std::string vals = ""){ boost::to_string(maps0, vals); return vals; }(); vals0.empty()){ err("Строка старшей связи");
 					}else if("index_id" == stairs.at("parent") ? maps1.flip() : maps0.flip(); false){ mpre("ОШИБКА инвертирования сигнала", __LINE__);
 					}else if(boost::dynamic_bitset<> maps = ("index_id" == stairs.at("parent") ? maps1&maps0 : maps1|maps0); maps.empty()){ mpre("ОШИБКА расчета значения", __LINE__);
 					}else if(TMs _index = index; _index.empty()){ mpre("ОШИБКА создания копии морфа", __LINE__);
@@ -1428,9 +1436,9 @@ int main(int argc, char **argv){
 		}return false; }(); false){ mpre("ОШИБКА создания рабочих функций", __LINE__);
 	}else if(int loop = [&](int loop = 0){ // Количетсво повторений
 		if(int epoch = (bmf::ARGV.end() == bmf::ARGV.find("-epoch") ? 0 : atoi(bmf::ARGV.at("-epoch").c_str())); (0 > epoch)){ mpre("ОШИБКА расчета количества эпох", __LINE__);
-		}else if(bmf::ARGV.end() == bmf::ARGV.find("-epoch")){ mpre("Количество эпох не указано", __LINE__);
+		}else if(bmf::ARGV.end() == bmf::ARGV.find("-epoch")){ mpre("Количество эпох не указано -epoch", __LINE__);
 		}else if(!epoch){ loop = -1; mpre("Указано нулевое количество эпох расчитываем до полного совпадения", __LINE__);
-		}else if(loop = epoch){ mpre("Максимальное количество эпох расчета " +to_string(loop), __LINE__);
+		}else if(loop = epoch){ mpre("Максимальное количество эпох расчета -epoch " +to_string(loop), __LINE__);
 		}else{ mpre("ОШИБКА расчтеа количества повторений", __LINE__);
 		}return loop; }(); false){ mpre("ОШИБКА расчета колчиества повторений", __LINE__);
 	}else if([&](){ // Расчет исходников
@@ -1476,7 +1484,7 @@ int main(int argc, char **argv){
 				}}return false; }()){ mpre("ОШИБКА сохранения результатов", __LINE__);
 			}else{ //mpre("Расчет " +to_string(key), __LINE__);
 			}} std::cerr << endl; return false; }()){ mpre("ОШИБКА расчета карты", __LINE__);
-		}else if(bmf::exec("BEGIN TRANSACTION"); false){ mpre("ОШИБКА запуска начала транзакции", __LINE__);
+		}else if(bmf::exec("BEGIN TRANSACTION")){ mpre("Сбой запуска транзакции сохранения набора данных", __LINE__);
 		}else if([&](int progress = 0){ for(auto& dano_itr:BMF_DANO_EX.at("")){ // Двоичная карта исходников
 			if(bmf::Progress("Индекс исходных сигналов " +to_string(progress), (float)++progress/BMF_DANO_EX.at("").size(), __LINE__); false){ mpre("Индикатор прогресса", __LINE__);
 			}else if(TMs dano = dano_itr.second; dano.empty()){ mpre("ОШИБКА получения исходника", __LINE__);
@@ -1533,7 +1541,7 @@ int main(int argc, char **argv){
 			//}else if(microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9 -microtime; false){ mpre("ОШИБКА установки времени начала обучения", __LINE__);
 			}else{ //mpre("Расчет значений итога "+ itog.at("id"), __LINE__);
 			}} std::cerr << endl; return false; }()){ mpre("ОШИБКА расчета карты модели", __LINE__);
-		}else if(bmf::exec("COMMIT TRANSACTION"); false){ mpre("ОШИБКА начала сессии к БД", __LINE__);
+		}else if(bmf::exec("COMMIT TRANSACTION")){ mpre("Сбой закрытия транзакции сохранения набора данных", __LINE__);
 		}else{ //mpre(DANO, "Расчет итогов", __LINE__);
 		}return false; }()){ mpre("ОШИБКА расчета исходников", __LINE__);
 	}else if(int errors = [&](int errors = 0, bool pass = false){ do{ // Итерации обучения
@@ -1586,19 +1594,16 @@ int main(int argc, char **argv){
 				}else if(!++count){ mpre("ОШИБКА инкремента счетчика", __LINE__);
 				}else if([&](){ // Обучение
 					if(learn == calc){ //mpre("Сравнение itog[" +itog.at("id") +"]=" +calc, __LINE__);
-					}else if(bmf::exec("BEGIN TRANSACTION"); false){ mpre("ОШИБКА запуска начала транзакции", __LINE__);
+					}else if(bmf::exec("BEGIN TRANSACTION")){ mpre("Сбой запуска начала транзакции", __LINE__);
 					}else if(string _calc = bmf::Learn(index, learn, key); (1 <= _calc.length() >= 2)){ mpre("ОШИБКА обучения морфа значение не верная длинна результата", __LINE__);
-					}else if(bmf::exec("COMMIT TRANSACTION"); false){ mpre("ОШИБКА начала сессии к БД", __LINE__);
+					}else if(bmf::exec("COMMIT TRANSACTION")){ mpre("Сбой закрытия транзакции", __LINE__);
 					}else if(err+=1; !err){ mpre("Инкремент ошибок", __LINE__);
-					/*}else if([&](){ // Вывод дерева и остановка
-						if(bmf::Tree(index, key); false){ mpre("ОШИБКА построения дерева", __LINE__);
-						}else if(int response = system("sleep 1"); response){ exit(mpre("Остановка выполенния", __LINE__));
-						}return false; }()){ mpre("ОШИБКА выведения дерева", __LINE__);*/
 					}else{ //mpre("Обучение " +index["map"], __LINE__);
 					}return false; }()){ mpre("ОШИБКА обучения", __LINE__);
 				}else{ //mpre("Обучение сигнала " +to_string(key) +" itog[" +itog.at("id") +"]", __LINE__);
 				} } return false; }(); false){ mpre("ОШИБКА сравнения результата расчета", __LINE__);
 			}else if(!++key){ mpre("Инкремент номера примера", __LINE__);
+			//}else if(sqlite3_finalize(bmf::stmt); false){ mpre("ОШИБКА сериализации", __LINE__);
 			}else if(!(rep = !rep)){ mpre("ОШИБКА положительный повтор", __LINE__);
 			}else{
 			}}while(!(rep = !rep)); return err; }(); (0 > err)){ mpre("ОШИБКА проверки списка итогов", __LINE__);
