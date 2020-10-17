@@ -46,6 +46,7 @@
 //#include <stdlib.h>
 //#include <unistd.h>
 //#include <termios.h>
+#include <memory>
 
 //#define CL_HPP_MINIMUM_OPENCL_VERSION 110
 //#define CL_HPP_TARGET_OPENCL_VERSION 210
@@ -87,19 +88,22 @@ namespace bmf{ // Глобальные переменные
 	float pips_first = -1; // Процент правильных прогнозов в бите
 	float pips_last = -1; // Процент правильных прогнозов в бите
 
-	TMs CACHE; // Кеш результатов расчета
+//	TMs CACHE; // Кеш результатов расчета
 	TMs COUNT; // Кеш результатов расчета
 	TMs CALCULATE; // Список формул для быстрых расчетов для каждого из итогов
 	std::map<int, boost::dynamic_bitset<>> DANO; // Кеш результатов исходников
 	std::map<int, boost::dynamic_bitset<>> ITOG; // Кеш результатов расчета
-	std::map<int, boost::dynamic_bitset<>> MAPS; // Список битовых результатов расчета для каждого морфа
+//	std::map<int, boost::dynamic_bitset<>> MAPS; // Список битовых результатов расчета для каждого морфа
 
 	TMs databases; // Список баз данных
+	string dbname; //Имя БД
+	sqlite3_stmt* stmt; // Соединение
+	sqlite3* db = 0; //Идентификатор БД
 	TMs ARGV; // Массив параметров консоли
 	int timestamp =  time(0); // Расчет выполнения участков кода
 	auto microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9;
 
-	std::function<TMMi(string,TMMi&)> Save; // Сохранение информации в базу
+	std::function<TMMi(string,TM3i&)> Save; // Сохранение информации в базу
 	std::function<std::string(TMs)> Calculate; // Расчет строки для расчета польской нотации
 	std::function<std::string(std::string,TM3i&)> Calc; // Расчет строки польской нотации
 	std::function<TMs(TMs,int)> Tree; // История морфа
@@ -121,7 +125,7 @@ namespace bmf{ // Глобальные переменные
 	std::function<TMMi(TMMi&,string,string,string)> Dataset; // Выгрузка данных из базы с проверкой равенства
 	std::function<void(string,float,int)> Progress; // Отрисовка полосы выполнения
 	std::function<int(void)> Getch; // Получение нажатий клавиш в консоли
-	std::function<boost::dynamic_bitset<>(TMs)> Maps; // Расчет карт результатов
+	std::function<boost::dynamic_bitset<>(TMs&)> Maps; // Расчет карт результатов
 }
 
 int main(int argc, char **argv){
@@ -159,21 +163,34 @@ int main(int argc, char **argv){
 		}else if(in = nlohmann::json::parse(bmf::ARGV.at("-")); false){ mpre("ОШИБКА Входящий параметр с обучающими данными пуст", __LINE__);
 		}else{ //mpre("Данные из потока std::cin "+ in.dump(), __LINE__);
 		} return in; }(); false){ mpre("ОШИБКА получения входного потока", __LINE__);
-	}else if([&](){ // Остановки из консоли
-		if([&](){ // Отображение атрибутов командной строки
+	}else if([&](bool skip = true){ // Остановки из консоли
+		if([&](bool skip = false){ // Версия программы
+			if(bmf::ARGV.end() == bmf::ARGV.find("-v")){ //mpre("Пропускаем отображение версии", __LINE__);
+			}else if(skip = !skip; false){ mpre("Условия выхода", __LINE__);
+			}else{ std::cout << endl;
+				std::cout << "bimotph v6.2" << endl;
+				std::cout << "Copyright (C) 2020 биморф.рф" << endl;
+				std::cout << "Нет НИКАКИХ ГАРАНТИЙ до степени, разрешённой законом." << endl << endl;
+				std::cout << "Лицензия freemium https://ru.wikipedia.org/wiki/Freemium" << endl;
+				std::cout << "Данная версия является условной бесплатной с граничением сети в "+ to_string(bmf::size_max)+ " морфов" << endl;
+				std::cout << "Морф — наименьшая осмысленная единица языка (логики)" << endl << endl;
+
+				std::cout << "Авторы программы -- Кривошлыков Евгений Павлович +79582014736" << endl << endl;
+			}return skip; }()){ mpre("Информация о версии", __LINE__);
+		}else if([&](){ // Отображение атрибутов командной строки
 			if(bmf::ARGV.end() == bmf::ARGV.find("-a")){ return false; //mpre("Пропускаем отображение версии", __LINE__);
 			}else{ mpre(bmf::ARGV, __LINE__, "Атрибуты командной строки");
 			} return true; }()){ mpre("Атрибуты параметров командной строки", __LINE__);
 		}else if([&](){ // Раздел помощи
-			if(string file = (1 <= argc ? argv[0] : "./bimorph"); (0 >= file.length())){ mpre("ОШИБКА получения имени файла", __LINE__);
-			}else if(bmf::ARGV.end() == bmf::ARGV.find("-h")){ return false; //mpre("Пропускаем раздел помощи", __LINE__);
+			if(bmf::ARGV.end() == bmf::ARGV.find("-h")){ return false; //mpre("Пропускаем раздел помощи", __LINE__);
+			}else if(string file = (1 <= argc ? argv[0] : "./bimorph"); (0 >= file.length())){ mpre("ОШИБКА получения имени файла", __LINE__);
 			}else{ std::cout << endl;
 				std::cout << "Использование: "+ file+ " [КЛЮЧИ]… [SQLITE ФАЙЛ]… [КЛЮЧИ]…" << endl;
 				std::cout << "-epoch		количество эпох выполнения при полном совпадении процесс обучения останавливается" << endl;
 				std::cout << "-db		файл sqlite базы данных в которых хранится модель" << endl;
 				std::cout << "-itog		номер итога для обучения -itog 3.2" << endl;
 				std::cout << "-rand		перемешивание списка для более равномерных результатов" << endl;
-				std::cout << "-version	показать информацию о версии" << endl;
+				std::cout << "-v		показать информацию о версии" << endl;
 				std::cout << "-h		показать эту справку и выйти" << endl;
 				std::cout << "-dano		параметры расчета в формате json при пустом значении берет из стандартного ввода -" << endl;
 				std::cout << "-thread		количество потоков обучения" << endl;
@@ -189,56 +206,36 @@ int main(int argc, char **argv){
 				std::cout << "Об ошибках в переводе сообщений «биморф» сообщайте по адресу: <bmf@mpak.su>" << endl;
 				std::cout << "Полная документация: http://биморф.рф/" << endl << endl;
 			} return true; return false; }()){ mpre("Раздел помощи", __LINE__);
-		}else if([&](){ // Версия программы
-			if(bmf::ARGV.end() == bmf::ARGV.find("-version")){ return false; //mpre("Пропускаем отображение версии", __LINE__);
-			}else{ std::cout << endl;
-				std::cout << "bimotph v5.2" << endl;
-				std::cout << "Copyright (C) 2017 биморф.рф" << endl;
-				std::cout << "Нет НИКАКИХ ГАРАНТИЙ до степени, разрешённой законом." << endl << endl;
-				std::cout << "Лицензия freemium https://ru.wikipedia.org/wiki/Freemium" << endl;
-				std::cout << "Данная версия является условной бесплатной с граничением сети в "+ to_string(bmf::size_max)+ " морфов" << endl;
-				std::cout << "Морф — наименьшая осмысленная единица языка (логики)" << endl << endl;
-
-				std::cout << "Авторы программы -- Кривошлыков Евгений Павлович +79582014736" << endl << endl;
-			} return true; }()){ mpre("Информация о версии", __LINE__);
-		}else{ return false;
-		} return true; }()){ exit(mpre("Остановка выполнения", __LINE__));
-	}else if(string dbname = [&](string dbname = ""){ // Имя базы данных
+		}else if(skip = !skip; false){ mpre("Условие выхода", __LINE__);
+		}else{
+		}return skip; }()){ exit(mpre("Остановка выполнения", __LINE__));
+	}else if([&](){ // Имя базы данных
 		if(bmf::ARGV.end() == bmf::ARGV.find("-db")){ mpre("ОШИБКА БД для сохранения не задана -db", __LINE__);
 		}else if(0 >= bmf::ARGV.at("-db").length()){ mpre("База данных для сохранения не указана", __LINE__);
-		}else if(dbname = bmf::ARGV.at("-db"); (0 >= dbname.length())){ mpre("ОШИБКА имя файла для БД не задано", __LINE__);
+		}else if(bmf::dbname = bmf::ARGV.at("-db"); (0 >= bmf::dbname.length())){ mpre("ОШИБКА имя файла для БД не задано", __LINE__);
 		}else{ //mpre("База данных"+ string, __LINE__);
-		} return dbname; }(); (0 >= dbname.length())){ mpre("ОШИБКА получения имени базы данных", __LINE__);
-	}else if(sqlite3* db = 0; false){ mpre("ОШИБКА установки идентификатора ошибки базы данных", __LINE__);
-	}else if([&](){ // Подключение базы
+		}return false; }()){ mpre("ОШИБКА получения имени базы данных", __LINE__);
+	}else if([&](){ // Функции БД
 		if(bmf::exec = ([&](string sql, bool pass = false, int sleep = 0){ // Запрос к БД
-			sqlite3_stmt* stmt; // Запрос к базе данныхa
 			do{
 				if(char *error_report = NULL; false){ mpre("ОШИБКА Установки строки ошибки", __LINE__);
-				}else if(int result = sqlite3_exec(db, sql.c_str(), 0, 0, &error_report); (SQLITE_OK == result)){ //mpre("Запрос выполнен без ошибок " +sql, __LINE__);
+				}else if(int result = sqlite3_exec(bmf::db, sql.c_str(), 0, 0, &error_report); (SQLITE_OK == result)){ //mpre("Запрос выполнен без ошибок " +sql, __LINE__);
 				}else if("COMMIT TRANSACTION" == sql){ mpre("COMMIT TRANSACTION Не повторяем", __LINE__);
 				}else if([&](){ mpre("Запрос: "+ sql, __LINE__); mpre("Ошибка: " + std::string(error_report), __LINE__); mpre("Повторный запрос к БД через "+ to_string(sleep += 10) +" сек.", __LINE__); return false; }()){ mpre("ОШИБКА уведомления", __LINE__);
 				}else if(int request = system(("sleep "+ to_string(sleep)).c_str()); (0 != request)){ mpre("Отмена запроса", __LINE__); exit(1);
 				}else{ pass = true; //mpre("Повторный запрос к БД", __LINE__);
 				}
 			}while(!(pass = !pass));
-			return stmt; }); false){ mpre("ОШИБКА установки функции запроса к БД", __LINE__);
-		}else if(bmf::prepare = ([&](string sql){ // Запрос к БД
-			int result, sqlite_result, sleep = 30;
-			sqlite3_stmt* stmt; // Запрос к базе данныхa
-			//const char* mess[100];
-			do{
-				if([&](){ sqlite_result = sqlite3_prepare(db, sql.c_str(), -1, &stmt, 0); return (SQLITE_OK == sqlite_result); }()){ //mpre("Запрос выполнен без ошибок");
-				//}else if(std::string error = std::string(mess); false){ mpre("ОШИБКА получения сообщения об ошибки", __LINE__);
-				}else if([&](){ mpre("Запрос "+ sql, __LINE__); mpre("БД вернула ошибку `" +string(sqlite3_errmsg(db)) +"`", __LINE__); mpre("Повторная выбрка из БД через "+ to_string(sleep *= 2), __LINE__); return false; }()){ mpre("ОШИБКА уведомления", __LINE__);
-				}else if(int request = system(("sleep "+ to_string(sleep)).c_str()); (0 != request)){ mpre("Выход из запроса", __LINE__); exit(1);
-				}else{ //mpre("Повторный запрос к БД", __LINE__);
-				}
-			}while(SQLITE_OK != sqlite_result);
-			return stmt; }); false){ mpre("ОШИБКА установки функции запроса к БД", __LINE__);
+			return bmf::stmt; }); false){ mpre("ОШИБКА установки функции запроса к БД", __LINE__);
+		}else if(bmf::prepare = ([&](string sql, bool repeat = false, int sleep =30){ do{ // Запрос к БД
+			if(int sqlite_result = sqlite3_prepare_v2(bmf::db, sql.c_str(), -1, &bmf::stmt, 0); (SQLITE_OK == sqlite_result)){ //mpre("Запрос выполнен без ошибок");
+			}else if([&](){ mpre("Запрос "+ sql, __LINE__); mpre("БД вернула ошибку `" +string(sqlite3_errmsg(bmf::db)) +"`", __LINE__); mpre("Повторная выбрка из БД через "+ to_string(sleep *= 2), __LINE__); return false; }()){ mpre("ОШИБКА уведомления", __LINE__);
+			}else if(int request = system(("sleep "+ to_string(sleep)).c_str()); (0 != request)){ mpre("Выход из запроса", __LINE__); exit(1);
+			}else if(repeat = true; false){ mpre("Установка повтора", __LINE__);
+			}else{ //mpre("Повторный запрос к БД", __LINE__);
+			} }while(repeat); return bmf::stmt; }); false){ mpre("ОШИБКА установки функции запроса к БД", __LINE__);
 		}else if(bmf::fk = ([&](string table, TMs where, TMs insert, TMs update, TMs row = {}){ // Обновление базы данных
-			if(sqlite3_stmt* stmt; false){ mpre("ОШИБКА установки идентификатора соединения", __LINE__);
-			}else if([&](){
+			if([&](){
 				if(where.empty()){// std::cerr << __LINE__ << " Условие на выборку записей не указано" << endl;
 				}else if(string sql = [&](string sql = ""){
 					string values;
@@ -279,8 +276,8 @@ int main(int argc, char **argv){
 						values += separ+ "'"+ val+ "'";
 					} sql += "("+ fields+ ") VALUES ("+ values+ ")";
 					return sql; }(); (0 >= sql.length())){ std::cerr << __LINE__ << " Запрос добавления новой записи в БД" << endl;
-				}else if(stmt = bmf::exec(sql); false){ mpre("ОШИБКА выполнения запроса к БД", __LINE__); //std::cerr << __LINE__ << " ОШИБКА выполнения запроса к базе данных: " << sql << " >> " << sqlite3_errmsg(db) << endl;// return false;
-				}else if(rowid = sqlite3_last_insert_rowid(db); false){ mpre("ОШИБКА получения идентификатора последней установленной записи", __LINE__); //std::cerr << __LINE__ << " Идентификатор последней установленной записи << " << rowid << endl;
+				}else if(bmf::stmt = bmf::exec(sql); false){ mpre("ОШИБКА выполнения запроса к БД", __LINE__); //std::cerr << __LINE__ << " ОШИБКА выполнения запроса к базе данных: " << sql << " >> " << sqlite3_errmsg(db) << endl;// return false;
+				}else if(rowid = sqlite3_last_insert_rowid(bmf::db); false){ mpre("ОШИБКА получения идентификатора последней установленной записи", __LINE__); //std::cerr << __LINE__ << " Идентификатор последней установленной записи << " << rowid << endl;
 				}else if(sql = "SELECT * FROM `"+ table+ "` WHERE id="+ to_string(rowid); sql.empty()){ mpre("ОШИБКА установки запроса на выборку", __LINE__); //std::cerr << __LINE__ << " Запрос на выборку внось установленной записи" << endl;
 				}else if(TMMi TAB = bmf::Tab(sql); TAB.empty()){ mpre("ОШИБКА выборки списка", __LINE__);
 				}else if(row = erb(TAB, {{"id", to_string(rowid)}}); false){ mpre("ОШИБКА получения элемента", __LINE__);
@@ -311,23 +308,23 @@ int main(int argc, char **argv){
 				}return false; }()){ std::cerr << __LINE__ << " Обновение найденной по условию записи" << endl;
 			}else{// mpre(where, __LINE__); mpre(insert, __LINE__); mpre(update, __LINE__);
 			}return row; }); false){ mpre("ОШИБКА обьявления функции Crc32", __LINE__);
-		}else if(bmf::Tab = ([&](string sql){ // Выборка таблицы
-			char *val; TMMi TAB;
-			if(sqlite3_stmt* stmt = bmf::prepare(sql); false){ mpre("ОШИБКА запроса к БД", __LINE__);
-			}else if(int count = sqlite3_column_count(stmt); false){ std::cerr << " ОШИБКА расчета количества записей в таблице";
-			}else{ int id = 0;
-				while(SQLITE_ROW == sqlite3_step(stmt)){
-					TMs row; string row_id;
+		}else if(bmf::Tab = ([&](string sql, TMMi TAB = {}){ // Выборка таблицы
+			if(bmf::stmt = bmf::prepare(sql); false){ mpre("ОШИБКА запроса к БД", __LINE__);
+			}else if(int count = sqlite3_column_count(bmf::stmt); false){ std::cerr << " ОШИБКА расчета количества записей в таблице";
+			}else if([&](int id = 0){ while(SQLITE_ROW == sqlite3_step(bmf::stmt)){
+					TMs row; string row_id; char *val;
 					for(int num = 0; num < count; num++){
-						string field = (string) sqlite3_column_name(stmt, num);
-						val = (char*) sqlite3_column_text(stmt, num);
+						string field = (string) sqlite3_column_name(bmf::stmt, num);
+						val = (char*) sqlite3_column_text(bmf::stmt, num);
 						string value = (val == NULL ? "" : val);
 						row.insert(std::make_pair(field, value));
 					} //exit(mpre(mask, __LINE__, "Маска"));
 					int next_id = (row.end() == row.find("id") ? ++id : atoi(row["id"].c_str()));
 					TAB.insert(std::make_pair(next_id, row));
-				}// std::cerr << __LINE__ << " Запрос к БД " << sql << " размер: " << TAB.size() << endl;
-			} return TAB; }); false){ mpre("ОШИБКА установки функции выборки списка таблциы", __LINE__);
+				}return false; }()){ mpre("ОШИБКА выгрузки данных", __LINE__);
+			}else if(sqlite3_finalize(bmf::stmt); false){ mpre("ОШИБКА сериализации", __LINE__);
+			}else{
+			}return TAB; }); false){ mpre("ОШИБКА установки функции выборки списка таблциы", __LINE__);
 		}else if(bmf::Dataset = ([&](TMMi& TAB, string name, string table, string comment){ // Функция восстановления из БД с проверкой
 			if([&](){ // Проверка наличия таблицы в базах
 					if(DATABASES.empty()){ mpre("ОШИБКА не установлен список баз данных", __LINE__);
@@ -351,31 +348,17 @@ int main(int argc, char **argv){
 				} return check; }()){ std::cerr << __LINE__ << " ОШИБКА Даныне в справочниках не совпадают" << endl; exit(1); //bmf::Data(_TAB, __LINE__, name, comment); exit(1);
 			}else{// std::cerr << __LINE__ << " (Выборка данных) Запрос: " << sql << endl;
 			} return TAB; }); false){ mpre("ОШИБКА установки функции выборки из БД", __LINE__);
-		}else if(std::experimental::filesystem::perms p = std::experimental::filesystem::status(dbname).permissions(); ((p & std::experimental::filesystem::perms::owner_write) == std::experimental::filesystem::perms::none)){ mpre("ОШИБКА файл БД не доступен для записи $chmod u+w "+ dbname, __LINE__);
-		}else if([&](){ // Установка соединения с БД
-			if(SQLITE_OK != sqlite3_open(dbname.c_str(), &db)){ std::cerr << __LINE__ << " ОШИБКА открытия базы данных << " << dbname << endl;
-			}else if(string f = argv[0]; (f != "./bmf")){ //mpre("Пропуск подключения родительсткой БД", __LINE__);
-			}else if(string attach_database = "../../../../.htdb"; (0 >= attach_database.length())){ mpre("ОШИБКА имя доп БД не задано", __LINE__);
-			}else if(access(attach_database.c_str(), F_OK) == -1){ mpre("Файл БД не найден "+ attach_database, __LINE__);
-			}else if(bmf::exec("ATTACH DATABASE '../../../../.htdb' AS bmf"); false){ mpre("ОШИБКА Подключение основной базы с данными", __LINE__);
-			}else{ std::cerr << __LINE__ << " Подключение родительской БД " << attach_database << endl;
-			} return false; }()){ mpre("ОШИБКА подключения баз данных", __LINE__);
+		}else{
+		}return false; }()){ mpre("ОШИБКА функции БД", __LINE__);
+	}else if([&](){ // Подключение базы
+		if(std::experimental::filesystem::perms p = std::experimental::filesystem::status(bmf::dbname).permissions(); ((p & std::experimental::filesystem::perms::owner_write) == std::experimental::filesystem::perms::none)){ mpre("ОШИБКА файл БД не доступен для записи $chmod u+w "+ bmf::dbname, __LINE__);
+		}else if(SQLITE_OK != sqlite3_open(bmf::dbname.c_str(), &bmf::db)){ std::cerr << __LINE__ << " ОШИБКА открытия базы данных << " << bmf::dbname << endl;
+		}else if(bmf::exec("PRAGMA journal_mode = MEMORY"); false){ mpre("Контроль доступа в памяти", __LINE__);
+		//}else if(){ mpre("Не удалось закрыть соединение с БД", __LINE__);
 		}else if([&](){ // Получение пути до файла БД
-			if(int pos = dbname.rfind("/"); (0 > pos)){ //mpre("Слешей в пути до скопления не найдено", __LINE__);
-			}else if(bmf::clump_id = dbname.substr(pos+1, dbname.length()); (0 >= bmf::clump_id.length())){ mpre("ОШИБКА сокращения пути до файла", __LINE__);
+			if(int pos = bmf::dbname.rfind("/"); (0 > pos)){ //mpre("Слешей в пути до скопления не найдено", __LINE__);
+			}else if(bmf::clump_id = bmf::dbname.substr(pos+1, bmf::dbname.length()); (0 >= bmf::clump_id.length())){ mpre("ОШИБКА сокращения пути до файла", __LINE__);
 			}else{ //mpre("Путь до БД сокращен "+ clump_id, __LINE__);
-			} return (0 >= bmf::clump_id.length()); }()){ mpre("ОШИБКА получения скопления", __LINE__);
-		}else if([&](){ // Получение текущего скопления
-			if("0" == bmf::clump_id){ mpre("Скопление не указано", __LINE__);
-			}else if(DATABASES = bmf::Tab("PRAGMA database_list"); DATABASES.empty()){ mpre("ОШИБКА получения списка подключенных таблиц", __LINE__);
-			}else if(bmf::databases = erb(DATABASES, {{"name", "bmf"}}); bmf::databases.empty()){ //mpre("Общая таблица не найдена", __LINE__);
-			}else if(string sql = "SELECT 0 AS id, COUNT(*) AS cnt FROM bmf.sqlite_master WHERE type='table' AND name='mp_bmf_clump'"; (0 >= sql.length())){ mpre("ОШИБКА составления запроса проверки таблицы скоплений", __LINE__);
-			}else if([&](){ TMMi CLUMP = bmf::Tab(sql); return ("0" == CLUMP.find(0)->second.find("cnt")->second); }()){ mpre("Таблица со скоплениями отсутсвует в базе", __LINE__);
-			}else if(sql = "SELECT * FROM mp_bmf_clump WHERE id='"+ bmf::clump_id+ "'"; false){ mpre("Задайте номер скопления", __LINE__);
-			}else if([&](){ BMF_CLUMP = bmf::Tab(sql); bmf::bmf_clump = (0 >= BMF_CLUMP.size() ? TMs({}) : BMF_CLUMP.begin()->second); return bmf::bmf_clump.empty(); }()){ //mpre("Информация о скоплении не установлена "+ sql, __LINE__);
-			}else if(bmf::bmf_clump = bmf::fk("mp_bmf_clump", {{"id", bmf::clump_id}}, {}, {{"hide", "0"}}); bmf::bmf_clump.empty()){ mpre("ОШИБКА обновления видимости скопления", __LINE__);
-			}else if(bmf::exec("UPDATE mp_bmf_clump SET hide=1 WHERE id<>"+ bmf::clump_id); false){ mpre("ОШИБКА скрытия не активных скопления", __LINE__);
-			}else{ mpre("Скопление: `"+ bmf::bmf_clump["name"]+ "`", __LINE__);
 			} return (0 >= bmf::clump_id.length()); }()){ mpre("ОШИБКА получения скопления", __LINE__);
 		}else if([&](){ // Добавление таблиц в БД если они не созданы
 			if(bmf::exec("CREATE TABLE IF NOT EXISTS main.mp_bmf_index (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,`clump_id` INTEGER,`itog_values_id` INTEGER,`dano_id` INTEGER,`itog_id` INTEGER,`index_id` INTEGER, `bmf-index` INTEGER, `map` TEXT, FOREIGN KEY (index_id) REFERENCES mp_bmf_index(id), FOREIGN KEY (`bmf-index`) REFERENCES mp_bmf_index(id))"); false){ mpre("ОШИБКА создания таблицы морфов", __LINE__);
@@ -393,57 +376,28 @@ int main(int argc, char **argv){
 		}else if([&](){ // Очищение списка морфов
 			if(bmf::ARGV.end() == bmf::ARGV.find("-c")){ //mpre("Сохраняем результат предыдущих расчетов", __LINE__);
 			}else if(bmf::exec("DELETE FROM mp_bmf_index"); false){ mpre("ОШИБКА выполнения запроса на очистку морфорв", __LINE__);
-			}else if(bmf::exec("DELETE FROM mp_bmf_dano"); false){ mpre("ОШИБКА выполнения запроса на очистку морфорв", __LINE__);
-			}else if(bmf::exec("DELETE FROM mp_bmf_dano_values"); false){ mpre("ОШИБКА выполнения запроса на очистку морфорв", __LINE__);
-			}else if(bmf::exec("DELETE FROM mp_bmf_dano_titles"); false){ mpre("ОШИБКА выполнения запроса на очистку морфорв", __LINE__);
-			}else if(bmf::exec("DELETE FROM mp_bmf_itog"); false){ mpre("ОШИБКА выполнения запроса на очистку морфорв", __LINE__);
-			}else if(bmf::exec("DELETE FROM mp_bmf_itog_values"); false){ mpre("ОШИБКА выполнения запроса на очистку морфорв", __LINE__);
-			}else if(bmf::exec("DELETE FROM mp_bmf_itog_titles"); false){ mpre("ОШИБКА выполнения запроса на очистку морфорв", __LINE__);
+			//}else if(bmf::exec("DELETE FROM mp_bmf_dano"); false){ mpre("ОШИБКА выполнения запроса на очистку морфорв", __LINE__);
+			//}else if(bmf::exec("DELETE FROM mp_bmf_dano_values"); false){ mpre("ОШИБКА выполнения запроса на очистку морфорв", __LINE__);
+			//}else if(bmf::exec("DELETE FROM mp_bmf_dano_titles"); false){ mpre("ОШИБКА выполнения запроса на очистку морфорв", __LINE__);
+			//}else if(bmf::exec("DELETE FROM mp_bmf_itog"); false){ mpre("ОШИБКА выполнения запроса на очистку морфорв", __LINE__);
+			//}else if(bmf::exec("DELETE FROM mp_bmf_itog_values"); false){ mpre("ОШИБКА выполнения запроса на очистку морфорв", __LINE__);
+			//}else if(bmf::exec("DELETE FROM mp_bmf_itog_titles"); false){ mpre("ОШИБКА выполнения запроса на очистку морфорв", __LINE__);
 			//}else if(0 < BMF_INDEX_EX.at("").size()){ mpre("ОШИБКА после удаления всех морфов в базе все еще остаются данные", __LINE__);
 			}else{ mpre("Очистка списка морфов по аргументу -c", __LINE__); //system("sleep 1");
 			} return false; }()){ mpre("ОШИБКА выборки списка морфов", __LINE__);
+		}else if(BMF_DANO_EX[""] = bmf::Tab("SELECT * FROM `mp_bmf_dano`"); false){ mpre("ОШИБКА получения дано скопления", __LINE__);
+		//}else if(true){ mpre("Пропускаем функции БД", __LINE__);
 		}else if([&](){ // Выгрузка данных из базы
-			if(BMF_DANO_EX[""] = bmf::Tab("SELECT * FROM `mp_bmf_dano` -- WHERE `clump_id`='"+ bmf::clump_id+ "'"); false){ mpre("ОШИБКА получения дано скопления", __LINE__);
-			}else if(BMF_DANO_VALUES_EX[""] = bmf::Tab("SELECT * FROM `mp_bmf_dano_values` -- WHERE `clump_id`='"+ bmf::clump_id+ "'"); false){ mpre("ОШИБКА получения дано значений", __LINE__);
+			if(BMF_DANO_VALUES_EX[""] = bmf::Tab("SELECT * FROM `mp_bmf_dano_values` -- WHERE `clump_id`='"+ bmf::clump_id+ "'"); false){ mpre("ОШИБКА получения дано значений", __LINE__);
 			}else if(BMF_DANO_TITLES_EX[""] = bmf::Tab("SELECT * FROM `mp_bmf_dano_titles` -- WHERE `clump_id`='"+ bmf::clump_id+ "'"); false){ mpre("ОШИБКА получения дано справочника", __LINE__);
 			}else if(BMF_ITOG_VALUES_EX[""] = bmf::Tab("SELECT * FROM `mp_bmf_itog_values` -- WHERE `clump_id`='"+ bmf::clump_id+ "'"); false){ mpre("ОШИБКА получения итогов значений", __LINE__);
 			}else if(BMF_ITOG_TITLES_EX[""] = bmf::Tab("SELECT * FROM `mp_bmf_itog_titles` -- WHERE `clump_id`='"+ bmf::clump_id+ "'"); false){ mpre("ОШИБКА получения итогов справочника", __LINE__);
 			}else if(BMF_ITOG_EX[""] = bmf::Tab("SELECT * FROM `mp_bmf_itog` -- WHERE `clump_id`='"+ bmf::clump_id+ "'"); false){ mpre("ОШИБКА получения итогов скопления", __LINE__);
-			}else if([&](bool skip = false){ // Не загружаем данные из БД -mode table
-				if(bmf::ARGV.end() == bmf::ARGV.find("-mode")){ //mpre("Режим не установлен", __LINE__);
-				}else if(std::string mode = bmf::ARGV.at("-mode"); ("table" != mode)){ //mpre("Режим не таблица", __LINE__);
-				}else if(!(skip = true)){ mpre("ОШИБКА установки пропуска", __LINE__);
-				}else{ //mpre("Пропускаем загрузку данных из БД", __LINE__);
-				}return false; }()){ mpre("Не загружаем данные из БД", __LINE__);
-			}else if(std::string sql = [&](std::string sql = ""){ // Список морфов по делителю
-				if(sql = "SELECT * FROM `mp_bmf_index`"; sql.empty()){ mpre("ОШИБКА Запрос к БД без условий", __LINE__);
-				}else if(bmf::ARGV.end() == bmf::ARGV.find("-itog")){ //mpre("Делитель не задан", __LINE__);
-				}else if(std::string itog = bmf::ARGV.at("-itog"); itog.empty()){ mpre("ОШИБКА получения делителя", __LINE__);
-				}else if(mpre("Условие итога "+ itog, __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
-				}else if(int npos = itog.find("."); false){ mpre("ОШИБКА нахождения позиции делителя", __LINE__);
-				}else if(std::string where = [&](std::string where = ""){ // Запрос к БД по номеру итога
-					if(std::string::npos != npos){ //mpre("Указан делитель " +itog, __LINE__);
-					}else if(where = " WHERE itog_id=" +itog; sql.empty()){ mpre("ОШИБКА установки условий по номеру итога", __LINE__);
-					}else{ mpre("Условие по номеру итога " +where, __LINE__);
-					}return where; }(); false){ mpre("Запрос к БД по номеру итога", __LINE__);
-				}else if(int divider = atoi((std::string::npos == npos) ? itog.c_str() : itog.substr(0, npos).c_str()); !divider){ mpre("ОШИБКА получения делителя " +itog, __LINE__);
-				}else if(int remains = atoi((std::string::npos == npos) ? string("0").c_str() : itog.substr(npos+1, itog.length()).c_str()); (0 > remains)){ mpre("ОШИБКА получения остатка", __LINE__);
-				}else if(sql += [&](std::string where, std::string split = "0"){ for(auto itog_itr:BMF_ITOG_EX.at("")){ // Запрос к БД по делителю
-					if(!where.empty()){ //mpre("Делитель не указан", __LINE__);
-					}else if(itog_itr.second.end() == itog_itr.second.find("id")){ mpre("ОШИБКА поле идентификатора у итога не найдено", __LINE__);
-					}else if(int id = atoi(itog_itr.second.at("id").c_str()); (0 >= id)){ mpre("ОШИБКА формата идентификатора итога", __LINE__);
-					}else if(remains != id%divider){ //mpre("Не совпадение по условиям делителя " +itog_itr.second.at("id"), __LINE__);
-					}else if(split += "," + itog_itr.second.at("id"); split.empty()){ mpre("ОШИБКА добавления условия", __LINE__);
-					}else{ //mpre("Условие делителя " +itog_itr.second.at("id"), __LINE__);
-					}}return (split.empty() ? where : " WHERE itog_id IN (" +split +")"); }(where); sql.empty()){ mpre("Запрос к БД по делителю", __LINE__);
-				}else{ //mpre("Условие итога " +itog, __LINE__);
-				}return sql; }(); sql.empty()){ mpre("ОШИБКА выборки составления запроса на выборку списка морфов", __LINE__);
-			//}else if(mpre("Запрос sql=" +sql, __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
-			}else if(BMF_INDEX_EX[""] = bmf::Tab(sql); false){ mpre("ОШИБКА получения итогов скопления", __LINE__);
-			}else{ mpre("Загрузка данных из БД", __LINE__);
+			}else{ //mpre("Загрузка данных из БД", __LINE__);
 			}return false; }()){ mpre("ОШИБКА выгрузки данных из базы", __LINE__);
 		}else{ //mpre(BMF_INDEX_EX.at(""), __LINE__, "Скопление");
 		}return false;	}()){ mpre("ОШИБКА подключения базы данных", __LINE__);
+	//}else if(int result = sqlite3_close_v2(bmf::db); (SQLITE_OK == result)){ mpre("ОШИБКА проверки ЛИКОВ", __LINE__);
 	}else if([&](){ // Установка функций
 		if(bmf::Tree = ([&](TMs bmf_index, int key){ // Отображение дерева
 			if(string after_char = "  "; (0 >= after_char.length())){ mpre("ОШИБКА установки префикса отображения", __LINE__);
@@ -738,7 +692,7 @@ int main(int argc, char **argv){
 					}else if(std::string reverse = (">" == str ? "1" : "0"); (1 != reverse.length())){ err("Расчет прямого значения");
 					}else if(std::string val = ("01" == _v1 +_v0 ? smooth : reverse); (1 != val.length())){ err("ОШИБКА расчета значения");
 					}else if(vals.push(val); false){ err("Сохранение результата");
-					}else if(bmf::CACHE[num] = val; bmf::CACHE.empty()){ err("Сохарнение в кеш");
+					//}else if(bmf::CACHE[num] = val; bmf::CACHE.empty()){ err("Сохарнение в кеш");
 					//}else if(mpre("Расчет морфа " +_v1 + ":"+ _v0  +" " +str + " val=" + val +" CACHE[" +std::to_string(key) +"][" +num +"]", __LINE__); false){ err("Уведомление");
 					}else if(num = ""; false){ err("Обнуление числа");
 					}else{ //pre("Расчет");
@@ -1133,13 +1087,17 @@ int main(int argc, char **argv){
 			} return false; }); false){ mpre("ОШИБКА установки значений", __LINE__);
 		}else if(bmf::Learn = ([&](TMs bmf_index, string val = "", int key, TMs stair = {}){ //mpre("Обучение "+ bmf_index.at("id"), __LINE__);  //system("sleep 1"); // mpre(BMF_INDEX, __LINE__, "Список"); // if(remove){ mpre(row, __LINE__, "Ученик"); }
 			if(int rep = 2e9; 0 >= rep){ mpre("ОШИБКА установки предельного размера обучения для сети", __LINE__);
-			}else if(TMMi STAIRS = [&](TMMi STAIRS = {}){ // Требование к морфу
+			}else if(static TMMi STAIRS; false){ mpre("ОШИБКА лестница не пуста", __LINE__);
+			}else if([&](){ // Требование к морфу
 				if(bmf_index.end() == bmf_index.find("id")){ mpre("ОШИБКА идентификатор у морка не установлен", __LINE__);
 				}else if(TMs stairs = {{"index_id", bmf_index.at("id")}, {"parent", "bmf-index"}}; stairs.empty()){ mpre("ОШИБКА создания первой ступени", __LINE__);
+				//}else if(mpre("Проверка до", __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
 				}else if(STAIRS.insert(make_pair(STAIRS.size(), stairs)); STAIRS.empty()){ mpre("ОШИБКА устанвоки первоначального значения лестнице", __LINE__);
+				//}else if(mpre("Проверка после", __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
 				}else if(bmf_index.empty()){ mpre("ОШИБКА входное значение лестницы пусто", __LINE__);
 				}else{ //mpre("Установка требований к лестнице promise="+ val, __LINE__);
-				} return STAIRS; }(); STAIRS.empty()){ mpre("ОШИБКА установки первоначального значения лестницы", __LINE__);
+				}return false; }()){ mpre("ОШИБКА установки первоначального значения лестницы", __LINE__);
+			//}else if(std::unique_ptr<Item> item(new Item); false){ mpre("ОШИБКА установки автоудаления очереди", __LINE__);
 			}else if([&](bool pass = false, int loop = 2e9){ do{ //mpre("Повтор "+ to_string(rep), __LINE__); // Ступени расчета
 				if(int size = STAIRS.size(); (0>=size)){ mpre("ОШИБКА Пустая лестница", __LINE__);
 				}else if(auto stairs_itr = STAIRS.rbegin(); stairs_itr == STAIRS.rend()){ mpre("ОШИБКА получения итаратора следующей ступени", __LINE__);
@@ -1286,20 +1244,15 @@ int main(int argc, char **argv){
 					if(TMs itog = itog_itr.second; itog.empty()){ mpre("ОШИБКА получения итога", __LINE__);
 					}else if(itog.end() == itog.find("index_id")){ mpre("ОШИБКА поле index_id у итога не задано", __LINE__);
 					}else if("" == itog.at("index_id")){ mpre(itog, "Итог", __LINE__); mpre("Пустое поле у итога index_id", __LINE__);
-					}else if(BMF_INDEX_EX.at("").end() == BMF_INDEX_EX.at("").find(atoi(itog["index_id"].c_str()))){ mpre("Морф итога не указан", __LINE__);
 					}else if(TMs index = erb(BMF_INDEX_EX, {{"id", itog.at("index_id")}}); index.empty()){ //mpre("ОШИБКА получения морфа итога", __LINE__);
 					}else if(TMs dano = erb(BMF_DANO_EX, {{"id", index.at("dano_id")}}); dano.empty()){ mpre("ОШИБКА выборки исходника морфа", __LINE__);
 					}else if(dano.end() == dano.find("val")){ mpre("ОШИБКА поле исходника val не устанволено", __LINE__);
 					}else if("" == dano.at("val")){ mpre("ОШИБКА значение исходника морфа не задано", __LINE__);
-					//}else if(index["val"] = bmf::Learn(index, "", 0, BMF_DANO_EX, BMF_ITOG_EX); index.empty()){ mpre("ОШИБКА расчета значения морфа", __LINE__);
-					//}else if(true){ mpre(BMF_INDEX_EX.at(""), "Справочник", __LINE__);
 					}else if(index["val"] = [&](std::string calc = ""){ // Быстрая проверка
 						if(std::string calculate = (bmf::CALCULATE.end() == bmf::CALCULATE.find(itog.at("id")) ? "" : bmf::CALCULATE.at(itog.at("id"))); false){ //pre("Удаленная ранее формула");
 						}else if(calculate = ("" == calculate ? bmf::Calculate(index) : calculate); calculate.empty()){ err("Расчет формулы калькуляции");
 						}else if(bmf::CALCULATE[itog.at("id")] = calculate; bmf::CALCULATE.empty()){ err("Сохранение значений калькуляции");
-						//}else if(mpre("Проверка 1", __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
 						}else if(calc = bmf::Calc(calculate, BMF_DANO_EX); (1 != calc.length())){ mpre("ОШИБКА Расчета Калькуляции " +calc +" " +calculate, __LINE__);
-						//}else if(mpre("Проверка 2", __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
 						}else{ //mpre("Быстрая проверка calculate="+ calculate, __LINE__);
 						} return calc; }(); (1 != index.at("val").length())){ err("Расчет формулы"); //mpre("Пропуск быстрой проверки calc=" +calc +" itog.at(val)=" +itog.at("val"), __LINE__);
 					}else if(mpre("Расчет "+ itog.at("id")+ " "+ itog_values.at("name")+ " ("+ itog.at("name")+ ") index["+ index.at("id")+ "]="+ index["val"] , __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
@@ -1316,7 +1269,6 @@ int main(int argc, char **argv){
 					}else if(string _val = (0 == pos ? "." : index.at("val")); (0 >= _val.length())){ mpre("ОШИБКА получения символа знака", __LINE__);
 					}else if([&](){ string _bin = bin; bin = bin.substr(0, os)+ _val+ bin.substr(os+1, bin.length()); return (0 >= bin.length()); }()){ mpre("ОШИБКА установки символа знака", __LINE__);
 					}else{ //mpre("Расчеты позиции и смещения pos="+ to_string(pos)+ " os="+ to_string(os)+ " length="+ to_string(bin.length())+ " val="+ val, __LINE__);
-						//mpre("Изменения "+ _bin+ " >> "+ bin, __LINE__);
 					}
 				}; return INDEX.empty(); }()){ mpre("Морфы значения не установлены `"+ itog_values["name"]+ "`", __LINE__);
 			}else if(bin = ((INDEX.find(0) != INDEX.end()) && (INDEX.at(0).at("val") == "1") ? "-" : "")+ bin; (0 >= bin.length())){ mpre("ОШИБКА установки символа отрицания", __LINE__);
@@ -1335,9 +1287,11 @@ int main(int argc, char **argv){
 				fprintf(stderr, "] (%.1f %%) %s\r", val*100, mess.c_str());
 				std::cerr.flush();
 			}; false){ mpre("ОШИБКА создания функции отображения прогресса", __LINE__);
-		}else if(bmf::Save = ([&](string table, TMMi& INDEX, int count_insert = 0, int count_update = 0, int count_delete = 0, TMMi ROW = {}, int progress = 0){ // Расчет значения формулы
-			int remains = INDEX.size()%1000;
-			for(auto index_itr = INDEX.rbegin(); index_itr != INDEX.rend(); index_itr++){ // Сохранение данных справочника
+		}else if(bmf::Save = ([&](string table, TM3i& TABS, int count_insert = 0, int count_update = 0, int count_delete = 0, TMMi ROW = {}, int progress = 0){ // Расчет значения формулы
+			if(TABS.end() == TABS.find("")){ //mpre("Список сохранения не задан", __LINE__);
+			}else if(TMMi& INDEX = TABS.at(""); INDEX.empty()){ //mpre("Список пуст не сохраняем table=" +table, __LINE__);
+			}else if(int remains = INDEX.size()%1000; false){ mpre("ОШИБКА получение делителя", __LINE__);
+			}else if([&](){ for(auto index_itr = INDEX.rbegin(); index_itr != INDEX.rend(); index_itr++){ // Сохранение данных справочника
 				if(TMs index = index_itr->second; index.empty()){ mpre("ОШИБКА выборки значения итератора", __LINE__);
 				}else if([&](){ // Прогресс
 					if(progress++ && progress%10000 && (progress != INDEX.size())){ //mpre("Отображаем прогресс первый, последний и кратный тысячи разы", __LINE__);
@@ -1394,28 +1348,27 @@ int main(int argc, char **argv){
 						count_insert++;
 					} return false; }()){ mpre("ОШИБКА добавления нового морфа", __LINE__);
 				}else{ //exit(mpre(ROW, __LINE__, "Обновление "+ to_string(index_id)));
-				}
-			} if(INDEX.size()){ std::cerr << endl; } return ROW; }); false){ mpre("ОШИБКС создания функции сохранения в базу данных", __LINE__);
-		}else if(bmf::Maps = ([&](TMs bmf_index, boost::dynamic_bitset<> maps = {}){ // Функция строки расчета карты морфов
-			if(TMMi STAIRS = [&](TMMi STAIRS = {}){ // Заполнение лестницы первоначальным значением
+				} }return false; }()){ mpre("ОШИБКА перебора", __LINE__);
+			}else if([&](){ if(INDEX.size()){ std::cerr << endl; }return false; }()){ mpre("ОШИБКА завершающего переноса", __LINE__);
+			}else{
+			}return ROW; }); false){ mpre("ОШИБКС создания функции сохранения в базу данных", __LINE__);
+		}else if(bmf::Maps = ([&](TMs& itog, boost::dynamic_bitset<> maps = {}){ // Функция строки расчета карты морфов
+			if(TMs bmf_index = bmf::fk("mp_bmf_index", {{"id", itog["index_id"]}}, {}, {}); bmf_index.empty()){ //mpre("Пустой морф итога", __LINE__);
+			}else if(static TMMi STAIRS; !STAIRS.empty()){ mpre("Создание статической лестницы", __LINE__);
+			}else if([&](){ // Заполнение лестницы первоначальным значением
 				if(false){ pre("Пропуск первоначального заполнения лестницы");
 				}else if(bmf_index.end() == bmf_index.find("id")){ err("Идентификатор морфа не указан");
 				}else if(TMs stairs = {{"index_id", bmf_index.at("id")}, {"parent", "bmf-index"}}; stairs.empty()){ err("Получение первоначальной ступени");
 				}else if(STAIRS.insert(make_pair(0, stairs)); STAIRS.empty()){ err("Добавление ступени в лестницу");
 				}else{ //pre("Первоначальное заполнение лестницы");
-				} return STAIRS; }(); STAIRS.empty()){ err("Создание первоначальной ступени");
+				}return false; }()){ err("Создание первоначальной ступени");
 			}else if([&](){ do{ // Перебор дерева
 				if(false){ pre("Пропуск расчета лестницы");
 				}else if(1 > STAIRS.size()){ err("Пустая лестница");
 				}else if(auto stairs_itr = STAIRS.rbegin(); (STAIRS.rend() == stairs_itr)){ err("Выборка итаратора ступени");
 				}else if(TMs stairs = stairs_itr->second; stairs.empty()){ err("Выборка ступени");
-				}else if(TMs index = [&](TMs index = {}){ // Проверка и выборка морфа ступени
-					if(stairs.end() == stairs.find("index_id")){ err("У ступени не найдено поле идентификатора морфа");
-					}else if(int index_id = atoi(stairs.at("index_id").c_str()); (0 == index_id)){ err("Выборка идентификатор морфа");
-					}else if(BMF_INDEX_EX.at("").end() == BMF_INDEX_EX.at("").find(index_id)){ err("Справочник морфов не содержит морфа итога");
-					}else if(index = BMF_INDEX_EX.at("").at(index_id); index.empty()){ err("Выборка морфа из справочника");
-					}else{ //mpre(index, "Морф", __LINE__);
-					} return index; }(); index.empty()){ err("Выборка морфа");
+				}else if(stairs.end() == stairs.find("index_id")){ err("ОШИБКА У ступени не найдено поле идентификатора морфа");
+				}else if(TMs index = bmf::fk("mp_bmf_index", {{"id", stairs.at("index_id")}}, {}, {}); index.empty()){ mpre("ОШИБКА морф не найден", __LINE__);
 				}else if(TMs dano = [&](TMs dano = {}){ // Проверка и выборка морфа ступени
 					if(index.end() == index.find("dano_id")){ err("У ступени не найдено поле исходника");
 					}else if(int dano_id = atoi(index.at("dano_id").c_str()); (0 == dano_id)){ err("Выборка идентификатор исходника");
@@ -1423,20 +1376,8 @@ int main(int argc, char **argv){
 					}else if(dano = BMF_DANO_EX.at("").at(dano_id); dano.empty()){ err("Выборка исходника");
 					}else{ //mpre(index, "Морф", __LINE__);
 					} return dano; }(); dano.empty()){ err("Выборка исходника");
-				}else if(TMs index_1 = [&](TMs index_1 = {}){ // Выборка старшего потомка
-					if(index.end() == index.find("index_id")){ err("У ступени не найдено поле идентификатора морфа");
-					}else if(int index_id = atoi(index.at("index_id").c_str()); (0 == index_id)){ //err("Не установлен старший потомок");
-					}else if(BMF_INDEX_EX.at("").end() == BMF_INDEX_EX.at("").find(index_id)){ err("Справочник морфов не содержит морфа");
-					}else if(index_1 = BMF_INDEX_EX.at("").at(index_id); index_1.empty()){ err("Выборка морфа из справочника");
-					}else{ //mpre(index, "Старший", __LINE__);
-					} return index_1; }(); false){ err("Выборка старшего потомка");
-				}else if(TMs index_0 = [&](TMs index_0 = {}){ // Выборка старшего потомка
-					if(index.end() == index.find("bmf-index")){ err("У ступени не найдено поле идентификатора морфа");
-					}else if(int index_id = atoi(index.at("bmf-index").c_str()); (0 == index_id)){ //err("Не установлен старший потомок");
-					}else if(BMF_INDEX_EX.at("").end() == BMF_INDEX_EX.at("").find(index_id)){ err("Справочник морфов не содержит морфа");
-					}else if(index_0 = BMF_INDEX_EX.at("").at(index_id); index_0.empty()){ err("Выборка морфа из справочника");
-					}else{ //mpre(index, "Младший", __LINE__);
-					} return index_0; }(); false){ err("Выборка старшего потомка");
+				}else if(TMs index_1 = bmf::fk("mp_bmf_index", {{"id", index.at("index_id")}}, {}, {}); false){ mpre("ОШИБКА морф не найден", __LINE__);
+				}else if(TMs index_0 = bmf::fk("mp_bmf_index", {{"id", index.at("bmf-index")}}, {}, {}); false){ mpre("ОШИБКА морф не найден", __LINE__);
 				}else if(std::string field = [&](std::string field = ""){ // Направление расчета
 					if(std::string _field = (stairs.end() == stairs.find("field") ? "" : stairs.at("field")); false){ pre("Определение старого направления");
 					}else if(TMs fields = {{"", "index_id"}, {"index_id", "bmf-index"}, {"bmf-index", ""}}; fields.empty()){ err("Установка списка переходов");
@@ -1449,8 +1390,6 @@ int main(int argc, char **argv){
 					if(bmf_index_id = (index.end() == index.find(field) ? "" : index.at(field)); false){ err("Выборка поля");
 					}else if(!field.empty()){ //mpre("Не расчитываем ступень "+ index.at("id") +" " +field, __LINE__);
 					}else if(index.end() == index.find("bmf-index")){ err("Поле младшей связи у морфа не найдено");
-					//}else if(index.end() == index.find("dano_id")){ err("Поле дано у морфа не установлено");
-					//}else if(int dano_id = atoi(index.at("dano_id").c_str()); !dano_id){ err("Выборка идентификатора дано");
 					}else if(boost::dynamic_bitset<> maps0(index_0.empty() ? dano["map"] : index_0["map"]); maps0.empty()){ err("Получение первого значения");
 					}else if(boost::dynamic_bitset<> maps1(index_1.empty() ? dano["map"] : index_1["map"]); maps1.empty()){ err("Получение первого значения");
 					}else if(stairs.end() == stairs.find("parent")){ err("Поле родителя не найдено в ступени");
@@ -1458,16 +1397,9 @@ int main(int argc, char **argv){
 					}else if(maps1 = ("index_id" == parent ? maps1.flip() : maps1); maps1.empty()){ err("Инвертирование старшей связи");
 					}else if(maps0 = ("index_id" == parent ? maps0 : maps0.flip()); maps0.empty()){ err("Инвертирование младшей связи");
 					}else if(boost::dynamic_bitset<> maps = ("index_id" == parent ? maps1&maps0 : maps1|maps0); maps.empty()){ err("Расчет результата");
-					}else if([&](){ // Отображение карт
-						if(true){ //mpre("Пропуск отображения карт", __LINE__);
-						}else if(std::string vals1 = [&](std::string vals1 = ""){ boost::to_string(maps1, vals1); return vals1; }(); vals1.empty()){ err("Строка старшей связи");
-						}else if(std::string vals0 = [&](std::string vals0 = ""){ boost::to_string(maps0, vals0); return vals0; }(); vals0.empty()){ err("Строка младшей связи");
-						}else if(std::string vals = [&](std::string vals = ""){ boost::to_string(maps, vals); return vals; }(); vals.empty()){ err("Строка результата");
-						}else{ mpre("Старшая ступень " +vals0, __LINE__); mpre("Младшая ступень " +vals0, __LINE__); mpre("Результат       " +vals ,__LINE__);
-						}return false; }()){ err("Отображение карт");
-					//}else if(bmf::MAPS[atoi(index.at("id").c_str())] = maps; bmf::MAPS.empty()){ err("Сохранение расчета морфа");
-					}else if(index["map"] = [&](std::string map = ""){ boost::to_string(maps, map); return map; }(); index.at("map").empty()){ mpre("ОШИБКА установки карты морфа", __LINE__);
-					}else if(erb_insert(BMF_INDEX_EX, index.at("id"), index); index.empty()){ mpre("ОШИБКА сохарнения значения морфа", __LINE__);
+					}else if(TMs _index = index; _index.empty()){ mpre("ОШИБКА клонирования морфа", __LINE__);
+					}else if(_index["map"] = [&](std::string map = ""){ boost::to_string(maps, map); return map; }(); _index.at("map").empty()){ mpre("ОШИБКА установки карты морфа", __LINE__);
+					}else if(index = bmf::fk("mp_bmf_index", {{"id", index.at("id")}, {"map", index.at("map")}}, {}, _index); index.empty()){ mpre("ОШИБКА сохранения карты", __LINE__);
 					}else if([&](){ // Расчет размера веток
 						if(int count_1 = (bmf::COUNT.end() == bmf::COUNT.find(index.at("index_id")) ? 0 : atoi(bmf::COUNT.at(index.at("index_id")).c_str())); 0 > count_1){ mpre("ОШИБКА расчета рамера старшей ветки", __LINE__);
 						}else if(int count_0 = (bmf::COUNT.end() == bmf::COUNT.find(index.at("bmf-index")) ? 0 : atoi(bmf::COUNT.at(index.at("bmf-index")).c_str())); 0 > count_1){ mpre("ОШИБКА расчета рамера старшей ветки", __LINE__);
@@ -1490,21 +1422,20 @@ int main(int argc, char **argv){
 					} return false; }()){ err("Удаление ступени");
 				}else{ //mpre("Расчет лестницы "+ std::to_string(loop), __LINE__);
 				}}while(0 < STAIRS.size()); return false; }()){ err("Перебор всех элементов дерева для составления строки расчетов");
-			//}else if(index_bmf.end() == bmf::MAPS.find(atoi(bmf_index.at("id").c_str()))){ err("Результат родительского морфа не установлен");
-			//}else if(maps = bmf::MAPS.at(atoi(bmf_index.at("id").c_str())); maps.empty()){ err("Выборка результата расчета");
 			}else{ //Tree(bmf_index, BMF_INDEX_EX); mpre("Расчет строки польской нотации " +calculate, __LINE__);
 			}return maps; }); false){ err("Создание функции расчета польской нотации");
 		}else{
 		}return false; }(); false){ mpre("ОШИБКА создания рабочих функций", __LINE__);
 	}else if(int loop = [&](int loop = 0){ // Количетсво повторений
 		if(int epoch = (bmf::ARGV.end() == bmf::ARGV.find("-epoch") ? 0 : atoi(bmf::ARGV.at("-epoch").c_str())); (0 > epoch)){ mpre("ОШИБКА расчета количества эпох", __LINE__);
-		}else if(bmf::ARGV.end() == bmf::ARGV.find("-epoch")){ loop = 1; mpre("Количество эпох не указано расчитываем без повторений", __LINE__);
+		}else if(bmf::ARGV.end() == bmf::ARGV.find("-epoch")){ mpre("Количество эпох не указано", __LINE__);
 		}else if(!epoch){ loop = -1; mpre("Указано нулевое количество эпох расчитываем до полного совпадения", __LINE__);
 		}else if(loop = epoch){ mpre("Максимальное количество эпох расчета " +to_string(loop), __LINE__);
 		}else{ mpre("ОШИБКА расчтеа количества повторений", __LINE__);
 		}return loop; }(); false){ mpre("ОШИБКА расчета колчиества повторений", __LINE__);
 	}else if([&](){ // Расчет исходников
 		if(in.empty()){ //mpre("Данные для расчета не указаны", __LINE__);
+		}else if(bmf::ARGV.end() == bmf::ARGV.find("-")){ //mpre("Не устанавливаем данные -", __LINE__);
 		}else if([&](){ // Перемешивание
 			if(1 >= in.size()){ //mpre("Не перемешиваем одно значение", __LINE__);
 			}else if(in.is_object()){ mpre("Обьект не перемешиваем", __LINE__);
@@ -1519,17 +1450,12 @@ int main(int argc, char **argv){
 			} return false; }()){ mpre("ОШИБКА перемешивания списка", __LINE__);
 		}else if(TMMi DANO = {}; false){ mpre("ОШИБКА создания временного хранилища результатов исходника", __LINE__);
 		}else if(TMMi ITOG = {}; false){ mpre("ОШИБКА создания временного хранилища результатов итогов", __LINE__);
-		//}else if(TM3i _BMF_DANO_EX = BMF_DANO_EX; _BMF_DANO_EX.empty()){ mpre("ОШИБКА установки первоначальных исходников дано", __LINE__);
-		//}else if(TM3i _BMF_ITOG_EX = BMF_ITOG_EX; _BMF_ITOG_EX.empty()){ mpre("ОШИБКА установки первоначальных итогов дано", __LINE__);
-		//}else if(mpre("Расчет значений обучающего набора данных " +to_string(in.size()), __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
 		}else if([&](){ for(auto &js:in.items()){ // Расчет карты
 			if(auto el = js.value(); el.empty()){ mpre("ОШИБКА элемент не найден", __LINE__);
 			}else if(int key = atoi(js.key().c_str()); (0 > key)){ mpre("ОШИБКА расчета номера обучающего примера", __LINE__);
 			}else if(bmf::Progress("Расчет обучающих примеров " +to_string(key+1), (float)(key+1)/in.size(), __LINE__); false){ mpre("Индикатор прогресса", __LINE__);
 			}else if(TMs dano = TMs(el["dano"]); dano.empty()){ mpre("ОШИБКА получения входных знаков", __LINE__);
 			}else if(bmf::Vals(dano, "dano", key, BMF_DANO_EX, BMF_DANO_VALUES_EX, BMF_DANO_TITLES_EX); false){ mpre("ОШИБКА установки входящих значений", __LINE__);
-			//}else if(DANO[to_string(key)] = BMF_DANO_EX.at(""); DANO.empty()){ mpre("ОШИБКА сохранения результатов", __LINE__);
-			//}else if(mpre("Проверка 1", __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
 			}else if([&](){ for(auto& dano_itr:BMF_DANO_EX.at("")){ // Сохранение результатов
 				if(dano_itr.second.end() == dano_itr.second.find("id")){ mpre("ОШИБКА поле идентификатора не найдено", __LINE__);
 				}else if(std::string id = dano_itr.second.at("id"); id.empty()){ mpre("ОШИБКА получения идентификатора итога", __LINE__);
@@ -1550,8 +1476,10 @@ int main(int argc, char **argv){
 				}}return false; }()){ mpre("ОШИБКА сохранения результатов", __LINE__);
 			}else{ //mpre("Расчет " +to_string(key), __LINE__);
 			}} std::cerr << endl; return false; }()){ mpre("ОШИБКА расчета карты", __LINE__);
+		}else if(bmf::exec("BEGIN TRANSACTION"); false){ mpre("ОШИБКА запуска начала транзакции", __LINE__);
 		}else if([&](int progress = 0){ for(auto& dano_itr:BMF_DANO_EX.at("")){ // Двоичная карта исходников
 			if(bmf::Progress("Индекс исходных сигналов " +to_string(progress), (float)++progress/BMF_DANO_EX.at("").size(), __LINE__); false){ mpre("Индикатор прогресса", __LINE__);
+			}else if(TMs dano = dano_itr.second; dano.empty()){ mpre("ОШИБКА получения исходника", __LINE__);
 			}else if(std::string dano_id = dano_itr.second.at("id"); dano_id.empty()){ mpre("ОШИБКА получения идентификатора дано", __LINE__);
 			}else if(boost::dynamic_bitset<> bit(in.size()); false){ mpre("ОШИБКА создания бита исходника", __LINE__);
 			}else if([&](){ for(auto &js:in.items()){ // Количество обучающих примеров для исходника
@@ -1561,11 +1489,14 @@ int main(int argc, char **argv){
 				}else if(bit[key] = atoi(val.c_str()); false){ mpre("ОШИБКА установки бита", __LINE__);
 				}else{ //mpre(_dano, "Дано " +val, __LINE__);
 				}}return false; }()){ mpre("ОШИБКА сохранения обучающих примеров", __LINE__);
-			}else if(dano_itr.second["map"] = [&](std::string map = ""){ boost::to_string(bit, map); return map; }(); dano_itr.second.at("map").empty()){ mpre("ОШИБКА установки карты исходника", __LINE__);
+			}else if(dano["map"] = [&](std::string map = ""){ boost::to_string(bit, map); return map; }(); dano.at("map").empty()){ mpre("ОШИБКА установки карты исходника", __LINE__);
+			}else if(erb_insert(BMF_DANO_EX, dano.at("id"), dano); dano.empty()){ mpre("ОШИБКА сохранения нового значения дано", __LINE__);
+			}else if(dano = bmf::fk("mp_bmf_dano", {{"id", dano.at("id")}}, {}, dano); dano.empty()){ mpre("ОШИБКА сохранения исходника в БД", __LINE__);
 			}else{ //mpre("Исходник " +dano_itr.second.at("id") +" " +dano_itr.second.at("map"), __LINE__);
 			} } std::cerr << endl; return false; }()){ mpre("ОШИБКА составления двоичной карты", __LINE__);
 		}else if([&](int progress = 0){ for(auto& itog_itr:BMF_ITOG_EX.at("")){ // Двоичная карта итогов
 			if(bmf::Progress("Индекс итоговых сигналов " +to_string(progress), (float)++progress/BMF_ITOG_EX.at("").size(), __LINE__); false){ mpre("Индикатор прогресса", __LINE__);
+			}else if(TMs itog = itog_itr.second; itog.empty()){ mpre("ОШИБКА выборки итога", __LINE__);
 			}else if([&](bool pass = false){ // Пропуск расчета по условию -itog
 				if(itog_itr.second.end() == itog_itr.second.find("id")){ mpre("ОШИБКА поле идентификатора у итога не найдено", __LINE__);
 				}else if(bmf::ARGV.end() == bmf::ARGV.find("-itog")){ //mpre("Условие не установлено", __LINE__);
@@ -1587,40 +1518,44 @@ int main(int argc, char **argv){
 				}else if(bit[key] = atoi(val.c_str()); false){ mpre("ОШИБКА установки бита", __LINE__);
 				}else{ //mpre(_dano, "Дано " +val, __LINE__);
 				}}return false; }()){ mpre("ОШИБКА сохранения обучающих примеров", __LINE__);
-			}else if(itog_itr.second["map"] = [&](std::string map = ""){ boost::to_string(bit, map); return map; }(); itog_itr.second.at("map").empty()){ mpre("ОШИБКА установки карты итога", __LINE__);
+			//}else if(std::string _map = itog.at("map"); false){ mpre("ОШИБКА сохранения старого значения карты", __LINE__);
+			}else if(itog["map"] = [&](std::string map = ""){ boost::to_string(bit, map); return map; }(); itog.at("map").empty()){ mpre("ОШИБКА установки карты итога", __LINE__);
+			}else if(erb_insert(BMF_ITOG_EX, itog.at("id"), itog); false){ mpre("ОШИБКА обновления итога", __LINE__);
+			}else if(itog = bmf::fk("mp_bmf_itog", {{"id", itog.at("id")}}, {}, itog); itog.empty()){ mpre("ОШИБКА обновления итога в БД", __LINE__);
 			}else{ //mpre("Итог " +itog_itr.second.at("id") +" " +itog_itr.second.at("map"), __LINE__); //mpre(dano_itr.second, "Исходник", __LINE__);
 			}} std::cerr << endl; return false; }()){ mpre("ОШИБКА составления двоичной карты", __LINE__);
-		}else if([&](int progress = 0){ for(auto itog_itr:BMF_ITOG_EX.at("")){ // Расчет списка карт
+		}else if([&](int progress = 0){ for(auto& itog_itr:BMF_ITOG_EX.at("")){ // Расчет списка карт
 			if(bmf::Progress("Расчет значений " +to_string(progress), (float)++progress/BMF_ITOG_EX.at("").size(), __LINE__); false){ mpre("Индикатор прогресса", __LINE__);
-			}else if(TMs itog = itog_itr.second; itog.empty()){ mpre("ОШИБКА получения итога", __LINE__);
-			}else if(itog.end() == itog.find("index_id")){ //mpre("Поле идентификатора морфа не найдено у итога пропускаем расчет " +itog.at("id"), __LINE__);
-			}else if(int index_id = atoi(itog.at("index_id").c_str()); !index_id){ //mpre("Пустой морф у индекса", __LINE__);
-			}else if(BMF_INDEX_EX.at("").end() == BMF_INDEX_EX.at("").find(index_id)){ //mpre("Морф не найден в справочнике", __LINE__);
-			}else if(TMs bmf_index = BMF_INDEX_EX.at("").at(index_id); bmf_index.empty()){ mpre("ОШИБКА получения морфа итога", __LINE__);
-			}else if(int itog_id = atoi(itog.at("id").c_str()); !itog_id){ mpre("ОШИБКА выборки идентификатора итога", __LINE__);
+			//}else if(TMs itog = itog_itr.second; itog.empty()){ mpre("ОШИБКА получения итога", __LINE__);
+			}else if(itog_itr.second.end() == itog_itr.second.find("index_id")){ //mpre("Поле идентификатора морфа не найдено у итога пропускаем расчет " +itog.at("id"), __LINE__);
 			//}else if(auto microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА установки времени начала обучения", __LINE__);
-			}else if(bmf::Maps(bmf_index); false){ mpre("ОШИБКА расчета карты итога", __LINE__);
+			}else if(bmf::Maps(itog_itr.second); false){ mpre("ОШИБКА расчета карты итога", __LINE__);
 			//}else if(microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9 -microtime; false){ mpre("ОШИБКА установки времени начала обучения", __LINE__);
 			}else{ //mpre("Расчет значений итога "+ itog.at("id"), __LINE__);
 			}} std::cerr << endl; return false; }()){ mpre("ОШИБКА расчета карты модели", __LINE__);
+		}else if(bmf::exec("COMMIT TRANSACTION"); false){ mpre("ОШИБКА начала сессии к БД", __LINE__);
 		}else{ //mpre(DANO, "Расчет итогов", __LINE__);
 		}return false; }()){ mpre("ОШИБКА расчета исходников", __LINE__);
 	}else if(int errors = [&](int errors = 0, bool pass = false){ do{ // Итерации обучения
 		if(int count = 0; false){ mpre("Обнуление счетчика", __LINE__);
 		}else if(bmf::loop++ >= loop){ //mpre("Остановка по максимальному количеству эпох", __LINE__);
-		}else if(int err = [&](int err = 0, int progress = 0){ for(auto &js:in.items()){ // Сравнение результата расчета
-			if(bmf::Progress("Эпоха:" +to_string(bmf::loop) +" Примеров:" +to_string(progress) +" Ошибок:"+ to_string(err), (float)++progress/in.size(), __LINE__); false){ mpre("Индикатор прогресса", __LINE__);
-			}else if(auto el = js.value(); el.empty()){ mpre("ОШИБКА элемент не найден", __LINE__);
-			}else if(int key = atoi(js.key().c_str()); (0 > key)){ mpre("ОШИБКА расчета номера обучающего примера", __LINE__);
-			}else if([&](){ for(auto& dano_itr:BMF_DANO_EX.at("")){ // Установка истории исходников
+		}else if(BMF_DANO_EX.end() == BMF_DANO_EX.find("")){ mpre("Поле списка исходников не найдено", __LINE__);
+		}else if(0 >= BMF_DANO_EX.at("").size()){ mpre("ОШИБКА Не найдены исходники", __LINE__);
+		}else if(int err = [&](int err = 0, int progress = 0, bool rep = false, int key = 0){ do{ // Сравнение результата расчета
+			//}else if(auto el = js.value(); el.empty()){ mpre("ОШИБКА элемент не найден", __LINE__);
+			//}else if(int key = atoi(js.key().c_str()); (0 > key)){ mpre("ОШИБКА расчета номера обучающего примера", __LINE__);
+			if(int size = 0; false){ mpre("ОШИБКА создания расчета размера обучающей выборки", __LINE__);
+			}else if([&](bool skip = false){ for(auto& dano_itr:BMF_DANO_EX.at("")){ // Установка истории исходников
 				if(boost::dynamic_bitset<> DANO(dano_itr.second["map"]); DANO.empty()){ mpre("ОШИБКА получения результата расчета", __LINE__);
+				}else if(size = dano_itr.second["map"].length(); (key >= size)){ skip = true; //mpre("ОШИБКА установки размера обучающей выборки", __LINE__);
 				}else if(std::string val = (DANO.test(key) ? "1" : "0"); (1 != val.length())){ mpre("ОШИБКА получения бит", __LINE__);
 				}else if(dano_itr.second["val"] = val; false){ mpre("ОШИБКА установки значения исходнику", __LINE__);
 				}else if(dano_itr.second.end() == dano_itr.second.find("values")){ mpre("ОШИБКА поле истории не найдено", __LINE__);
 				}else if(std::string values = dano_itr.second.at("values") + val; false){ mpre("ОШИБКА выборки истории", __LINE__);
 				}else if(dano_itr.second["values"] = ((values.length() > bmf::values_length) ? values.substr(values.length()-bmf::values_length, values.length()) : values); values.empty()){ mpre("ОШИБКА установки значения исходнику", __LINE__);
 				}else{ //mpre("Добавление значения в историю dano[" +dano_itr.second.at("id") +"]=" +dano_itr.second["values"], __LINE__);
-				} }return false; }()){ mpre("ОШИБКА сравнения результата расчета", __LINE__);
+				} }return skip; }()){ //mpre("ОШИБКА сравнения результата расчета", __LINE__);
+			}else if(bmf::Progress("Эпоха:" +to_string(bmf::loop) +" Примеров:" +to_string(progress) +" Ошибок:"+ to_string(err), (float)++progress/size, __LINE__); false){ mpre("Индикатор прогресса", __LINE__);
 			//}else if(auto microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА установки времени начала обучения", __LINE__);
 			}else if([&](){ for(auto& itog_itr:BMF_ITOG_EX.at("")){ // Проверка списка итогов
 				if(TMs itog = itog_itr.second; itog.empty()){ mpre("ОШИБКА выборки итога", __LINE__);
@@ -1644,8 +1579,8 @@ int main(int argc, char **argv){
 					} return index; }(); index.empty()){ mpre("ОШИБКА морф связи не найден", __LINE__);
 				}else if(boost::dynamic_bitset<> INDEX(index["map"]); INDEX.empty()){ mpre("ОШИБКА выборки расчета морфа", __LINE__);
 				}else if(std::string vals = [&](std::string vals = ""){ boost::to_string(ITOG, vals); return vals; }(); vals.empty()){ mpre("ОШИБКА Строка результата", __LINE__);
-				}else if(ITOG.size() != in.size()){ mpre("ОШИБКА размер итогов не совпадает с количеством обучающих примеров", __LINE__);
-				}else if(INDEX.size() != in.size()){ mpre("ОШИБКА размер карты не совпадает с количеством обучающих примеров", __LINE__);
+				//}else if(ITOG.size() != in.size()){ mpre("ОШИБКА размер итогов не совпадает с количеством обучающих примеров", __LINE__);
+				//}else if(INDEX.size() != in.size()){ mpre("ОШИБКА размер карты не совпадает с количеством обучающих примеров", __LINE__);
 				}else if(std::string learn = (ITOG.test(key) ? "1" : "0"); (1 != learn.length())){ mpre("ОШИБКА получения бит", __LINE__);
 				}else if(std::string calc = (INDEX.test(key) ? "1" : "0"); (1 != calc.length())){ mpre("ОШИБКА получения расчета", __LINE__);
 				}else if(!++count){ mpre("ОШИБКА инкремента счетчика", __LINE__);
@@ -1663,8 +1598,10 @@ int main(int argc, char **argv){
 					}return false; }()){ mpre("ОШИБКА обучения", __LINE__);
 				}else{ //mpre("Обучение сигнала " +to_string(key) +" itog[" +itog.at("id") +"]", __LINE__);
 				} } return false; }(); false){ mpre("ОШИБКА сравнения результата расчета", __LINE__);
+			}else if(!++key){ mpre("Инкремент номера примера", __LINE__);
+			}else if(!(rep = !rep)){ mpre("ОШИБКА положительный повтор", __LINE__);
 			}else{
-			}}return err; }(); (0 > err)){ mpre("ОШИБКА проверки списка итогов", __LINE__);
+			}}while(!(rep = !rep)); return err; }(); (0 > err)){ mpre("ОШИБКА проверки списка итогов", __LINE__);
 		}else if([&](){ // Расчет процента бит
 			if(1 == bmf::loop){ bmf::pips_first = (err ? (float)(count-err)/count : 1); //mpre("Расчет процента первой эпохи err=" +to_string(err) +" count=" +to_string(count), __LINE__);
 			}else{ bmf::pips_last = (err ? (float)(count-err)/count : 1); //mpre("Расчет процента последней эпохи", __LINE__);
@@ -1691,9 +1628,9 @@ int main(int argc, char **argv){
 				}else if(mpre("РЕЗУЛЬТАТ: "+ el.dump(), __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
 				}else if(int cache = Crc32(el["dano"].dump().c_str()); false){ mpre("ОШИБКА расчета ключа кеша", __LINE__);
 				}else if(bmf::Vals(dano, "dano", cache, BMF_DANO_EX, BMF_DANO_VALUES_EX, BMF_DANO_TITLES_EX); BMF_DANO_EX.empty()){ mpre("ОШИБКА установки входящих значений", __LINE__);
+				}else if(BMF_ITOG_VALUES_EX.end() == BMF_ITOG_VALUES_EX.find("")){ mpre("ОШИБКА список значений не задан", __LINE__);
 				}else if([&](){ for(auto &itog_values_itr:BMF_ITOG_VALUES_EX.at("")){ //for_each(BMF_ITOG_VALUES_EX.at("").begin(), BMF_ITOG_VALUES_EX.at("").end(), [&](auto &itog_values_itr){ // Расчет значений
-						if(BMF_INDEX_EX.at("").empty()){ //mpre("Установка первоначальных морфов", __LINE__);
-						}else if(TMs itog_values = itog_values_itr.second; itog_values.empty()){ mpre("ОШИБКА получения значения", __LINE__);
+						if(TMs itog_values = itog_values_itr.second; itog_values.empty()){ mpre("ОШИБКА получения значения", __LINE__);
 						}else if(itog_values_itr.second = bmf::Value(itog_values); itog_values_itr.second.empty()){ mpre("ОШИБКА расчета значения", __LINE__);
 						}else{ //mpre(itog_values, __LINE__, "Расчетное значение"); //mpre("Расчетное значение `"+ itog_values["name"]+ "` "+ to_string(dec)+ " ("+ bin+ ")", __LINE__);
 						}
@@ -1725,9 +1662,8 @@ int main(int argc, char **argv){
 			std::cout << j.dump('\t');
 		} return false; }()){ mpre("Ошибка отображение результата расчета", __LINE__);
 	}else if([&](){ // Сохранение
-		if(in.empty()){ mpre("Пустой массив обучающей выборки. Не сохраняем данные в БД", __LINE__);
 		//}else if(std::experimental::filesystem::perms p = std::experimental::filesystem::status(dbname).permissions(); ((p & std::experimental::filesystem::perms::others_write) == std::experimental::filesystem::perms::none)){ mpre("ОШИБКА файл БД не доступен для записи $chmod u+w "+ dbname, __LINE__);
-		}else if([&](){ //mpre("Сохранение результатов в тест", __LINE__);
+		if([&](){ //mpre("Сохранение результатов в тест", __LINE__);
 			if(bmf::exec("CREATE TABLE IF NOT EXISTS mp_bmf_test (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,`time` INTEGER, `date` TEXT, `size` INTEGER, `args` TEXT, `change` INTEGER, `duration` INTEGER, `index` INTEGER, `epoch` INTEGER, `loop` INTEGER, `first` REAL, `last` REAL, `clump` TEXT)"); false){ mpre("ОШИБКА создания значения итога", __LINE__);
 			}else if(string date = [&](string date = ""){ char mbstr[100]; time_t t = time(nullptr); std::strftime(mbstr, sizeof(mbstr), "%Y-%m-%d_%X", std::localtime(&t)); date = string(mbstr); return date; }(); (0 >= date.length())){ mpre("ОШИБКА расчета времени", __LINE__);
 			}else if(nlohmann::json arg = [&](nlohmann::json arg = {}){ arg = bmf::ARGV; arg.erase("-"); arg.erase("-dano"); return arg; }(); arg.empty()){ mpre("ОШИБКА получения строки аргументов", __LINE__);
@@ -1735,18 +1671,20 @@ int main(int argc, char **argv){
 			}else if(std::string first = [&](std::string _first = ""){ char first[10]; sprintf(first, "%0.4f", bmf::pips_first); _first = first; return _first; }(); false){ mpre("ОШИБКА получения первого процента", __LINE__);
 			}else if(std::string last = [&](std::string _last = ""){ char last[10]; sprintf(last, "%0.4f", bmf::pips_last); _last = last; return _last; }(); false){ mpre("ОШИБКА получения первого процента", __LINE__);
 			}else if(std::string epoch = (bmf::ARGV.end() == bmf::ARGV.find("-epoch") ? "" : bmf::ARGV.at("-epoch")); false){ mpre("ОШИБКА расчета количества эпох указанного в консоли", __LINE__);
-			}else if(TMs test = bmf::fk("mp_bmf_test", {}, {{"time", to_string(bmf::timestamp)}, {"date", date}, {"size", to_string(in.size())}, {"change", to_string(errors)}, {"duration", to_string(microtime)}, {"clump", bmf::clump_id}, {"epoch", epoch}, {"loop", to_string(bmf::loop)}, {"first", first}, {"last", (0 <= bmf::pips_last ? last : "")}, {"index", to_string(BMF_INDEX_EX.at("").size())}, {"args", arg.dump()}}, {}); test.empty()){ mpre("ОШИБКА сохранения результатов тестов", __LINE__);
+			}else if(std::string size = (BMF_INDEX_EX.end() == BMF_INDEX_EX.find("") ? "" : to_string(BMF_INDEX_EX.at("").size())); false){ mpre("ОШИБКА расчета размера модели", __LINE__);
+			}else if(TMs test = bmf::fk("mp_bmf_test", {}, {{"time", to_string(bmf::timestamp)}, {"date", date}, {"size", to_string(in.size())}, {"change", to_string(errors)}, {"duration", to_string(microtime)}, {"clump", bmf::clump_id}, {"epoch", epoch}, {"loop", to_string(bmf::loop)}, {"first", first}, {"last", (0 <= bmf::pips_last ? last : "")}, {"index", size}, {"args", arg.dump()}}, {}); test.empty()){ mpre("ОШИБКА сохранения результатов тестов", __LINE__);
 			}else{ //mpre("Сохранение статистики id "+ test["id"], __LINE__);
 			} return false; }()){ mpre("ОШИБКА сохранения теста", __LINE__);
 		//}else if(std::cerr << endl; false){ err("Отделяем отчет проелом");
+		}else if(true){ //mpre("Пустой массив обучающей выборки. Не сохраняем данные в БД", __LINE__);
 		}else if(bmf::exec("BEGIN TRANSACTION"); false){ mpre("ОШИБКА запуска начала транзакции", __LINE__);
-		}else if(TMMi _BMF_DANO_VALUES = bmf::Save("mp_bmf_dano_values", BMF_DANO_VALUES_EX.at("")); _BMF_DANO_VALUES.empty()){ mpre("ОШИБКА сохранения изначальных значений", __LINE__);
-		}else if(TMMi _BMF_DANO = bmf::Save("mp_bmf_dano", BMF_DANO_EX.at("")); _BMF_DANO.empty()){ mpre("ОШИБКА сохранения исходных данных", __LINE__);
-		}else if(TMMi _BMF_DANO_TITLES = bmf::Save("mp_bmf_dano_titles", BMF_DANO_TITLES_EX.at("")); false){ mpre("ОШИБКА сохранения изначальных заголовков", __LINE__);
-		}else if(TMMi _BMF_ITOG_VALUES = bmf::Save("mp_bmf_itog_values", BMF_ITOG_VALUES_EX.at("")); _BMF_ITOG_VALUES.empty()){ mpre("ОШИБКА сохранения итоговых значений", __LINE__);
-		}else if(TMMi _BMF_ITOG = bmf::Save("mp_bmf_itog", BMF_ITOG_EX.at("")); false){ mpre("ОШИБКА сохранения итоговых данных", __LINE__);
-		}else if(TMMi _BMF_ITOG_TITLES = bmf::Save("mp_bmf_itog_titles", BMF_ITOG_TITLES_EX.at("")); false){ mpre("ОШИБКА сохранения итоговых заголовков", __LINE__);
-		}else if(TMMi _BMF_INDEX = bmf::Save("mp_bmf_index", BMF_INDEX_EX.at("")); false){ mpre("ОШИБКА сохранения справочника морфа", __LINE__);
+		}else if(TMMi _BMF_DANO_VALUES = bmf::Save("mp_bmf_dano_values", BMF_DANO_VALUES_EX); _BMF_DANO_VALUES.empty()){ mpre("ОШИБКА сохранения изначальных значений", __LINE__);
+		}else if(TMMi _BMF_DANO = bmf::Save("mp_bmf_dano", BMF_DANO_EX); _BMF_DANO.empty()){ mpre("ОШИБКА сохранения исходных данных", __LINE__);
+		}else if(TMMi _BMF_DANO_TITLES = bmf::Save("mp_bmf_dano_titles", BMF_DANO_TITLES_EX); false){ mpre("ОШИБКА сохранения изначальных заголовков", __LINE__);
+		}else if(TMMi _BMF_ITOG_VALUES = bmf::Save("mp_bmf_itog_values", BMF_ITOG_VALUES_EX); _BMF_ITOG_VALUES.empty()){ mpre("ОШИБКА сохранения итоговых значений", __LINE__);
+		}else if(TMMi _BMF_ITOG = bmf::Save("mp_bmf_itog", BMF_ITOG_EX); false){ mpre("ОШИБКА сохранения итоговых данных", __LINE__);
+		}else if(TMMi _BMF_ITOG_TITLES = bmf::Save("mp_bmf_itog_titles", BMF_ITOG_TITLES_EX); false){ mpre("ОШИБКА сохранения итоговых заголовков", __LINE__);
+		}else if(TMMi _BMF_INDEX = bmf::Save("mp_bmf_index", BMF_INDEX_EX); false){ mpre("ОШИБКА сохранения справочника морфа", __LINE__);
 		}else if([&](){ for(auto &itog_itr:_BMF_ITOG){ //for_each(_BMF_ITOG.begin(), _BMF_ITOG.end(), [&](auto itog_itr){ // Корректировка связи с итогом
 				if(TMs itog = itog_itr.second; itog.empty()){ mpre("ОШИБКА получения морфа из итератора", __LINE__);
 				}else if(TMs _itog = itog_itr.second; _itog.empty()){ mpre("ОШИБКА получения морфа из итератора", __LINE__);
@@ -1870,7 +1808,7 @@ int main(int argc, char **argv){
 			} return false; }()){ mpre("ОШИБКА правки связей морфов", __LINE__);
 		}else if(bmf::exec("COMMIT TRANSACTION"); false){ mpre("ОШИБКА начала сессии к БД", __LINE__);
 		} return false; }()){ mpre("ОШИБКА установки ключей", __LINE__);
-	}else if(int result = sqlite3_close_v2(db); (SQLITE_OK != result)){ mpre("Не удалось закрыть соединение с БД", __LINE__);
+	}else if(int result = sqlite3_close_v2(bmf::db); (SQLITE_OK != result)){ mpre("Не удалось закрыть соединение с БД", __LINE__);
 	}else{ std::cerr << endl; //mpre(_BMF_INDEX, __LINE__, "Сохранение");
 	}
 }

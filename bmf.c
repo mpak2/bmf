@@ -1,11 +1,10 @@
 int mpre(string mess, int line, string comment = ""){
-	if(std::lock_guard<std::recursive_mutex> lock(mu); false){ mpre("ОШИБКА установки блокировки", __LINE__);
-	}else if(std::cerr << line << "." << mess << (comment.empty() ? "" : " `") << comment << (comment.empty() ? "" : "`") << endl; false){ mpre("ОШИБКА вывода уведомления", __LINE__);
+	if(std::cerr << line << "." << mess << (comment.empty() ? "" : " `") << comment << (comment.empty() ? "" : "`") << endl; false){ mpre("ОШИБКА вывода уведомления", __LINE__);
 	}else if(int npos = mess.find("ОШИБКА"); (-1 == npos)){ //mpre("Вхождение ключевого слова", __LINE__);
-	}else if([&](){ mpre("^^^ Критическое сообщение ^^^ Остановка выполнения программы", __LINE__); exit(0); int response = system("sleep 3"); return (0 != response); }()){ std::cerr << __LINE__ << " Остановка программы" << endl; exit(1);
-	}else if(int response = system("sleep 3"); (0 != response)){ std::cerr << __LINE__ << " Остановка программы" << endl; exit(1);
-	}else{ //mpre("Возвращенное значение"+ to_string(response), __LINE__);
-	} return 1;
+	}else if(std::cerr << line << ".^^^ Критическое сообщение ^^^ Остановка выполнения программы" << std::endl; false){ mpre("ОШИБКА отображения информации об ошибке", __LINE__);
+	}else if(int response = system("sleep 1"); true){ exit(mpre("Остановка выполнения программы", __LINE__));
+	}else{ // Возвращаем 1 в случае ошибки
+	}return 0;
 } int mpre(string mess, string comment, int line){
 	return mpre(mess, line, comment);
 }
@@ -53,9 +52,9 @@ int mpre(TMMs& TAB, int line, string comment = ""){
 	}else if(line > 0){
 		std::cerr << "__" << std::to_string(line) << "__";
 	}; std::cerr << "( // " << comment << "\n";
-	for(auto itr = TAB.begin(); itr != TAB.end(); itr++){
-		string key = itr->first;
-		TMs row = itr->second;
+	for(auto& itr:TAB){
+		string key = itr.first;
+		TMs row = itr.second;
 		mpre(row, line, comment, "\t", key);
 	} std::cerr << ")\n";
 	return 1;
