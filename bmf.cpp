@@ -1159,7 +1159,7 @@ int main(int argc, char **argv){
 					}else if(boost::dynamic_bitset<> maps = ("index_id" == stairs.at("parent") ? _maps1&_maps0 : _maps1|_maps0); maps.empty()){ mpre("ОШИБКА расчета значения", __LINE__);
 					}else if(std::string map = [&](std::string map = ""){ boost::to_string(maps, map); return map; }(); map.empty()){ mpre("ОШИБКА установки значения морфа", __LINE__);
 					}else if(map == index["map"]){ //mpre("Данные корректны", __LINE__);
-					}else{ mpre("ОШИБКА Проверки согласованности данных " +index.at("id"), __LINE__);
+					}else{ mpre("Данные не согласованы " +index.at("id"), __LINE__);
 					}return false; }()){ mpre("ОШИБКА проверка согласованности данных", __LINE__);
 				}else if([&](){ // Добавление нового морфа
 					if(_stairs.end() == _stairs.find("index_id")){ //mpre("Поле морфа в направлении не найдено", __LINE__);

@@ -123,11 +123,12 @@ int main(int argc, char **argv){
 				}return false; }()){ mpre("ОШИБКА добавления итоговых значений", __LINE__);
 			}else if(json["dano"] = csv; json.empty()){ pre("Загрузка исходников");
 			}else if(std::string mnist = json.dump(); mnist.empty()){ pre("Установка в строку");
-			}else if(MNIST += (MNIST.empty() ? "\t" : ",\n\t") +(mnist); MNIST.empty()){ pre("ОШИБКА добавления в список");
+			}else if(MNIST += (MNIST.empty() ? "\t" : ",\n\t"); MNIST.empty()){ pre("ОШИБКА добавления переноса");
+			}else if(MNIST += (csv.empty() ? "" : mnist); MNIST.empty()){ mpre("ОШИБКА добавления строки", __LINE__);
 			}else if([&](){ // Записываем в файл
 				if(lines += 1; !lines){ pre("Количество линий");
 				}else if([&](bool skip = false){ // Пропуск записи
-					if(fin.eof()){ //mpre("Последняя строка", __LINE__);
+					if(fin.eof()){ //mpre("Последняя строка", __LINE__)
 					}else if((0 < line) && (0 != lines%line)){ mpre("Совпадение делителя", __LINE__);
 					}else if(skip = !skip; false){ mpre("ОШИБКА изменения условия пропуска", __LINE__);
 					}else{ //mpre("Расчет пропуска " +std::to_string(skip ? 1 : 0), __LINE__);
