@@ -123,8 +123,8 @@ int main(int argc, char **argv){
 				}return false; }()){ mpre("ОШИБКА добавления итоговых значений", __LINE__);
 			}else if(json["dano"] = csv; json.empty()){ pre("Загрузка исходников");
 			}else if(std::string mnist = json.dump(); mnist.empty()){ pre("Установка в строку");
-			}else if(MNIST += (MNIST.empty() ? "\t" : ",\n\t"); MNIST.empty()){ pre("ОШИБКА добавления переноса");
-			}else if(MNIST += (csv.empty() ? "" : mnist); MNIST.empty()){ mpre("ОШИБКА добавления строки", __LINE__);
+			}else if(MNIST += (MNIST.empty() ? "\t" : ""); MNIST.empty()){ pre("ОШИБКА добавления переноса");
+			}else if(MNIST += (csv.empty() ? "" : ",\n\t" +mnist); MNIST.empty()){ mpre("ОШИБКА добавления строки", __LINE__);
 			}else if([&](){ // Записываем в файл
 				if(lines += 1; !lines){ pre("Количество линий");
 				}else if([&](bool skip = false){ // Пропуск записи
