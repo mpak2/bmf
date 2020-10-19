@@ -363,7 +363,7 @@ int main(int argc, char **argv){
 		}else if([&](){ // Добавление таблиц в БД если они не созданы
 			if(bmf::exec("CREATE TABLE IF NOT EXISTS main.`mp_bmf_index` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,`clump_id` INTEGER,`itog_values_id` INTEGER,`dano_id` INTEGER,`itog_id` INTEGER,`index_id` INTEGER, `bmf-index` INTEGER, `map` TEXT, FOREIGN KEY (index_id) REFERENCES mp_bmf_index(id), FOREIGN KEY (`bmf-index`) REFERENCES mp_bmf_index(id))"); false){ mpre("ОШИБКА создания таблицы морфов", __LINE__);
 			}else if(bmf::exec("CREATE INDEX IF NOT EXISTS `mp_bmf_index-itog_id` ON mp_bmf_index(itog_id);"); false){ mpre("ОШИБКА создания идекса списка морфов", __LINE__);
-			}else if(bmf::exec("CREATE TABLE IF NOT EXISTS main.`mp_bmf_dano` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,`time` INTEGER,`uid` INTEGER,`clump_id` INTEGER,`dano_values_id` INTEGER,`name` TEXT,`val` INTEGER,`values` TEXT, `map` TEXT, UNIQUE(dano_values_id, name))"); false){ mpre("ОШИБКА создания таблицы морфов", __LINE__);
+			}else if(bmf::exec("CREATE TABLE IF NOT EXISTS main.`mp_bmf_dano` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,`time` INTEGER,`uid` INTEGER,`clump_id` INTEGER,`dano_values_id` INTEGER,`name` TEXT,`val` INTEGER,`values` TEXT, UNIQUE(dano_values_id, name))"); false){ mpre("ОШИБКА создания таблицы морфов", __LINE__);
 			}else if(bmf::exec("CREATE INDEX IF NOT EXISTS `bmf_dano-clump_id-dano_values_id` ON mp_bmf_dano(clump_id,dano_values_id);"); false){ mpre("ОШИБКА создания индекса", __LINE__);
 			}else if(bmf::exec("CREATE TABLE IF NOT EXISTS main.`mp_bmf_itog` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,`time` INTEGER,`clump_id` INTEGER,`index_id` INTEGER,`itog_values_id` INTEGER,`name` TEXT,`val` INTEGER,`values` TEXT, UNIQUE(itog_values_id, name))"); false){ mpre("ОШИБКА создания таблицы морфов", __LINE__);
 			}else if(bmf::exec("CREATE INDEX IF NOT EXISTS `bmf_itog-clump_id-itog_values_id` ON mp_bmf_itog(clump_id,itog_values_id);"); false){ mpre("ОШИБКА создания индекса", __LINE__);
@@ -1331,10 +1331,10 @@ int main(int argc, char **argv){
 				}else if(bit[key] = atoi(val.c_str()); false){ mpre("ОШИБКА установки бита", __LINE__);
 				}else{ //mpre(_dano, "Дано " +val, __LINE__);
 				}}return false; }()){ mpre("ОШИБКА сохранения обучающих примеров", __LINE__);
-			}else if(dano["map"] = [&](std::string map = ""){ boost::to_string(bit, map); return map; }(); dano.at("map").empty()){ mpre("ОШИБКА установки карты исходника", __LINE__);
-			}else if(erb_insert(BMF_DANO_EX, dano.at("id"), dano); dano.empty()){ mpre("ОШИБКА сохранения нового значения дано", __LINE__);
-			}else if(dano = bmf::fk("mp_bmf_dano", {{"id", dano.at("id")}}, {}, dano); dano.empty()){ mpre("ОШИБКА сохранения исходника в БД", __LINE__);
-			}else if(TMs _dataset_map = {{"time", to_string(time(0))}, {"map", dano["map"]}}; _dataset_map.empty()){ mpre("ОШИБКА создания карты набора данных", __LINE__);
+			}else if(std::string map = [&](std::string map = ""){ boost::to_string(bit, map); return map; }(); map.empty()){ mpre("ОШИБКА установки карты исходника", __LINE__);
+			//}else if(erb_insert(BMF_DANO_EX, dano.at("id"), dano); dano.empty()){ mpre("ОШИБКА сохранения нового значения дано", __LINE__);
+			//}else if(dano = bmf::fk("mp_bmf_dano", {{"id", dano.at("id")}}, {}, dano); dano.empty()){ mpre("ОШИБКА сохранения исходника в БД", __LINE__);
+			}else if(TMs _dataset_map = {{"time", to_string(time(0))}, {"map", map}}; _dataset_map.empty()){ mpre("ОШИБКА создания карты набора данных", __LINE__);
 			}else if(TMs dataset_map = bmf::fk("mp_bmf_dataset_map", {{"dataset_id", bmf::dataset.at("id")}, {"alias", "dano"}, {"alias_id", dano.at("id")}}, _dataset_map, _dataset_map); dataset_map.empty()){ mpre("ОШИБКА установки карты исходника набора данных", __LINE__);
 			}else{ //mpre("Исходник " +dano_itr.second.at("id") +" " +dano_itr.second.at("map"), __LINE__);
 			} } std::cerr << endl; return false; }()){ mpre("ОШИБКА составления двоичной карты", __LINE__);
@@ -1364,8 +1364,8 @@ int main(int argc, char **argv){
 				}}return false; }()){ mpre("ОШИБКА сохранения обучающих примеров", __LINE__);
 			//}else if(std::string _map = itog.at("map"); false){ mpre("ОШИБКА сохранения старого значения карты", __LINE__);
 			}else if(std::string map = [&](std::string map = ""){ boost::to_string(bit, map); return map; }(); map.empty()){ mpre("ОШИБКА установки карты итога", __LINE__);
-			}else if(erb_insert(BMF_ITOG_EX, itog.at("id"), itog); false){ mpre("ОШИБКА обновления итога", __LINE__);
-			}else if(itog = bmf::fk("mp_bmf_itog", {{"id", itog.at("id")}}, {}, itog); itog.empty()){ mpre("ОШИБКА обновления итога в БД", __LINE__);
+			//}else if(erb_insert(BMF_ITOG_EX, itog.at("id"), itog); false){ mpre("ОШИБКА обновления итога", __LINE__);
+			//}else if(itog = bmf::fk("mp_bmf_itog", {{"id", itog.at("id")}}, {}, itog); itog.empty()){ mpre("ОШИБКА обновления итога в БД", __LINE__);
 			}else if(TMs _dataset_map = {{"time", to_string(time(0))}, {"map", map}}; _dataset_map.empty()){ mpre("ОШИБКА создания карты набора данных", __LINE__);
 			}else if(TMs dataset_map = bmf::fk("mp_bmf_dataset_map", {{"dataset_id", bmf::dataset.at("id")}, {"alias", "itog"}, {"alias_id", itog.at("id")}}, _dataset_map, _dataset_map); dataset_map.empty()){ mpre("ОШИБКА установки карты исходника набора данных", __LINE__);
 			}else{ //mpre("Итог " +itog_itr.second.at("id") +" " +itog_itr.second.at("map"), __LINE__); //mpre(dano_itr.second, "Исходник", __LINE__);
@@ -1420,7 +1420,9 @@ int main(int argc, char **argv){
 					if(index = bmf::fk("mp_bmf_index", {{"id", itog.at("index_id")}}, {}, {}); !index.empty()){ //mpre("Морф уже создан", __LINE__);
 					}else if(TMs dano = BMF_DANO_EX.at("").begin()->second; dano.empty()){ mpre("ОШИБКА выборки первого дано", __LINE__);
 					}else if(TMs _index = {{"id", bmf::Id(BMF_INDEX_EX)}, {"clump_id", bmf::clump_id}, {"itog_values_id", itog.at("itog_values_id")}, {"dano_id", dano.at("id")}, {"itog_id", itog.at("id")}, {"index_id", ""}, {"bmf-index", ""}}; _index.empty()){ mpre("ОШИБКА формирования свойст нового морфа", __LINE__);
-					}else if(boost::dynamic_bitset<> maps1(dano["map"]); maps1.empty()){ mpre("ОШИБКА выборки карты итога", __LINE__);
+					}else if(TMs _dataset_map = bmf::fk("mp_bmf_dataset_map", {{"dataset_id", bmf::dataset.at("id")}, {"alias", "dano"}, {"alias_id", dano.at("id")}}, {}, {}); _dataset_map.empty()){ mpre("ОШИБКА установки карты нового морфа", __LINE__);
+					}else if(_dataset_map.end() == _dataset_map.find("map")){ mpre("ОШИБКА поле карты у исходника не найдено", __LINE__);
+					}else if(boost::dynamic_bitset<> maps1(_dataset_map.at("map")); maps1.empty()){ mpre("ОШИБКА выборки карты итога", __LINE__);
 					}else if(boost::dynamic_bitset<> maps0 = maps1; maps0.empty()){ mpre("ОШИБКА получения старшей карты", __LINE__);
 					}else if(maps1.flip(); maps0.empty()){ mpre("ОШИБКА инвертирования старшего морфа", __LINE__);
 					}else if(boost::dynamic_bitset<> maps = maps1|maps0; maps.empty()){ mpre("ОШИБКА расчета карты", __LINE__);
