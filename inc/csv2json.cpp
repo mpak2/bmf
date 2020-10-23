@@ -48,7 +48,7 @@ int main(int argc, char **argv){
 		}else if(hide = argv[4]; hide.empty()){ mpre("ОШИБКА выборки имени поля итога", __LINE__);
 		}else{ //mpre("Строка итога "+ str, __LINE__);
 		} return hide; }(); false){ mpre("ОШИБКА строка скрытых полей не указана", __LINE__);
-	}else if(mpre("Скрытые поля " +hide, __LINE__); false){ mpre("ОШИБКА", __LINE__);
+	//}else if(mpre("Скрытые поля " +hide, __LINE__); false){ mpre("ОШИБКА", __LINE__);
 	}else if(std::map<std::string, std::string> hidden = [&](std::string hide, std::map<std::string, std::string> hidden = {}, int npos = 0, bool skip = true){ do{ // Список итогов
 			if(hide.empty()){ //mpre("Не указан список скрытых полей", __LINE__);
 			}else if(npos = hide.find(","); false){ mpre("ОШИБКА получения позиии запятой в строке", __LINE__);
@@ -121,21 +121,24 @@ int main(int argc, char **argv){
 					}else{ //mpre("Скрытие поля "+ field, __LINE__);
 					}
 				}return false; }()){ mpre("ОШИБКА добавления итоговых значений", __LINE__);
-			}else if(json["dano"] = csv; json.empty()){ pre("Загрузка исходников");
-			}else if(std::string mnist = json.dump(); mnist.empty()){ pre("Установка в строку");
-			}else if(MNIST += (MNIST.empty() ? "\t" : ""); MNIST.empty()){ pre("ОШИБКА добавления переноса");
-			}else if(MNIST += (csv.empty() ? "" : ",\n\t" +mnist); MNIST.empty()){ mpre("ОШИБКА добавления строки", __LINE__);
+			}else if([&](){ // Установка исходников
+				if(csv.empty()){ //mpre("Не добавляем значения исходников", __LINE__);
+				}else if(json["dano"] = csv; json.empty()){ pre("Загрузка исходников");
+				}else{ //mpre("Добавляем значения исходников", __LINE__);
+				}return false; }()){ mpre("ОШИБКА установки исходников", __LINE__);
+			}else if(MNIST += (!MNIST.empty() && !json.empty() ? ",\n" : ""); false){ mpre("ОШИБКА добавления переноса", __LINE__);
+			}else if(MNIST += (json.empty() ? "" : "\t" +json.dump()); false){ mpre("ОШИБКА добавления строки", __LINE__);
 			}else if([&](){ // Записываем в файл
 				if(lines += 1; !lines){ pre("Количество линий");
 				}else if([&](bool skip = false){ // Пропуск записи
 					if(fin.eof()){ //mpre("Последняя строка", __LINE__)
-					}else if((0 < line) && (0 != lines%line)){ mpre("Совпадение делителя", __LINE__);
+					}else if((0 < line) && (0 == lines%line)){ //mpre("Совпадение делителя", __LINE__);
 					}else if(skip = !skip; false){ mpre("ОШИБКА изменения условия пропуска", __LINE__);
 					}else{ //mpre("Расчет пропуска " +std::to_string(skip ? 1 : 0), __LINE__);
 					} return skip; }()){ //mpre("Условие пропуска записи файла " +std::to_string(lines) + " size ", __LINE__);
-				//}else if(true){ mpre("Записываем в файл "+ std::to_string(lines)+ " разбивка " +std::to_string(line) + " " +std::to_string(lines%line), __LINE__);
 				}else if(std::string num = (0 < line ? std::to_string(lines/line) : ""); false){ mpre("ОШИБКА расчета номера файла", __LINE__);
 				}else if(std::string filename = file_dir +(num.empty() ? "" : "/"+ num) +".json"; filename.empty()){ pre("ОШИБКА составления имени файла");
+				}else if(MNIST.empty()){ //mpre("Пустые данные для выгрузки " +filename, __LINE__);
 				}else if(std::ofstream fin(filename); !fin){ mpre("ОШИБКА Записи в файл "+ filename, __LINE__);
 				}else if(fin << "[\n" << MNIST << "\n]\n"; false){ pre("Запись");
 				}else if(fin.close(); false){ pre("ОШИБКА закрытия файла");
