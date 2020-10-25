@@ -22,16 +22,17 @@
 
 #cat clump/iris.json | ./bimorph clump/iris_3.sqlite - # ?cache=shared
 mv clump/iris.sqlite /tmp
-cat clump/iris_setosa.json | ./bimorph clump/iris.sqlite -
-cat clump/iris_versicolor.json | ./bimorph clump/iris.sqlite -
-cat clump/iris_virginica.json | ./bimorph clump/iris.sqlite -
+cat clump/iris_1.json | ./bimorph clump/iris.sqlite -
+cat clump/iris_2.json | ./bimorph clump/iris.sqlite -
+cat clump/iris_3.json | ./bimorph clump/iris.sqlite -
 
 ./bimorph clump/iris.sqlite -ds 1 -epoch 100 # ?cache=shared
 ./bimorph clump/iris.sqlite -ds 2 -epoch 100 # ?cache=shared
-./bimorph clump/iris.sqlite -ds 3 -epoch 100 # ?cache=shared
-./bimorph clump/iris.sqlite -ds 1 -epoch 100 # ?cache=shared
-./bimorph clump/iris.sqlite -ds 2 -epoch 100 # ?cache=shared
-./bimorph clump/iris.sqlite -ds 3 -epoch 100 # ?cache=shared
+#./bimorph clump/iris.sqlite -ds 3 -epoch 100 # ?cache=shared
+./bimorph clump/iris.sqlite # ?cache=shared
+#./bimorph clump/iris.sqlite -ds 1 -epoch 100 # ?cache=shared
+#./bimorph clump/iris.sqlite -ds 2 -epoch 100 # ?cache=shared
+#./bimorph clump/iris.sqlite -ds 3 -epoch 100 # ?cache=shared
 #cat clump/iris.json | ./bimorph - clump/iris.sqlite -c -rand 1 -epoch 100 # ?cache=shared
 sqlite3 clump/iris.sqlite -column -header "SELECT * FROM mp_bmf_test ORDER BY id DESC LIMIT 10; SELECT COUNT(*) AS count, MIN(duration) AS min_duration, AVG(duration) as avg_duration, MAX(duration) AS max_duration, AVG('index') as avg_bmf FROM mp_bmf_test;"
 
