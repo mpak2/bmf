@@ -1457,7 +1457,7 @@ int main(int argc, char **argv){
 			}else{ mpre("Набор данных " +dataset["id"] +" количество "+ dataset["count"] +" аккуратность "+ to_string(diff), __LINE__);
 			}}return false; }()){ mpre("ОШИБКА отображения списка набора данных", __LINE__);
 		}else if(int result = sqlite3_close_v2(bmf::db); (SQLITE_OK != result)){ mpre("Не удалось закрыть соединение с БД", __LINE__);
-		}else{ mpre("Выберете набор данных для расчета -ds", __LINE__);
+		}else{ mpre("Выберете набор данных для расчета -ds и количество эпох -epoch", __LINE__);
 		}return bmf::dataset; }(); bmf::dataset.empty()){ //mpre("ОШИБКА набор данных не установлен", __LINE__);
 	}else if(int loop = [&](int loop = 0){ // Количетсво повторений
 		if(int epoch = (bmf::ARGV.end() == bmf::ARGV.find("-epoch") ? 0 : atoi(bmf::ARGV.at("-epoch").c_str())); (0 > epoch)){ mpre("ОШИБКА расчета количества эпох", __LINE__);
