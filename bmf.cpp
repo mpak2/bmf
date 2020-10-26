@@ -1445,10 +1445,11 @@ int main(int argc, char **argv){
 			}else if(bmf::Conn()){ mpre("ОШИБКА подключения к БД", __LINE__);
 			}else if(float diff = [&](int ers = 0, int count = 0){ for(auto itog_itr:BMF_ITOG_EX.at("")){ // Расчет результата поитогово
 				if(TMs itog = itog_itr.second; itog.empty()){ mpre("ОШИБКА выборки итога", __LINE__);
-				}else if(TMs itog_map = bmf::fk("mp_bmf_dataset_map", {{"dataset_id", dataset.at("id")}, {"alias", "itog"}, {"alias_id", itog.at("id")}}, {}, {}); itog_map.empty()){ mpre("ОШИБКА выборки расчета итога", __LINE__);
+				}else if(TMs itog_map = bmf::fk("mp_bmf_dataset_map", {{"dataset_id", dataset.at("id")}, {"alias", "itog"}, {"alias_id", itog.at("id")}}, {}, {}); false){ mpre("ОШИБКА выборки расчета итога", __LINE__);
 				}else if(boost::dynamic_bitset<> gmap(itog_map.at("map")); gmap.empty()){ mpre("ОШИБКА установки карты итога", __LINE__);
-				}else if(TMs index_map = bmf::fk("mp_bmf_dataset_map", {{"dataset_id", dataset.at("id")}, {"alias", "index"}, {"alias_id", itog.at("index_id")}}, {}, {}); index_map.empty()){ mpre("ОШИБКА выборки расчета итога", __LINE__);
-				}else if(boost::dynamic_bitset<> imap(index_map.at("map")); imap.empty()){ mpre("ОШИБКА установки карты морфа", __LINE__);
+				}else if(TMs index_map = bmf::fk("mp_bmf_dataset_map", {{"dataset_id", dataset.at("id")}, {"alias", "index"}, {"alias_id", itog.at("index_id")}}, {}, {}); false){ mpre("ОШИБКА выборки расчета итога", __LINE__);
+				}else if(std::string map = (index_map.end() == index_map.find("map") ? std::string(dataset_count, '0') : index_map.at("map")); map.empty()){ mpre("ОШИБКА расчета карты", __LINE__);
+				}else if(boost::dynamic_bitset<> imap(map); imap.empty()){ mpre("ОШИБКА установки карты морфа", __LINE__);
 				}else if(auto temp = gmap ^ imap; temp.empty()){ mpre("Получение разнциы результатов", __LINE__);
 				}else if(ers += temp.count(); (0 > ers)){ mpre("ОШИБКА инкремента разницы", __LINE__);
 				}else if(count += dataset_count; (0 > count)){ mpre("ОШИБКА расчета количества сигналов", __LINE__);
