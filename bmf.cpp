@@ -129,7 +129,9 @@ namespace bmf{ // Глобальные переменные
 	std::function<int(void)> Getch; // Получение нажатий клавиш в консоли
 	std::function<boost::dynamic_bitset<>(TMs&)> Mapping; // Расчет карт результатов
 	std::function<TMs(TMs&,std::string)> Maps; // Расчет карт результатов
-	std::function<bool()> Conn; // Расчет карт результатов
+	std::function<bool(bool)> Open; // Открытие соединения с БД
+	std::function<bool(bool)> Close; // Закрытие соединения с БД
+	std::function<bool(string,string)> Mem; // Расчет карт результатов
 }
 
 int main(int argc, char **argv){
@@ -213,12 +215,40 @@ int main(int argc, char **argv){
 		}else{
 		}return skip; }()){ exit(mpre("Остановка выполнения", __LINE__));
 	}else if([&](){ // Функции БД
-		if(bmf::Conn = ([&](int result = 0){
+		if(bmf::Mem = ([&](std::string table_from, std::string table_to){ // Создание списка таблиц временной БД
+			if(TMs index = bmf::fk("sqlite_master", {{"type", "table"}, {"name", table_from}}, {}, {}); index.empty()){ mpre("Таблица не найдена "+ table_from, __LINE__);
+			}else if(index.end() == index.find("sql")){ mpre("ОШИБКА поле запроса на создание таблицы не найдено", __LINE__);
+			}else if(std::string sql = index.at("sql"); sql.empty()){ mpre("ОШИБКА получения запроса на создание таблицы index", __LINE__);
+			}else if(std::string::size_type start = sql.find(table_from); start == std::string::npos){ mpre("ОШИБКА имя таблицы в запросе не найдено", __LINE__);
+			}else if(sql.replace(start, table_from.size(), table_to); sql.empty()){ mpre("ОШИБКА замены имени таблицы", __LINE__);
+			}else if(bmf::exec(sql)){ mpre("ОШИБКА создания копии БД "+ sql, __LINE__);
+			}else if(bmf::exec("INSERT INTO " +table_to +" SELECT * FROM " +table_from +";")){ mpre("ОШИБКА копирования данных во временную таблицу", __LINE__);
+			}else{ //mpre("Создание копии таблицы " +table_from +" > " +table_to +" " +sql, __LINE__);
+			}return 0; }); false){ mpre("ОШИБКА создания списка таблиц временной БД", __LINE__);
+		}else if(bmf::Open = ([&](bool tmp, int result = 0){ // Открытие соединения с БД
 			if(std::string dbname = "file:" +bmf::dbname +"?cache=shared&mode=rwc&_journal_mode=WAL"; dbname.empty()){ mpre("ОШИБКА установки свойств соединения", __LINE__);
 			}else if(result != sqlite3_open(dbname.c_str(), &bmf::db); (SQLITE_OK != result)){ std::cerr << __LINE__ << " ОШИБКА открытия базы данных << " << bmf::dbname << endl;
-			}else if(bmf::exec("PRAGMA journal_mode=WAL;"); false){ mpre("Контроль доступа в памяти", __LINE__);
-			}else{ //mpre("Подключение к БД", __LINE__);
+			}else if([&](){ // Создание временных таблиц расчета
+				if(!tmp){ //mpre("Не создаем временные таблицы расчетов", __LINE__);
+				}else if(bmf::exec("PRAGMA journal_mode=WAL;"); false){ mpre("Контроль доступа в памяти", __LINE__);
+				}else if(bmf::exec("ATTACH DATABASE 'file::memory:?cache=shared' AS memory;")){ mpre("ОШИБКА подключения оперативной БД", __LINE__);
+				}else if(bmf::Mem("mp_bmf_index", "memory.mp_bmf_index")){ mpre("ОШИБКА создания копии таблицы", __LINE__); // Запрос на создание оперативной таблицу морфов
+				}else if(bmf::Mem("mp_bmf_dataset", "memory.mp_bmf_dataset")){ mpre("ОШИБКА создания копии таблицы", __LINE__); // Запрос на создание оперативной таблицу морфов
+				}else if(bmf::Mem("mp_bmf_dataset_map", "memory.mp_bmf_dataset_map")){ mpre("ОШИБКА создания копии таблицы", __LINE__); // Запрос на создание оперативной таблицу морфов
+				}else{ //mpre("Создание временных таблиц расчета", __LINE__);
+				}return false; }()){ mpre("ОШИБКА создания временных таблиц расчета", __LINE__);
+			}else{ //mpre("Открытие БД", __LINE__);
 			}return result; }); false){ mpre("ОШИБКА подключения к базе данных", __LINE__);
+		}else if(bmf::Close = ([&](bool tmp){ // Заскрытие соединения с БД
+			if([&](){ // Сохранение результатов расчета
+				if(!tmp){ //mpre("Не сохранеяем результаты расчета", __LINE__);
+				}else if(bmf::exec("DELETE FROM mp_bmf_index; INSERT INTO mp_bmf_index SELECT * FROM memory.mp_bmf_index;")){ mpre("ОШИБКА копирования данных во временную таблицу", __LINE__);
+				}else if(bmf::exec("DELETE FROM mp_bmf_dataset_map; INSERT INTO mp_bmf_dataset_map SELECT * FROM memory.mp_bmf_dataset_map;")){ mpre("ОШИБКА копирования данных во временную таблицу", __LINE__);
+				}else{ //mpre("Сохранение результатов расчета", __LINE__);
+				}return false; }()){ mpre("ОШИБКА сохранения значений таблиц", __LINE__);
+			}else if(int result = sqlite3_close_v2(bmf::db); (SQLITE_OK != result)){ mpre("Не удалось закрыть соединение с БД", __LINE__);
+			}else{ //mpre("Закрытие БД", __LINE__);
+			}return false; }); false){ mpre("ОШИБКА подключения к базе данных", __LINE__);
 		}else if(bmf::exec = ([&](string sql, bool pass = false, int sleep = 0, int result = 1){ do{ // Запрос к БД
 			if(char *error_report = NULL; false){ mpre("ОШИБКА Установки строки ошибки", __LINE__);
 			}else if(result = sqlite3_exec(bmf::db, sql.c_str(), 0, 0, &error_report); (SQLITE_OK == result)){ //mpre("ОШИБКА выполенения запроса", __LINE__);
@@ -235,11 +265,16 @@ int main(int argc, char **argv){
 			}else{ //mpre("Повторный запрос к БД", __LINE__);
 			} }while(repeat); return result; }); false){ mpre("ОШИБКА установки функции запроса к БД", __LINE__);
 		}else if(bmf::fk = ([&](string table, TMs where, TMs insert, TMs update, TMs row = {}){ // Обновление базы данных
-			if([&](){
+			if([&](){ // Изменение имени БД для оперативной
+				if(("mp_bmf_index" != table) && ("mp_bmf_dataset_map" != table)){ //mpre("Пропускаем корррекцию имени таблицы", __LINE__);
+				}else if(table = "memory." +table; table.empty()){ mpre("ОШИБКА добавления префикса к имени таблицы", __LINE__);
+				}else{ //mpre("Коррекция имени таблицы " +table, __LINE__);
+				}return false; }()){ mpre("ОШИБКА коррекции имени БД", __LINE__);
+			}else if([&](){
 				if(where.empty()){// std::cerr << __LINE__ << " Условие на выборку записей не указано" << endl;
 				}else if(string sql = [&](string sql = ""){
 					string values;
-					sql = "SELECT * FROM `"+ table+ "`";
+					sql = "SELECT * FROM "+ table;
 					for(TMs::iterator itr = where.begin(); itr != where.end(); itr++){
 						string key = itr->first;
 						string val = itr->second;
@@ -261,7 +296,7 @@ int main(int argc, char **argv){
 				}else if([&](){ insert.erase("id"); return insert.empty(); }()){ mpre("Устанавливаем нулевой идентификатор", __LINE__);
 				}else if(string sql = [&](string sql = ""){
 					string fields, values;
-					sql = "INSERT INTO `"+ table+ "`";
+					sql = "INSERT INTO "+ table;
 					for(TMs::iterator itr = where.begin(); itr != where.end(); itr++){
 						string key = itr->first;
 						string val = itr->second;
@@ -277,9 +312,10 @@ int main(int argc, char **argv){
 					} sql += "("+ fields+ ") VALUES ("+ values+ ")";
 					return sql; }(); (0 >= sql.length())){ std::cerr << __LINE__ << " Запрос добавления новой записи в БД" << endl;
 				}else if(bmf::exec(sql)){ mpre("ОШИБКА выполнения запроса к БД", __LINE__); //std::cerr << __LINE__ << " ОШИБКА выполнения запроса к базе данных: " << sql << " >> " << sqlite3_errmsg(db) << endl;// return false;
+				//}else if(mpre("Добавление записи "+ sql, __LINE__)){ mpre("ОШИБКА уведомления", __LINE__);
 				}else if(rowid = sqlite3_last_insert_rowid(bmf::db); false){ mpre("ОШИБКА получения идентификатора последней установленной записи", __LINE__); //std::cerr << __LINE__ << " Идентификатор последней установленной записи << " << rowid << endl;
-				}else if(sql = "SELECT * FROM `"+ table+ "` WHERE id="+ to_string(rowid); sql.empty()){ mpre("ОШИБКА установки запроса на выборку", __LINE__); //std::cerr << __LINE__ << " Запрос на выборку внось установленной записи" << endl;
-				}else if(TMMi TAB = bmf::Tab(sql); TAB.empty()){ mpre("ОШИБКА выборки списка", __LINE__);
+				}else if(sql = "SELECT * FROM "+ table+ " WHERE id="+ to_string(rowid); sql.empty()){ mpre("ОШИБКА установки запроса на выборку", __LINE__); //std::cerr << __LINE__ << " Запрос на выборку внось установленной записи" << endl;
+				}else if(TMMi TAB = bmf::Tab(sql); TAB.empty()){ mpre("ОШИБКА выборки списка " +sql, __LINE__);
 				}else if(row = erb(TAB, {{"id", to_string(rowid)}}); false){ mpre("ОШИБКА получения элемента", __LINE__);
 				}else{// std::cerr << __LINE__ << " Добавление новой записи к базе `"+ table+ "` << " << rowid << " " << endl;
 				} return false; }()){ std::cerr << __LINE__ << "ОШИБКА добавление запроса если не найден по условиям" << endl;
@@ -288,7 +324,7 @@ int main(int argc, char **argv){
 				}else if(row.empty()){ std::cerr << __LINE__ << " Запись для обновления не найдена " << endl;
 				}else if(string sql = [&](string sql = ""){
 					string fields, values;
-					sql = "UPDATE `"+ table+ "`";
+					sql = "UPDATE "+ table;
 					for(TMs::iterator itr = update.begin(); itr != update.end(); itr++){
 						string key = itr->first;
 						if(key == "id"){ // Сохраняем идентификатор записи
@@ -301,7 +337,7 @@ int main(int argc, char **argv){
 					} sql += " SET "+ values+ " WHERE id="+ row["id"];
 					return sql; }(); (0 >= sql.length())){ std::cerr << __LINE__ << " Запрос добавления новой записи в БД" << endl;
 				}else if(bmf::exec(sql); false){ mpre("ОШИБКА обновления записи", __LINE__); //std::cerr << __LINE__ << " ОШИБКА обновления записи" << endl;
-				}else if(sql = "SELECT * FROM `"+ table+ "` WHERE id="+ row["id"]; false){ mpre("ОШИБКА запроса на выборку вновь установленных данных", __LINE__); //std::cerr << __LINE__ << " Запрос на выборку внось установленной записи" << endl;
+				}else if(sql = "SELECT * FROM "+ table+ " WHERE id="+ row["id"]; false){ mpre("ОШИБКА запроса на выборку вновь установленных данных", __LINE__); //std::cerr << __LINE__ << " Запрос на выборку внось установленной записи" << endl;
 				}else if(TMMi TAB = bmf::Tab(sql); TAB.empty()){ mpre("ОШИБКА выборки списка", __LINE__);
 				}else if(row = erb(TAB, {{"id", row["id"]}}); row.empty()){ mpre("ОШИБКА полуения списка измененных данных", __LINE__); //std::cerr << __LINE__ << "Список измененных данных" << endl;
 				}else{ //std::cerr << __LINE__ << " Обновляем запись: " << sql << endl;// mpre(update, __LINE__);
@@ -327,14 +363,13 @@ int main(int argc, char **argv){
 			}return TAB; }); false){ mpre("ОШИБКА установки функции выборки списка таблциы", __LINE__);
 		}else if(bmf::Dataset = ([&](TMMi& TAB, string name, string table, string comment){ // Функция восстановления из БД с проверкой
 			if([&](){ // Проверка наличия таблицы в базах
-					if(DATABASES.empty()){ mpre("ОШИБКА не установлен список баз данных", __LINE__);
-					}else if(string master = string(bmf::databases.empty() ? "" : "bmf.")+ "sqlite_master"; (0 >= master.length())){ mpre("ОШИБКА формирования имени таблицы проверки", __LINE__);
-					}else if(string sql = "SELECT 0 AS id, count(*) AS cnt FROM "+ master+ " WHERE type='table' AND name='"+ table+ "'"; (0 >= sql.length())){ mpre("ОШИБКА составления запроса проверки таблицы скоплений", __LINE__);
-					}else if([&](){ TMMi CLUMP; CLUMP = bmf::Tab(sql); return ("0" != CLUMP[0]["cnt"]); }()){ return false; //mpre("ОШИБКА Таблица `"+ table+ "` отсутсвует в базе", __LINE__);
-					}else{ //mpre("Таблица `"+ table+ "` не найдена в (База скопления) и bmf (База сайта)", __LINE__);
-					} return true;
-				}()){ //mpre("Данные справочника "+ name+ " с "+ to_string(TAB.size())+ " позициями не перезагружается", __LINE__);
-			}else if(string sql = "SELECT * FROM `"+ table+ "`"; false){ // Запрос на выбору данных
+				if(DATABASES.empty()){ mpre("ОШИБКА не установлен список баз данных", __LINE__);
+				}else if(string master = string(bmf::databases.empty() ? "" : "bmf.")+ "sqlite_master"; (0 >= master.length())){ mpre("ОШИБКА формирования имени таблицы проверки", __LINE__);
+				}else if(string sql = "SELECT 0 AS id, count(*) AS cnt FROM "+ master+ " WHERE type='table' AND name='"+ table+ "'"; (0 >= sql.length())){ mpre("ОШИБКА составления запроса проверки таблицы скоплений", __LINE__);
+				}else if([&](){ TMMi CLUMP; CLUMP = bmf::Tab(sql); return ("0" != CLUMP[0]["cnt"]); }()){ return false; //mpre("ОШИБКА Таблица `"+ table+ "` отсутсвует в базе", __LINE__);
+				}else{ //mpre("Таблица `"+ table+ "` не найдена в (База скопления) и bmf (База сайта)", __LINE__);
+				} return true; }()){ //mpre("Данные справочника "+ name+ " с "+ to_string(TAB.size())+ " позициями не перезагружается", __LINE__);
+			}else if(string sql = "SELECT * FROM "+ table; false){ // Запрос на выбору данных
 			}else if(TMMi _TAB = bmf::Tab(sql); false){ std::cerr << __LINE__ << " ОШИБКА выборки таблицы из базы данных";
 			}else if(bool check = true; !check){ return TAB;
 			}else if(_TAB.size() != TAB.size()){ mpre("Не совпадение размера данных в справочниках", __LINE__); //data(_TAB, __LINE__, name, comment); //std::cerr << " Не совпадение размера данных в справочниках" << endl; data(_TAB, __LINE__, name, comment);
@@ -363,9 +398,9 @@ int main(int argc, char **argv){
 			}else{ //mpre("Путь до БД сокращен "+ clump_id, __LINE__);
 			} return (0 >= bmf::clump_id.length()); }()){ mpre("ОШИБКА получения скопления", __LINE__);
 		}else if(std::experimental::filesystem::perms p = std::experimental::filesystem::status(bmf::dbname).permissions(); ((p & std::experimental::filesystem::perms::owner_write) == std::experimental::filesystem::perms::none)){ mpre("ОШИБКА файл БД не доступен для записи $chmod u+w "+ bmf::dbname, __LINE__);
-		}else if(bmf::Conn()){ mpre("ОШИБКА подключения к БД", __LINE__);
+		}else if(bmf::Open(false)){ mpre("ОШИБКА подключения к БД", __LINE__);
 		}else if([&](){ // Добавление таблиц в БД если они не созданы
-			if(bmf::exec("CREATE TABLE IF NOT EXISTS main.`mp_bmf_index` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,`clump_id` INTEGER,`itog_values_id` INTEGER,`dano_id` INTEGER,`itog_id` INTEGER,`index_id` INTEGER, `bmf-index` INTEGER, FOREIGN KEY (index_id) REFERENCES mp_bmf_index(id), FOREIGN KEY (`bmf-index`) REFERENCES mp_bmf_index(id))"); false){ mpre("ОШИБКА создания таблицы морфов", __LINE__);
+			if(bmf::exec("CREATE TABLE IF NOT EXISTS mp_bmf_index (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,`clump_id` INTEGER,`itog_values_id` INTEGER,`dano_id` INTEGER,`itog_id` INTEGER,`index_id` INTEGER, `bmf-index` INTEGER, FOREIGN KEY (index_id) REFERENCES mp_bmf_index(id), FOREIGN KEY (`bmf-index`) REFERENCES mp_bmf_index(id))"); false){ mpre("ОШИБКА создания таблицы морфов", __LINE__);
 			}else if(bmf::exec("CREATE INDEX IF NOT EXISTS `mp_bmf_index-itog_id` ON mp_bmf_index(itog_id);"); false){ mpre("ОШИБКА создания идекса списка морфов", __LINE__);
 			}else if(bmf::exec("CREATE TABLE IF NOT EXISTS main.`mp_bmf_dano` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,`time` INTEGER,`uid` INTEGER,`clump_id` INTEGER,`dano_values_id` INTEGER,`name` TEXT,`val` INTEGER,`values` TEXT, UNIQUE(dano_values_id, name))"); false){ mpre("ОШИБКА создания таблицы морфов", __LINE__);
 			}else if(bmf::exec("CREATE INDEX IF NOT EXISTS `bmf_dano-clump_id-dano_values_id` ON mp_bmf_dano(clump_id,dano_values_id);"); false){ mpre("ОШИБКА создания индекса", __LINE__);
@@ -375,8 +410,8 @@ int main(int argc, char **argv){
 			}else if(bmf::exec("CREATE TABLE IF NOT EXISTS main.`mp_bmf_itog_values` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,`time` INTEGER,`index_type_id` INTEGER,`clump_id` INTEGER,`name` TEXT,`value` INTEGER,`itog_values_option_id` INTEGER,`bin` INTEGER, UNIQUE(name))"); false){ mpre("ОШИБКА создания значения итога", __LINE__);
 			}else if(bmf::exec("CREATE TABLE IF NOT EXISTS main.`mp_bmf_itog_titles` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,`time` INTEGER, `clump_id` INTEGER, `itog_values_id` INTEGER, `value` INTEGER, `name` INTEGER, `text` TEXT, UNIQUE(itog_values_id,name))"); false){ mpre("ОШИБКА создания значения итога", __LINE__);
 			}else if(bmf::exec("CREATE TABLE IF NOT EXISTS main.`mp_bmf_dano_titles` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,`time` INTEGER, `clump_id` INTEGER, `dano_values_id` INTEGER, `value` INTEGER, `name` INTEGER, `text` TEXT, UNIQUE(dano_values_id,name))"); false){ mpre("ОШИБКА создания значения итога", __LINE__);
-			}else if(bmf::exec("CREATE TABLE IF NOT EXISTS main.`mp_bmf_dataset` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,`time` INTEGER, `clump_id` INTEGER, `name` TEXT, `md5` TEXT, `count` INTEGER, UNIQUE(`md5`))"); false){ mpre("ОШИБКА создания списка наборов данных", __LINE__);
-			}else if(bmf::exec("CREATE TABLE IF NOT EXISTS main.`mp_bmf_dataset_map` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,`time` INTEGER, `dataset_id` INTEGER, `alias` TEXT, `alias_id` INTEGER, `map` TEXT, FOREIGN KEY (dataset_id) REFERENCES mp_bmf_dataset(id) ON DELETE CASCADE, UNIQUE(`dataset_id`,`alias`,`alias_id`))"); false){ mpre("ОШИБКА создания списка наборов данных", __LINE__);
+			}else if(bmf::exec("CREATE TABLE IF NOT EXISTS mp_bmf_dataset (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,`time` INTEGER, `clump_id` INTEGER, `name` TEXT, `md5` TEXT, `count` INTEGER, UNIQUE(`md5`))"); false){ mpre("ОШИБКА создания списка наборов данных", __LINE__);
+			}else if(bmf::exec("CREATE TABLE IF NOT EXISTS mp_bmf_dataset_map (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,`time` INTEGER, `dataset_id` INTEGER, `alias` TEXT, `alias_id` INTEGER, `map` TEXT, FOREIGN KEY (dataset_id) REFERENCES mp_bmf_dataset(id) ON DELETE CASCADE, UNIQUE(`dataset_id`,`alias`,`alias_id`))"); false){ mpre("ОШИБКА создания списка наборов данных", __LINE__);
 			}else if(bmf::exec("CREATE INDEX IF NOT EXISTS `mp_bmf_dataset_map-dataset_id-alias-alias_id` ON mp_bmf_dataset_map(dataset_id,alias,alias_id);"); false){ mpre("ОШИБКА создания идекса списка наборов данных", __LINE__);
 			}else{ return false;
 			} return true; }()){ mpre("ОШИБКА подключения БД созвездия и создания таблиц", __LINE__);
@@ -405,7 +440,8 @@ int main(int argc, char **argv){
 			}else if(BMF_DATASET_EX[""] = bmf::Tab("SELECT * FROM `mp_bmf_dataset`"); false){ mpre("ОШИБКА получения итогов скопления", __LINE__);
 			}else{ //mpre("Загрузка данных из БД", __LINE__);
 			}return false; }()){ mpre("ОШИБКА выгрузки данных из базы", __LINE__);
-		}else if(int result = sqlite3_close_v2(bmf::db); (SQLITE_OK != result)){ mpre("Не удалось закрыть соединение с БД", __LINE__);
+		//}else if(int result = sqlite3_close_v2(bmf::db); (SQLITE_OK != result)){ mpre("Не удалось закрыть соединение с БД", __LINE__);
+		}else if(bmf::Close(false)){ mpre("ОШИБКА закрытия БД", __LINE__);
 		}else if(skip = !skip; false){ mpre("ОШИБКА установки признака пропуска", __LINE__);
 		}else{ //mpre(BMF_INDEX_EX.at(""), __LINE__, "Скопление");
 		}return skip;	}()){ mpre("ОШИБКА подключения базы данных", __LINE__);
@@ -1340,7 +1376,7 @@ int main(int argc, char **argv){
 			} return false; }()){ mpre("ОШИБКА перемешивания списка", __LINE__);
 		}else if(TMMi DANO = {}; false){ mpre("ОШИБКА создания временного хранилища результатов исходника", __LINE__);
 		}else if(TMMi ITOG = {}; false){ mpre("ОШИБКА создания временного хранилища результатов итогов", __LINE__);
-		}else if(bmf::Conn()){ mpre("ОШИБКА подключения к БД", __LINE__);
+		}else if(bmf::Open(true)){ mpre("ОШИБКА подключения к БД", __LINE__);
 		}else if([&](){ for(auto &js:in.items()){ // Расчет карты
 			if(auto el = js.value(); el.empty()){ mpre("ОШИБКА элемент не найден", __LINE__);
 			}else if(int key = atoi(js.key().c_str()); (0 > key)){ mpre("ОШИБКА расчета номера обучающего примера", __LINE__);
@@ -1367,6 +1403,16 @@ int main(int argc, char **argv){
 				}}return false; }()){ mpre("ОШИБКА сохранения результатов", __LINE__);
 			}else{ //mpre("Расчет " +to_string(key), __LINE__);
 			}} std::cerr << endl; return false; }()){ mpre("ОШИБКА расчета карты", __LINE__);
+		/*}else if([&](){ // Копирование данных в оперативу
+			if(bmf::exec("ATTACH DATABASE 'file::memory:?cache=shared' AS memory;")){ mpre("ОШИБКА подключения оперативной БД", __LINE__);
+			//}else if(bmf::exec("CREATE TABLE memory.`mp_bmf_index` AS SELECT * FROM main.`mp_bmf_index`;")){ mpre("ОШИБКА копирования данных в оперативу", __LINE__);
+			//}else if(bmf::exec("CREATE TABLE memory.`mp_bmf_dataset_map` AS SELECT * FROM main.`mp_bmf_dataset_map`;")){ mpre("ОШИБКА копирования данных в оперативу", __LINE__);
+			}else if(TMs index = bmf::fk("sqlite_master", {{"type", "table"}, {"name", "mp_bmf_index"}}, {}, {}); index.empty()){ mpre("ОШИБКА получения запроса на создание таблицы index", __LINE__);
+			}else if(std::string sql = index.at("sql"); sql.empty()){ mpre("ОШИБКА получения ")
+			//}else if(bmf::exec("CREATE TABLE memory.mp_bmf_index(mp_bmf_index);")){ mpre("ОШИБКА создания таблицы морфов", __LINE__);
+			//}else if(bmf::exec("CREATE TABLE memory.mp_bmf_dataset_map(mp_bmf_dataset_map);")){ mpre("ОШИБКА создания таблицы морфов", __LINE__);
+			}else{ mpre(index, "Создание оперативной БД", __LINE__);
+			}return false; }()){ mpre("ОШИБКА создания копии БД в оперативе", __LINE__);*/
 		}else if(bmf::exec("BEGIN TRANSACTION")){ mpre("Сбой запуска транзакции сохранения набора данных", __LINE__);
 		}else if([&](){ // Установка набора данных
 			if(std::string _md5 = md5(bmf::ARGV.at("-")); _md5.empty()){ mpre("ОШИБКА расчета хеша набора обучающих данных", __LINE__);
@@ -1427,7 +1473,7 @@ int main(int argc, char **argv){
 			}else{ //mpre("Расчет значений итога "+ itog.at("id"), __LINE__);
 			}} std::cerr << endl; return false; }()){ mpre("ОШИБКА расчета карты модели", __LINE__);
 		}else if(bmf::exec("COMMIT TRANSACTION")){ mpre("Сбой закрытия транзакции сохранения набора данных", __LINE__);
-		}else if(int result = sqlite3_close_v2(bmf::db); (SQLITE_OK != result)){ mpre("Не удалось закрыть соединение с БД", __LINE__);
+		}else if(bmf::Close(true)){ mpre("ОШИБКА закрытия БД", __LINE__);
 		}else{ //mpre(DANO, "Расчет итогов", __LINE__);
 		}return false; }()){ mpre("ОШИБКА расчета исходников", __LINE__);
 	}else if(bmf::dataset = [&](){ // Выборка набора данных для расчета
@@ -1437,12 +1483,12 @@ int main(int argc, char **argv){
 		}else if(bmf::dataset = erb(BMF_DATASET_EX, {{"id", ds}}); !bmf::dataset.empty()){ //mpre("Набор данных указанный в командной строке", __LINE__);
 		//}else if(1 <= BMF_DATASET_EX.at("").size()){ mpre("Укажите набор данных -ds " +ds, __LINE__);
 		//}else if(bmf::dataset = BMF_DATASET_EX.at("").begin()->second; !bmf::dataset.empty()){ //mpre("Единственный набор данных", __LINE__);
+		}else if(bmf::Open(true)){ mpre("ОШИБКА подключения к БД", __LINE__);
 		}else if([&](){ for(auto& dataset_itr:BMF_DATASET_EX.at("")){ // Вывод списка набора данных
 			if(TMs dataset = dataset_itr.second; dataset.empty()){ mpre("ОШИБКА выборки набора данных", __LINE__);
 			}else if(dataset.end() == dataset.find("count")){ mpre("ОШИБКА поле количества примеров не установлено", __LINE__);
 			}else if(int dataset_count = atoi(dataset.at("count").c_str()); !dataset_count){ mpre("ОШИБКА расчета количества примеров в наборе данных", __LINE__);
 			}else if(BMF_ITOG_EX.end() == BMF_ITOG_EX.find("")){ mpre("ОШИБКА список итогов не установлен", __LINE__);
-			}else if(bmf::Conn()){ mpre("ОШИБКА подключения к БД", __LINE__);
 			}else if(float diff = [&](int ers = 0, int count = 0){ for(auto itog_itr:BMF_ITOG_EX.at("")){ // Расчет результата поитогово
 				if(TMs itog = itog_itr.second; itog.empty()){ mpre("ОШИБКА выборки итога", __LINE__);
 				}else if(TMs itog_map = bmf::fk("mp_bmf_dataset_map", {{"dataset_id", dataset.at("id")}, {"alias", "itog"}, {"alias_id", itog.at("id")}}, {}, {}); false){ mpre("ОШИБКА выборки расчета итога", __LINE__);
@@ -1457,7 +1503,7 @@ int main(int argc, char **argv){
 				}}return (!ers ? 1 : (float)(count-ers)/count); }(); (0 > diff)){ mpre("ОШИБКА расчета результата набора данных", __LINE__);
 			}else{ mpre("Набор данных:" +dataset["id"] +" количество:"+ dataset["count"] +" точность:"+ to_string(diff), __LINE__);
 			}}return false; }()){ mpre("ОШИБКА отображения списка набора данных", __LINE__);
-		}else if(int result = sqlite3_close_v2(bmf::db); (SQLITE_OK != result)){ mpre("Не удалось закрыть соединение с БД", __LINE__);
+		}else if(bmf::Close(true)){ mpre("ОШИБКА закрытия БД", __LINE__);
 		}else{ mpre("Выберете набор данных для расчета -ds и количество -epoch", __LINE__);
 		}return bmf::dataset; }(); bmf::dataset.empty()){ //mpre("ОШИБКА набор данных не установлен", __LINE__);
 	}else if(int loop = [&](int loop = 0){ // Количетсво повторений
@@ -1474,9 +1520,15 @@ int main(int argc, char **argv){
 		}else if(0 >= BMF_DANO_EX.at("").size()){ mpre("ОШИБКА Не найдены исходники", __LINE__);
 		//}else if(bmf::dataset.empty()){ mpre("ОШИБКА набор данных не установлен", __LINE__);
 		}else if(int dataset_count = atoi(bmf::dataset["count"].c_str()); (0 >= dataset_count)){ mpre("ОШИБКА нулевое количество в наборе данных", __LINE__);
+		}else if(bmf::Open(true)){ mpre("ОШИБКА подключения к БД", __LINE__);
+		/*}else if([&](){ // Копирование данных в оперативу
+			if(bmf::exec("ATTACH DATABASE 'file::memory:?cache=shared' AS memory;")){ mpre("ОШИБКА подключения оперативной БД", __LINE__);
+			}else if(bmf::exec("CREATE TABLE memory.`mp_bmf_index` AS SELECT * FROM main.`mp_bmf_index`;")){ mpre("ОШИБКА копирования данных в оперативу", __LINE__);
+			}else if(bmf::exec("CREATE TABLE memory.`mp_bmf_dataset_map` AS SELECT * FROM main.`mp_bmf_dataset_map`;")){ mpre("ОШИБКА копирования данных в оперативу", __LINE__);
+			}else{ //mpre("Создание оперативной БД", __LINE__);
+			}return false; }()){ mpre("ОШИБКА создания копии БД в оперативе", __LINE__);*/
 		}else if(int err = [&](int err = 0, int progress = 0, bool rep = false, int key = 0){ do{ // Сравнение результата расчета
-			if(bmf::Conn()){ mpre("ОШИБКА подключения к БД", __LINE__);
-			}else if([&](){ for(auto& dano_itr:BMF_DANO_EX.at("")){ // Установка истории исходников
+			if([&](){ for(auto& dano_itr:BMF_DANO_EX.at("")){ // Установка истории исходников
 				if(TMs dataset_map = bmf::fk("mp_bmf_dataset_map", {{"dataset_id", bmf::dataset.at("id")}, {"alias", "dano"}, {"alias_id", dano_itr.second.at("id")}}, {}, {}); false){ //mpre(bmf::dataset, "Набор данных", __LINE__); mpre(dano_itr.second, "Дано", __LINE__); mpre("ОШИБКА установки карты нового морфа", __LINE__);
 				}else if(int dataset_count = atoi(bmf::dataset.at("count").c_str()); !dataset_count){ mpre("ОШИБКА количество примеров обучающей выборки не указано", __LINE__);
 				}else if(std::string map = (dataset_map.empty() ? std::string(dataset_count, '0') : dataset_map.at("map")); (map.length() != dataset_count)){ mpre("ОШИБКА создания карты исходника map=" +map, __LINE__);
@@ -1489,7 +1541,7 @@ int main(int argc, char **argv){
 				}else if(dano_itr.second["values"] = ((values.length() > bmf::values_length) ? values.substr(values.length()-bmf::values_length, values.length()) : values); values.empty()){ mpre("ОШИБКА установки значения исходнику", __LINE__);
 				}else{ //mpre("Добавление значения в историю dano[" +dano_itr.second.at("id") +"]=" +dano_itr.second["values"], __LINE__);
 				} }return false; }()){ mpre("ОШИБКА сравнения результата расчета", __LINE__);
-			}else if(bmf::Progress("Эпоха:" +to_string(bmf::loop) +" Примеров:" +to_string(progress) +" Обучений:"+ to_string(err), (float)++progress/dataset_count, __LINE__); false){ mpre("Индикатор прогресса", __LINE__);
+			}else if(bmf::Progress("Эпоха:" +to_string(bmf::loop) +" Примеров:" +to_string(progress) +" Изменений:"+ to_string(err), (float)++progress/dataset_count, __LINE__); false){ mpre("Индикатор прогресса", __LINE__);
 			}else if([&](){ for(auto& itog_itr:BMF_ITOG_EX.at("")){ // Проверка списка итогов
 				if(TMs itog = itog_itr.second; itog.empty()){ mpre("ОШИБКА выборки итога", __LINE__);
 				}else if(itog.end() == itog.find("id")){ mpre("ОШИБКА не найден идентификатор итога", __LINE__);
@@ -1531,11 +1583,12 @@ int main(int argc, char **argv){
 					}return false; }()){ mpre("ОШИБКА обучения", __LINE__);
 				}else{ //mpre("Обучение сигнала " +to_string(key) +" itog[" +itog.at("id") +"]", __LINE__);
 				} } return false; }(); false){ mpre("ОШИБКА сравнения результата расчета", __LINE__);
-			}else if(int result = sqlite3_close_v2(bmf::db); (SQLITE_OK != result)){ mpre("Не удалось закрыть соединение с БД", __LINE__);
 			}else if(++key >= dataset_count){ //mpre("Инкремент номера примера", __LINE__);
 			}else if(!(rep = !rep)){ mpre("ОШИБКА положительный повтор", __LINE__);
 			}else{
 			}}while(!(rep = !rep)); return err; }(); (0 > err)){ mpre("ОШИБКА проверки списка итогов", __LINE__);
+		//}else if(int result = sqlite3_close_v2(bmf::db); (SQLITE_OK != result)){ mpre("Не удалось закрыть соединение с БД", __LINE__);
+		}else if(bmf::Close(true)){ mpre("ОШИБКА закрытия БД", __LINE__);
 		}else if([&](){ // Расчет процента бит
 			if(1 == bmf::loop){ bmf::pips_first = (err ? (float)(dataset_count-err)/dataset_count : 1); //mpre("Расчет процента первой эпохи err=" +to_string(err) +" count=" +to_string(count), __LINE__);
 			}else{ bmf::pips_last = (err ? (float)(dataset_count-err)/dataset_count : 1); //mpre("Расчет процента последней эпохи", __LINE__);
@@ -1595,7 +1648,7 @@ int main(int argc, char **argv){
 			std::cout << j.dump('\t');
 		} return false; }()){ mpre("Ошибка отображение результата расчета", __LINE__);
 	}else if([&](){ // Сохранение
-		if(bmf::Conn()){ mpre("ОШИБКА подключения к БД", __LINE__);
+		if(bmf::Open(false)){ mpre("ОШИБКА подключения к БД", __LINE__);
 		}else if([&](){ //mpre("Сохранение результатов в тест", __LINE__);
 			if(bmf::exec("CREATE TABLE IF NOT EXISTS mp_bmf_test (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,`time` INTEGER, `date` TEXT, `size` INTEGER, `args` TEXT, `change` INTEGER, `duration` INTEGER, `index` INTEGER, `epoch` INTEGER, `loop` INTEGER, `first` REAL, `last` REAL, `clump` TEXT)"); false){ mpre("ОШИБКА создания значения итога", __LINE__);
 			}else if(string date = [&](string date = ""){ char mbstr[100]; time_t t = time(nullptr); std::strftime(mbstr, sizeof(mbstr), "%Y-%m-%d_%X", std::localtime(&t)); date = string(mbstr); return date; }(); (0 >= date.length())){ mpre("ОШИБКА расчета времени", __LINE__);
@@ -1739,7 +1792,8 @@ int main(int argc, char **argv){
 				}
 			} return false; }()){ mpre("ОШИБКА правки связей морфов", __LINE__);
 		}else if(bmf::exec("COMMIT TRANSACTION"); false){ mpre("ОШИБКА начала сессии к БД", __LINE__);
-		}else if(int result = sqlite3_close_v2(bmf::db); (SQLITE_OK != result)){ mpre("Не удалось закрыть соединение с БД", __LINE__);
+		//}else if(int result = sqlite3_close_v2(bmf::db); (SQLITE_OK != result)){ mpre("Не удалось закрыть соединение с БД", __LINE__);
+		}else if(bmf::Close(false)){ mpre("ОШИБКА закрытия БД", __LINE__);
 		} return false; }()){ mpre("ОШИБКА установки ключей", __LINE__);
 	}else{ std::cerr << endl; //mpre(_BMF_INDEX, __LINE__, "Сохранение");
 	}
