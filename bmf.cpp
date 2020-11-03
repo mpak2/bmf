@@ -228,9 +228,9 @@ int main(int argc, char **argv){
 		}else if(bmf::Open = ([&](bool tmp, int result = 0){ // Открытие соединения с БД
 			if(std::string dbname = "file:" +bmf::dbname +"?cache=shared&mode=rwc&_journal_mode=WAL"; dbname.empty()){ mpre("ОШИБКА установки свойств соединения", __LINE__);
 			}else if(result != sqlite3_open(dbname.c_str(), &bmf::db); (SQLITE_OK != result)){ std::cerr << __LINE__ << " ОШИБКА открытия базы данных << " << bmf::dbname << endl;
+			//}else if(bmf::exec("PRAGMA journal_mode=WAL;"); false){ mpre("Контроль доступа в памяти", __LINE__);
 			}else if([&](){ // Создание временных таблиц расчета
 				if(!tmp){ //mpre("Не создаем временные таблицы расчетов", __LINE__);
-				}else if(bmf::exec("PRAGMA journal_mode=WAL;"); false){ mpre("Контроль доступа в памяти", __LINE__);
 				}else if(bmf::exec("ATTACH DATABASE 'file::memory:?cache=shared' AS memory;")){ mpre("ОШИБКА подключения оперативной БД", __LINE__);
 				}else if(bmf::Mem("mp_bmf_index", "memory.mp_bmf_index")){ mpre("ОШИБКА создания копии таблицы", __LINE__); // Запрос на создание оперативной таблицу морфов
 				}else if(bmf::Mem("mp_bmf_dataset", "memory.mp_bmf_dataset")){ mpre("ОШИБКА создания копии таблицы", __LINE__); // Запрос на создание оперативной таблицу морфов
@@ -242,8 +242,8 @@ int main(int argc, char **argv){
 		}else if(bmf::Close = ([&](bool tmp){ // Заскрытие соединения с БД
 			if([&](){ // Сохранение результатов расчета
 				if(!tmp){ //mpre("Не сохранеяем результаты расчета", __LINE__);
-				}else if(bmf::exec("DELETE FROM mp_bmf_index; INSERT INTO mp_bmf_index SELECT * FROM memory.mp_bmf_index;")){ mpre("ОШИБКА копирования данных во временную таблицу", __LINE__);
-				}else if(bmf::exec("DELETE FROM mp_bmf_dataset_map; INSERT INTO mp_bmf_dataset_map SELECT * FROM memory.mp_bmf_dataset_map;")){ mpre("ОШИБКА копирования данных во временную таблицу", __LINE__);
+				}else if(bmf::exec("INSERT OR REPLACE INTO main.mp_bmf_index SELECT * FROM memory.mp_bmf_index;")){ mpre("ОШИБКА копирования данных во временную таблицу", __LINE__);
+				}else if(bmf::exec("INSERT OR REPLACE INTO main.mp_bmf_dataset_map SELECT * FROM memory.mp_bmf_dataset_map;")){ mpre("ОШИБКА копирования данных во временную таблицу", __LINE__);
 				}else{ //mpre("Сохранение результатов расчета", __LINE__);
 				}return false; }()){ mpre("ОШИБКА сохранения значений таблиц", __LINE__);
 			}else if(int result = sqlite3_close_v2(bmf::db); (SQLITE_OK != result)){ mpre("Не удалось закрыть соединение с БД", __LINE__);
@@ -420,13 +420,6 @@ int main(int argc, char **argv){
 			}else if(bmf::exec("DELETE FROM mp_bmf_index"); false){ mpre("ОШИБКА выполнения запроса на очистку морфорв", __LINE__);
 			}else if(bmf::exec("DELETE FROM mp_bmf_dataset"); false){ mpre("ОШИБКА очищения таблицы наборов данных", __LINE__);
 			}else if(bmf::exec("DELETE FROM mp_bmf_dataset_map"); false){ mpre("ОШИБКА очищения таблицы карт", __LINE__);
-			//}else if(bmf::exec("DELETE FROM mp_bmf_dano"); false){ mpre("ОШИБКА выполнения запроса на очистку морфорв", __LINE__);
-			//}else if(bmf::exec("DELETE FROM mp_bmf_dano_values"); false){ mpre("ОШИБКА выполнения запроса на очистку морфорв", __LINE__);
-			//}else if(bmf::exec("DELETE FROM mp_bmf_dano_titles"); false){ mpre("ОШИБКА выполнения запроса на очистку морфорв", __LINE__);
-			//}else if(bmf::exec("DELETE FROM mp_bmf_itog"); false){ mpre("ОШИБКА выполнения запроса на очистку морфорв", __LINE__);
-			//}else if(bmf::exec("DELETE FROM mp_bmf_itog_values"); false){ mpre("ОШИБКА выполнения запроса на очистку морфорв", __LINE__);
-			//}else if(bmf::exec("DELETE FROM mp_bmf_itog_titles"); false){ mpre("ОШИБКА выполнения запроса на очистку морфорв", __LINE__);
-			//}else if(0 < BMF_INDEX_EX.at("").size()){ mpre("ОШИБКА после удаления всех морфов в базе все еще остаются данные", __LINE__);
 			}else{ mpre("Очистка списка морфов по аргументу -c", __LINE__); //system("sleep 1");
 			} return false; }()){ mpre("ОШИБКА выборки списка морфов", __LINE__);
 		}else if(BMF_DANO_EX[""] = bmf::Tab("SELECT * FROM `mp_bmf_dano`"); false){ mpre("ОШИБКА получения дано скопления", __LINE__);
@@ -1403,16 +1396,6 @@ int main(int argc, char **argv){
 				}}return false; }()){ mpre("ОШИБКА сохранения результатов", __LINE__);
 			}else{ //mpre("Расчет " +to_string(key), __LINE__);
 			}} std::cerr << endl; return false; }()){ mpre("ОШИБКА расчета карты", __LINE__);
-		/*}else if([&](){ // Копирование данных в оперативу
-			if(bmf::exec("ATTACH DATABASE 'file::memory:?cache=shared' AS memory;")){ mpre("ОШИБКА подключения оперативной БД", __LINE__);
-			//}else if(bmf::exec("CREATE TABLE memory.`mp_bmf_index` AS SELECT * FROM main.`mp_bmf_index`;")){ mpre("ОШИБКА копирования данных в оперативу", __LINE__);
-			//}else if(bmf::exec("CREATE TABLE memory.`mp_bmf_dataset_map` AS SELECT * FROM main.`mp_bmf_dataset_map`;")){ mpre("ОШИБКА копирования данных в оперативу", __LINE__);
-			}else if(TMs index = bmf::fk("sqlite_master", {{"type", "table"}, {"name", "mp_bmf_index"}}, {}, {}); index.empty()){ mpre("ОШИБКА получения запроса на создание таблицы index", __LINE__);
-			}else if(std::string sql = index.at("sql"); sql.empty()){ mpre("ОШИБКА получения ")
-			//}else if(bmf::exec("CREATE TABLE memory.mp_bmf_index(mp_bmf_index);")){ mpre("ОШИБКА создания таблицы морфов", __LINE__);
-			//}else if(bmf::exec("CREATE TABLE memory.mp_bmf_dataset_map(mp_bmf_dataset_map);")){ mpre("ОШИБКА создания таблицы морфов", __LINE__);
-			}else{ mpre(index, "Создание оперативной БД", __LINE__);
-			}return false; }()){ mpre("ОШИБКА создания копии БД в оперативе", __LINE__);*/
 		}else if(bmf::exec("BEGIN TRANSACTION")){ mpre("Сбой запуска транзакции сохранения набора данных", __LINE__);
 		}else if([&](){ // Установка набора данных
 			if(std::string _md5 = md5(bmf::ARGV.at("-")); _md5.empty()){ mpre("ОШИБКА расчета хеша набора обучающих данных", __LINE__);
