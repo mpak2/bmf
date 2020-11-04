@@ -174,7 +174,7 @@ int main(int argc, char **argv){
 			if(bmf::ARGV.end() == bmf::ARGV.find("-v")){ //mpre("Пропускаем отображение версии", __LINE__);
 			}else if(skip = !skip; false){ mpre("Условия выхода", __LINE__);
 			}else{ std::cout << endl;
-				std::cout << "bimotph v6.2" << endl;
+				std::cout << "bimotph v7.1" << endl;
 				std::cout << "Copyright (C) 2020 биморф.рф" << endl;
 				std::cout << "Нет НИКАКИХ ГАРАНТИЙ до степени, разрешённой законом." << endl << endl;
 				std::cout << "Лицензия freemium https://ru.wikipedia.org/wiki/Freemium" << endl;
@@ -272,7 +272,7 @@ int main(int argc, char **argv){
 			}else if(result = sqlite3_exec(bmf::db, sql.c_str(), 0, 0, &error_report); (SQLITE_OK == result)){ //mpre("ОШИБКА выполенения запроса", __LINE__);
 			}else if("COMMIT TRANSACTION" == sql){ mpre("COMMIT TRANSACTION Не повторяем", __LINE__);
 			}else if([&](){ mpre("Запрос: "+ sql, __LINE__); mpre("Ошибка: " + std::string(error_report), __LINE__); mpre("Повторный запрос к БД через "+ to_string(sleep += 10) +" сек.", __LINE__); return false; }()){ mpre("ОШИБКА уведомления", __LINE__);
-			}else if(int request = system(("sleep "+ to_string(sleep)).c_str()); (0 != request)){ mpre("Отмена запроса", __LINE__); exit(1);
+			}else if(0 != system(("sleep "+ to_string(sleep)).c_str())){ mpre("Отмена запроса", __LINE__); exit(1);
 			}else{ pass = true; //mpre("Повторный запрос к БД", __LINE__);
 			} }while(!(pass = !pass)); return result; }); false){ mpre("ОШИБКА установки функции запроса к БД", __LINE__);
 		}else if(bmf::prepare = ([&](string sql, bool repeat = false, int result = 1, int sleep =30){ do{ // Запрос к БД
@@ -283,17 +283,15 @@ int main(int argc, char **argv){
 			}else{ //mpre("Повторный запрос к БД", __LINE__);
 			} }while(repeat); return result; }); false){ mpre("ОШИБКА установки функции запроса к БД", __LINE__);
 		}else if(bmf::fk = ([&](string table, TMs where, TMs insert, TMs update, TMs row = {}){ // Обновление базы данных
-			if([&](){
+			if([&](){ // Выборка по условию
 				if(where.empty()){// std::cerr << __LINE__ << " Условие на выборку записей не указано" << endl;
-				}else if(string sql = [&](string sql){
-					string values;
+				}else if(string sql = [&](string sql, string values = ""){
 					for(TMs::iterator itr = where.begin(); itr != where.end(); itr++){
 						string key = itr->first;
 						string val = itr->second;
 						string separ = (values.size() ? " AND " : "");
 						values += separ+ "`"+ key+ "`='"+ val+ "'";
-					} sql += " WHERE "+ values;
-					return sql; }("SELECT * FROM "+ table); (0 >= sql.length())){ std::cerr << __LINE__ << " Запрос добавления выборку записи из БД" << endl;
+					}return sql += " WHERE "+ values; }("SELECT * FROM "+ table); (0 >= sql.length())){ std::cerr << __LINE__ << " Запрос добавления выборку записи из БД" << endl;
 				}else if([&](){ // Выборка массива
 					if(TMMi TAB = bmf::Tab(sql); TAB.empty()){ // Выполнение запроса к базе дыннх
 					}else if(TAB.size() < 1){// std::cerr << __LINE__ << " Размер выборки меньше нуля << " << sql << endl;
@@ -301,14 +299,12 @@ int main(int argc, char **argv){
 					}else{ //mpre(row, __LINE__); // std::cerr << __LINE__ << " Запрос к БД:" << sql << endl; // mpre(row);
 					} return false; }()){ std::cerr << " Запрос на получения вновь установленной записи" << endl;
 				}else{// std::cerr << __LINE__ << " Запрос на выборку значений: " << sql << endl; // mpre(where, __LINE__);
-				} return false; }()){ std::cerr << __LINE__ << " Выборка записи по условию" << endl;
+				}return false; }()){ std::cerr << __LINE__ << " Выборка записи по условию" << endl;
 			}else if([&](){ int rowid; // Добавление
 				if(insert.empty()){// std::cerr << __LINE__ << " Условия добавления новой записи не указаны" << endl;
 				}else if(!row.empty()){// std::cerr << __LINE__ << " Запись уже найдена по условиям << " << row["id"] << endl; mpre(where, __LINE__); mpre(insert, __LINE__); mpre(update, __LINE__);
-				}else if([&](){ insert.erase("id"); return insert.empty(); }()){ mpre("Устанавливаем нулевой идентификатор", __LINE__);
-				}else if(string sql = [&](string sql = ""){
-					string fields, values;
-					sql = "INSERT INTO "+ table;
+				}else if(insert.erase("id"); (insert.end() != insert.find("id"))){ mpre("ОШИБКА Устанавливаем нулевой идентификатор", __LINE__);
+				}else if(string sql = [&](string sql, string fields = "", string values = ""){
 					for(TMs::iterator itr = where.begin(); itr != where.end(); itr++){
 						string key = itr->first;
 						string val = itr->second;
@@ -321,33 +317,27 @@ int main(int argc, char **argv){
 						string separ = (fields.size() ? ", " : "");
 						fields += separ+ "`"+ key+ "`";
 						values += separ+ "'"+ val+ "'";
-					} sql += "("+ fields+ ") VALUES ("+ values+ ")";
-					return sql; }(); (0 >= sql.length())){ std::cerr << __LINE__ << " Запрос добавления новой записи в БД" << endl;
+					}return sql += "("+ fields+ ") VALUES ("+ values+ ")"; }("INSERT INTO "+ table); (0 >= sql.length())){ std::cerr << __LINE__ << " Запрос добавления новой записи в БД" << endl;
 				}else if(bmf::exec(sql)){ mpre("ОШИБКА выполнения запроса к БД", __LINE__); //std::cerr << __LINE__ << " ОШИБКА выполнения запроса к базе данных: " << sql << " >> " << sqlite3_errmsg(db) << endl;// return false;
-				//}else if(mpre("Добавление записи "+ sql, __LINE__)){ mpre("ОШИБКА уведомления", __LINE__);
 				}else if(rowid = sqlite3_last_insert_rowid(bmf::db); false){ mpre("ОШИБКА получения идентификатора последней установленной записи", __LINE__); //std::cerr << __LINE__ << " Идентификатор последней установленной записи << " << rowid << endl;
 				}else if(sql = "SELECT * FROM "+ table+ " WHERE id="+ to_string(rowid); sql.empty()){ mpre("ОШИБКА установки запроса на выборку", __LINE__); //std::cerr << __LINE__ << " Запрос на выборку внось установленной записи" << endl;
 				}else if(TMMi TAB = bmf::Tab(sql); TAB.empty()){ mpre("ОШИБКА выборки списка " +sql, __LINE__);
 				}else if(row = erb(TAB, {{"id", to_string(rowid)}}); false){ mpre("ОШИБКА получения элемента", __LINE__);
 				}else{// std::cerr << __LINE__ << " Добавление новой записи к базе `"+ table+ "` << " << rowid << " " << endl;
-				} return false; }()){ std::cerr << __LINE__ << "ОШИБКА добавление запроса если не найден по условиям" << endl;
+				}return false; }()){ std::cerr << __LINE__ << "ОШИБКА добавление запроса если не найден по условиям" << endl;
 			}else if([&](){ // Обновление
 				if(update.empty()){ //std::cerr << __LINE__ << " Условия обновления не указаны" << endl;
 				}else if(row.empty()){ std::cerr << __LINE__ << " Запись для обновления не найдена " << endl;
-				}else if(string sql = [&](string sql = ""){
-					string fields, values;
-					sql = "UPDATE "+ table;
+				}else if(string sql = [&](string sql, string fields = "", string values = ""){
 					for(TMs::iterator itr = update.begin(); itr != update.end(); itr++){
-						string key = itr->first;
-						if(key == "id"){ // Сохраняем идентификатор записи
+						if(string key = itr->first; (key == "id")){ // Сохраняем идентификатора записи
 						}else if(key.substr(0, 1) == "_"){ // Технические поля
 						}else{
 							string val = itr->second;
 							string separ = (values.size() ? ", " : "");
 							values += separ+ "`"+ key+ "`='"+ val+ "'";
 						}
-					} sql += " SET "+ values+ " WHERE id="+ row["id"];
-					return sql; }(); (0 >= sql.length())){ std::cerr << __LINE__ << " Запрос добавления новой записи в БД" << endl;
+					}return sql += " SET "+ values+ " WHERE id="+ row["id"]; }("UPDATE "+ table); (0 >= sql.length())){ std::cerr << __LINE__ << " Запрос добавления новой записи в БД" << endl;
 				}else if(bmf::exec(sql); false){ mpre("ОШИБКА обновления записи", __LINE__); //std::cerr << __LINE__ << " ОШИБКА обновления записи" << endl;
 				}else if(sql = "SELECT * FROM "+ table+ " WHERE id="+ row["id"]; false){ mpre("ОШИБКА запроса на выборку вновь установленных данных", __LINE__); //std::cerr << __LINE__ << " Запрос на выборку внось установленной записи" << endl;
 				}else if(TMMi TAB = bmf::Tab(sql); TAB.empty()){ mpre("ОШИБКА выборки списка", __LINE__);
@@ -408,7 +398,7 @@ int main(int argc, char **argv){
 			if(int pos = bmf::dbname.rfind("/"); (0 > pos)){ //mpre("Слешей в пути до скопления не найдено", __LINE__);
 			}else if(bmf::clump_id = bmf::dbname.substr(pos+1, bmf::dbname.length()); (0 >= bmf::clump_id.length())){ mpre("ОШИБКА сокращения пути до файла", __LINE__);
 			}else{ //mpre("Путь до БД сокращен "+ clump_id, __LINE__);
-			} return (0 >= bmf::clump_id.length()); }()){ mpre("ОШИБКА получения скопления", __LINE__);
+			}return (0 >= bmf::clump_id.length()); }()){ mpre("ОШИБКА получения скопления", __LINE__);
 		}else if(std::experimental::filesystem::perms p = std::experimental::filesystem::status(bmf::dbname).permissions(); ((p & std::experimental::filesystem::perms::owner_write) == std::experimental::filesystem::perms::none)){ mpre("ОШИБКА файл БД не доступен для записи $chmod u+w "+ bmf::dbname, __LINE__);
 		}else if(bmf::Open(false)){ mpre("ОШИБКА подключения к БД", __LINE__);
 		}else if([&](){ // Добавление таблиц в БД если они не созданы
@@ -756,49 +746,26 @@ int main(int argc, char **argv){
 			}else if(stairs.end() == stairs.find("list")){ mpre("ОШИБКА список в ступени не задан", __LINE__);
 			}else if(string list = stairs.at("list"); false){ mpre("История не установлена", __LINE__);
 			}else if([&](int pos = 0, int loop = 2e9){ while((string::npos != (pos = list.find_last_of(","))) && (loop-- > 0) && (1 < _DANO.size())){ // Исключение повторяющихся исходников
-					if(false){ mpre("Пропуск исключений", __LINE__);
-					}else if(int dano_id =atoi(list.substr(pos +1, list.length()-1).c_str()); (0 == dano_id)){ mpre("ОШИБКА получения идентификатор исходника " +list, __LINE__);
-					}else if(list =list.substr(0, pos); false){ mpre("ОШИБКА сокращение длинны списка", __LINE__);
-					}else if(_DANO.end() == _DANO.find(dano_id)){ mpre(_DANO, "Список", __LINE__); mpre("ОШИБКА Исходник не найден в списке " +list +" "+ to_string(dano_id), __LINE__);
-					}else if(_DANO.erase(dano_id); _DANO.empty()){ mpre("ОШИБКА не удаляем последнее значение", __LINE__);
-					}else{ //mpre("Пропуск выбора исходника "+ to_string(dano_id) +" list=" +list, __LINE__);
-					}
-				}return _DANO.empty(); }()){ mpre("ОШИБКА список не должен оставаться пустым", __LINE__);
+				if(false){ mpre("Пропуск исключений", __LINE__);
+				}else if(int dano_id =atoi(list.substr(pos +1, list.length()-1).c_str()); (0 == dano_id)){ mpre("ОШИБКА получения идентификатор исходника " +list, __LINE__);
+				}else if(list =list.substr(0, pos); false){ mpre("ОШИБКА сокращение длинны списка", __LINE__);
+				}else if(_DANO.end() == _DANO.find(dano_id)){ mpre(_DANO, "Список", __LINE__); mpre("ОШИБКА Исходник не найден в списке " +list +" "+ to_string(dano_id), __LINE__);
+				}else if(_DANO.erase(dano_id); _DANO.empty()){ mpre("ОШИБКА не удаляем последнее значение", __LINE__);
+				}else{ //mpre("Пропуск выбора исходника "+ to_string(dano_id) +" list=" +list, __LINE__);
+				}}return _DANO.empty(); }()){ mpre("ОШИБКА список не должен оставаться пустым", __LINE__);
 			}else if(bmf::dataset.end() == bmf::dataset.find("count")){ mpre("ОШИБКА поле количества элементов в наборе данных не установлено", __LINE__);
 			}else if(int dataset_count = atoi(bmf::dataset.at("count").c_str()); !dataset_count){ mpre("ОШИБКА расчета количества элементов в наборе данных", __LINE__);
-			}else if([&](int pos = 0, bool loop = false){ do{
-					for(auto dano_itr:BMF_DANO_EX.at("")){ // Перебор исходных значений
-						if(1 >= _DANO.size()){ //mpre("Не удаляем последнее значение", __LINE__);
-						//}else if(2 > values.length()){ mpre("Длинны основной истории не достаточно для сравнения", __LINE__);
-						}else if(_DANO.end() == _DANO.find(dano_itr.first)){ //mpre("Уже удален " +dano.at("id"), __LINE__);
-						//}else if(dano_itr.second.end() == dano_itr.second.find("values")){ mpre("ОШИБКА в исходнике не найдена история", __LINE__);
-						//}else if(string _values = dano_itr.second.at("values"); (0 >= _values.length())){ mpre("ОШИБКА выборки истории исходника", __LINE__);
-						//}else if(int len = _values.length(); (0 >= len)){ mpre("Пропуск расчетов", __LINE__);
-						/*}else if(bool erase = [&](){ // Удаление неподходящего по длинне исходника
-							if(pos < len){ return false; //mpre("Позиция символа в пределах истории pos="+ to_string(pos) +" len="+ to_string(len), __LINE__);
-							}else if(_DANO.erase(dano_itr.first); false){ mpre("ОШИБКА удаления короткого значения истории", __LINE__);
-							}else{ //mpre("Удаляем исходник с короткой историей " +dano.at("id"), __LINE__);
-							} return true; }()){ //mpre("Удаления исходника по длинне "+ dano.at("id"), __LINE__);*/
-						//}else if(1 >= _DANO.size()){ //mpre("Не удаляем последнее значение", __LINE__);
-						}else if(0 > (--pos + dataset_count)){ //mpre("Полный цикл проверки", __LINE__);
-						}else if(TMs dataset_map = bmf::fk("mp_bmf_dataset_map", {{"dataset_id", bmf::dataset.at("id")}, {"alias", "dano"}, {"alias_id", dano_itr.second.at("id")}}, {}, {}); false){ mpre("ОШИБКА выборки карты исходника", __LINE__);
-						}else if(boost::dynamic_bitset<> map = boost::dynamic_bitset<>(dataset_map.end() == dataset_map.find("map") ? std::string(dataset_count, '0') : dataset_map.at("map")); (dataset_count != map.size())){ mpre("ОШИБКА расчета карты исходника", __LINE__);
-						}else if([&](){ // Удаление исходника
-							//if(string _char_last = _values.substr(len -1, 1); (1 != _char_last.length())){ mpre("ОШИБКА получения последнего символа", __LINE__);
-							if(string _char_last = (map.test(key) ? "1" : "0"); (1 != _char_last.length())){ mpre("ОШИБКА получения последнего значения", __LINE__);
-							//}else if(string _char_cur = _values.substr(len -pos -1, 1); (1 != _char_cur.length())){ mpre("ОШИБКА получения текущего символа", __LINE__);
-							}else if(int cur = (key < pos ? dataset_count +key -pos : key -pos); (0 > cur || dataset_count <= cur)){ //mpre("ОШИБКА расчета текущего значения key=" +to_string(key) +" dataset_count=" +to_string(dataset_count) +" pos=" +to_string(pos) +" cur=" +to_string(cur), __LINE__);
-							}else if(string _char_cur = (map.test(cur) ? "1" : "0"); (1 != _char_cur.length())){ mpre("ОШИБКА получения предудущего символа", __LINE__);
-							}else if(_char_last != _char_cur){ //mpre("Подходящее значение cur=" +to_string(cur) +" char_cur=" +_char_cur +" char_last=" +_char_last, __LINE__);
-							}else if(_DANO.erase(dano_itr.first); false){ mpre("ОШИБКА удаления короткого значения истории", __LINE__);
-							}else{ //mpre(dano_itr.second, "Исходник " +char_cur +" " +char_last, __LINE__); mpre("Удаление исходника " +std::to_string(dano_itr.first), __LINE__);
-							} return false; }()){ mpre("ОШИБКА удаления по значению", __LINE__);
-						//}else if(pos >= bmf::values_length){ mpre("ОШИБКА Выход за пределы длинны строки истории", __LINE__);
-						}else if(!(loop = true)){ mpre("ОШИБКА установки признака продолжения цикла", __LINE__);
-						}else{ //mpre("Продолжаем цикл " +to_string(pos), __LINE__);
-						}
-					}
-				}while(!(loop = !loop)); return false; }()){ mpre("ОШИБКА перебора значений", __LINE__);
+			}else if(int prev = (!key ? dataset_count -1 : key -1); (0 > prev)){ mpre("ОШИБКА расчета предыдущей позиции", __LINE__);
+			}else if([&](int pos = 0, bool loop = false){ for(auto dano_itr:BMF_DANO_EX.at("")){ // Перебор исходных значений
+				if(1 >= _DANO.size()){ //mpre("Не удаляем последнее значение", __LINE__);
+				}else if(_DANO.end() == _DANO.find(dano_itr.first)){ //mpre("Уже удален " +dano.at("id"), __LINE__);
+				}else if(TMs dataset_map = bmf::fk("mp_bmf_dataset_map", {{"dataset_id", bmf::dataset.at("id")}, {"alias", "dano"}, {"alias_id", dano_itr.second.at("id")}}, {}, {}); false){ mpre("ОШИБКА выборки карты исходника", __LINE__);
+				}else if(std::string _map = (dataset_map.end() == dataset_map.find("map") ? std::string(dataset_count, '0') : dataset_map.at("map")); _map.empty()){ mpre("ОШИБКА получения карты исходника", __LINE__);
+				}else if(boost::dynamic_bitset<> map = boost::dynamic_bitset<>(_map); (dataset_count != map.size())){ mpre("ОШИБКА расчета карты исходника", __LINE__);
+				}else if(map.test(key) != map.test(prev)){ //mpre("Изменившийся исходник", __LINE__);
+				}else if(_DANO.erase(dano_itr.first); false){ mpre("ОШИБКА неизменившегося исходника", __LINE__);
+				}else{ //mpre("Удаление исходника " +std::to_string(dano_itr.first), __LINE__);
+				}}return false; }()){ mpre("ОШИБКА перебора значений", __LINE__);
 			}else if(_dano = [&](){ // Оставшееся значение
 				if(auto dano_itr = _DANO.rbegin(); false){ mpre("ОШИБКА выборки оставшегося значения", __LINE__);
 				}else if(_dano = dano_itr->second; _dano.empty()){ mpre("ОШИБКА выборки оставшегося значения", __LINE__);
@@ -1372,7 +1339,7 @@ int main(int argc, char **argv){
 			}else if(in.is_object()){ mpre("Обьект не перемешиваем", __LINE__);
 			}else if(string random = (bmf::ARGV.end() == bmf::ARGV.find("-rand") ? "0" : bmf::ARGV.at("-rand")); (0 >= random.length())){ mpre("ОШИБКА аргумент перемешивания не задан -rand", __LINE__);
 			}else if(string::npos != random.find_last_not_of("0123456789")){ mpre("ОШИБКА формат перемешивания задан неправильно "+ random, __LINE__);
-			}else if("0" == random){ mpre("Перемешивание отключено -rand " +random, __LINE__);
+			}else if("0" == random){ //mpre("Перемешивание отключено -rand " +random, __LINE__);
 			}else if(std::random_device rd;  false){ mpre("ОШИБКА создания случайного значения", __LINE__);
 			}else if(std::mt19937 g(rd()); false){ mpre("ОШИБКА инициации случайного значения", __LINE__);
 			}else if(shuffle(in.begin(), in.end(), g); false){ mpre("ОШИБКА перемешивания массива", __LINE__);
@@ -1381,10 +1348,12 @@ int main(int argc, char **argv){
 		}else if(TMMi DANO = {}; false){ mpre("ОШИБКА создания временного хранилища результатов исходника", __LINE__);
 		}else if(TMMi ITOG = {}; false){ mpre("ОШИБКА создания временного хранилища результатов итогов", __LINE__);
 		}else if(bmf::Open(true)){ mpre("ОШИБКА подключения к БД", __LINE__);
+		}else if(auto microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени", __LINE__);
 		}else if([&](){ for(auto &js:in.items()){ // Расчет карты
 			if(auto el = js.value(); el.empty()){ mpre("ОШИБКА элемент не найден", __LINE__);
 			}else if(int key = atoi(js.key().c_str()); (0 > key)){ mpre("ОШИБКА расчета номера обучающего примера", __LINE__);
-			}else if(bmf::Progress("Расчет обучающих примеров " +to_string(key+1), (float)(key+1)/in.size(), __LINE__); false){ mpre("Индикатор прогресса", __LINE__);
+			}else if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - microtime; false){ mpre("ОШИБКА расчета времени", __LINE__);
+			}else if(bmf::Progress("Расчет обучающих примеров " +to_string(key+1) +" (" + to_string(_microtime) +" сек.)", (float)(key+1)/in.size(), __LINE__); false){ mpre("Индикатор прогресса", __LINE__);
 			}else if(TMs dano = TMs(el["dano"]); dano.empty()){ mpre("ОШИБКА получения входных знаков", __LINE__);
 			}else if(bmf::Vals(dano, "dano", key, BMF_DANO_EX, BMF_DANO_VALUES_EX, BMF_DANO_TITLES_EX); false){ mpre("ОШИБКА установки входящих значений", __LINE__);
 			}else if([&](){ for(auto& dano_itr:BMF_DANO_EX.at("")){ // Сохранение результатов
@@ -1502,7 +1471,7 @@ int main(int argc, char **argv){
 		if(int epoch = (bmf::ARGV.end() == bmf::ARGV.find("-epoch") ? 0 : atoi(bmf::ARGV.at("-epoch").c_str())); (0 > epoch)){ mpre("ОШИБКА расчета количества эпох", __LINE__);
 		}else if(bmf::ARGV.end() == bmf::ARGV.find("-epoch")){ mpre("Для обучения укажите количество эпох -epoch", __LINE__);
 		}else if(!epoch){ loop = -1; mpre("Указано нулевое количество эпох расчитываем до полного совпадения", __LINE__);
-		}else if(loop = epoch){ mpre("Набор данных -ds " +bmf::dataset.at("id")+ " количество эпох -epoch " +to_string(loop), __LINE__);
+		}else if(loop = epoch){ //mpre("Набор данных -ds " +bmf::dataset.at("id")+ " количество эпох -epoch " +to_string(loop), __LINE__);
 		}else{ mpre("ОШИБКА расчтеа количества повторений", __LINE__);
 		}return loop; }(); false){ mpre("ОШИБКА расчета колчиества повторений", __LINE__);
 	//}else if(mpre("Обучение -ds " +bmf::dataset.at("id") +" -epoch " +to_string(loop), __LINE__); false){ mpre("ОШИБКА уведомления о свойствах расчетов", __LINE__);
@@ -1510,11 +1479,13 @@ int main(int argc, char **argv){
 		if(bmf::loop++ >= loop){ //mpre("Остановка по максимальному количеству эпох", __LINE__);
 		}else if(BMF_DANO_EX.end() == BMF_DANO_EX.find("")){ mpre("Поле списка исходников не найдено", __LINE__);
 		}else if(0 >= BMF_DANO_EX.at("").size()){ mpre("ОШИБКА Не найдены исходники", __LINE__);
-		//}else if(bmf::dataset.empty()){ mpre("ОШИБКА набор данных не установлен", __LINE__);
+		}else if(bmf::dataset.empty()){ mpre("ОШИБКА набор данных не установлен", __LINE__);
 		}else if(int dataset_count = atoi(bmf::dataset["count"].c_str()); (0 >= dataset_count)){ mpre("ОШИБКА нулевое количество в наборе данных", __LINE__);
 		}else if(bmf::Open(true)){ mpre("ОШИБКА подключения к БД", __LINE__);
+		}else if(auto microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени", __LINE__);
 		}else if(int err = [&](int err = 0, int progress = 0, bool rep = false, int key = 0){ do{ // Сравнение результата расчета
-			if(bmf::Progress("Эпоха:" +to_string(bmf::loop) +" Примеров:" +to_string(progress) +" Изменений:"+ to_string(err), (float)++progress/dataset_count, __LINE__); false){ mpre("Индикатор прогресса", __LINE__);
+			if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - microtime; false){ mpre("ОШИБКА расчета времени", __LINE__);
+			}else if(bmf::Progress("Эпоха:" +to_string(bmf::loop) +" Примеров:" +to_string(progress) +" Изменений:"+ to_string(err)+ " (" +to_string(_microtime) +" сек.)", (float)++progress/dataset_count, __LINE__); false){ mpre("Индикатор прогресса", __LINE__);
 			}else if([&](){ for(auto& itog_itr:BMF_ITOG_EX.at("")){ // Проверка списка итогов
 				if(TMs itog = itog_itr.second; itog.empty()){ mpre("ОШИБКА выборки итога", __LINE__);
 				}else if(itog.end() == itog.find("id")){ mpre("ОШИБКА не найден идентификатор итога", __LINE__);
@@ -1566,7 +1537,7 @@ int main(int argc, char **argv){
 		}else if(errors += err; !err){ //mpre("Ошибок не обнаружено количество Эпох обучения "+ to_string(epoch -loop) +" Размер модели " +to_string(BMF_INDEX_EX.at("").size()) +" морфов Время "+ to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 -bmf::microtime) +" сек", __LINE__);
 		}else if(!(pass = !pass)){ mpre("ОШИБКА инвертирования признака повтора", __LINE__);
 		}else{ //mpre("Результаты расчета Общее количество/Последней эпохи " +to_string(errors) +"/" +to_string(err) +"\n", __LINE__);
-		} }while(!(pass = !pass)); return errors; }(); false){ mpre("ОШИБКА перебора эпох", __LINE__);
+		}}while(!(pass = !pass)); return errors; }(); false){ mpre("ОШИБКА перебора эпох", __LINE__);
 	}else if([&](){ // Вывод итоговых значений
 		if(bmf::ARGV.end() == bmf::ARGV.find("-dano")){ //mpre("Данные для расчета не указаны", __LINE__);
 		}else if(nlohmann::json _in = ("" == bmf::ARGV.at("-dano") ? in : nlohmann::json::parse(bmf::ARGV.at("-dano"))); false){ mpre("ОШИБКА разбора строки атрибута -dano", __LINE__);
