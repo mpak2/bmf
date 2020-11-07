@@ -138,7 +138,7 @@ namespace bmf{ // Глобальные переменные
 int main(int argc, char **argv){
 	if(false){ mpre("ОШИБКА", __LINE__);
 	}else if(setlocale(LC_ALL, "LC_ALL=C.UTF-8"); false){ mpre("ОШИБКА установки кирилицы", __LINE__);
-	}else if([&](){ // Список значений из консоли
+	/*}else if([&](){ // Список значений из консоли
 		if([&](){ for(int i = 0; i < argc; i++){ // Параметры значений консоли
 				if(0 >= i){ //mpre("Имя файла", __LINE__);
 				}else if(string arg = argv[i]; (0 >= arg.length())){ mpre("ОШИБКА получения аргумента консоли", __LINE__);
@@ -146,7 +146,7 @@ int main(int argc, char **argv){
 					if("-" == arg){ //mpre("Вход", __LINE__);
 					}else if("-" == arg.substr(0, 1)){ //mpre("Имя параметра", __LINE__);
 					}else if(bmf::ARGV.end() != bmf::ARGV.find("-db")){ mpre("ОШИБКА атрибут консоли имени БД уже установлен `"+ arg+ "`", __LINE__);
-					}else if([&](){ bmf::ARGV.insert(make_pair("-db", arg)); return (bmf::ARGV.end() == bmf::ARGV.find("-db")); }()){ mpre("ОШИБКА установки имени БД из консоли", __LINE__);
+					}else if(bmf::ARGV.insert(make_pair("-db", arg)); (bmf::ARGV.end() == bmf::ARGV.find("-db"))){ mpre("ОШИБКА установки имени БД из консоли", __LINE__);
 					}else if(bmf::ARGV.end() != bmf::ARGV.find("-db")){ //mpre("Имя БД установлено из атрибута "+ to_string(i), __LINE__);
 					}else{ return true;
 					} return false; }()){ mpre("ОШИБКА установки БД", __LINE__);
@@ -162,7 +162,32 @@ int main(int argc, char **argv){
 			} return false; }()){ mpre(bmf::ARGV, __LINE__, "Аргументы консоли"); mpre("ОШИБКА получения массива параметров консоли", __LINE__);
 		}else if([&](){ bmf::clump_id = (bmf::ARGV.end() == bmf::ARGV.find("-db") ? bmf::clump_id : bmf::ARGV.at("-db")); return false; }()){ mpre("ОШИБКА Параметр адресной строки с указанием БД не задан", __LINE__);
 		}else{ //mpre("Список параметров консоли", bmf::ARGV, __LINE__);
-		} return false; }()){ mpre("ОШИБКА получения данных", __LINE__);
+		} return false; }()){ mpre("ОШИБКА получения данных", __LINE__);*/
+	}else if([&](){ // Параметры консоли
+		if([&](){ for(int i = 0; i < argc; i++){ // Перебор всех параметров
+			if(0 >= i){ //mpre("Имя файла", __LINE__);
+			}else if(string str = argv[i]; (0 >= str.length())){ mpre("ОШИБКА получения аргумента консоли", __LINE__);
+			}else if(int npos = str.find("="); false){ mpre("Расчет позиции равно в строке аргументов", __LINE__);
+			}else if(std::string arg = (std::string::npos == npos ? str : str.substr(0, npos)); false){ mpre("ОШИБКА получения имени аргумента", __LINE__);
+			}else if(std::string val = (std::string::npos == npos ? "" : str.substr(npos +1, str.length())); false){ mpre("ОШИБКА получения значения аргумента", __LINE__);
+			}else if([&](bool skip = false){
+				if(std::string::npos != npos){ //mpre("Задан аргумент", __LINE__);
+				}else if("-" != arg){ //mpre("Не признак загрузки", __LINE__);
+				}else if(bmf::ARGV.insert(make_pair("-", "")); bmf::ARGV.empty()){ mpre("ОШИБКА установки нового артибута в массив", __LINE__);
+				}else if(!(skip = true)){ mpre("Установка значения пропуска", __LINE__);
+				}return skip; }()){ // Признак загрузки
+			}else if([&](bool skip = false){ // Установка БД
+				if(std::string::npos != npos){ //mpre("Задан аргумент", __LINE__);
+				}else if(bmf::ARGV.end() != bmf::ARGV.find("db")){ mpre("ОШИБКА БД уже задана `" +bmf::ARGV.at("db") + "` " +arg, __LINE__);
+				}else if(bmf::ARGV.insert(make_pair("db", arg)); bmf::ARGV.empty()){ mpre("ОШИБКА установки нового артибута в массив", __LINE__);
+				}else if(!(skip = true)){ mpre("Установка значения пропуска", __LINE__);
+				}else{ //mpre("Установка БД " +arg, __LINE__);
+				}return skip; }()){ //mpre("ОШИБКА установки БД", __LINE__);
+			}else if(bmf::ARGV.insert(make_pair(arg, val)); bmf::ARGV.empty()){ mpre("ОШИБКА установки нового артибута в массив", __LINE__);
+			}else{ //mpre("Аргумент консоли "+ arg + "=" +val, __LINE__);
+			}}return false; }()){ mpre("ОШИБКА разбора параметров консоли", __LINE__);
+		}else{ //mpre(bmf::ARGV, "Список параметров", __LINE__);
+		}return bmf::ARGV.empty(); }()){ mpre("ОШИБКА параметры консоли не заданы", __LINE__);
 	}else if(nlohmann::json in = [&](nlohmann::json in = {}){ // Входной поток
 		if(bmf::ARGV.end() == bmf::ARGV.find("-")){ //mpre("Данные для обучения не установлены", __LINE__);
 		}else if([&](string str = ""){ while(getline(std::cin, str)){ bmf::ARGV.at("-") += ("\n"+ str); }; return (0 >= bmf::ARGV.at("-").length()); }()){ mpre("ОШИБКА входящий параметр не задан", __LINE__);
@@ -235,7 +260,7 @@ int main(int argc, char **argv){
 			}else if(std::string::size_type start = sql.find(table); start == std::string::npos){ mpre("ОШИБКА имя таблицы в запросе не найдено", __LINE__);
 			}else if(sql.replace(start, table.size(), table); sql.empty()){ mpre("ОШИБКА замены имени таблицы", __LINE__);
 			}else if(bmf::exec(sql)){ mpre("ОШИБКА создания копии БД "+ sql, __LINE__);
-			}else if(std::string where = (bmf::ARGV.end() == bmf::ARGV.find("-itog") ? "1" : "(itog_id=" +bmf::ARGV.at("-itog") +" OR itog_id IS NULL)"); where.empty()){ mpre("Условия выборки", __LINE__);
+			}else if(std::string where = (bmf::ARGV.end() == bmf::ARGV.find("itog") ? "1" : "(itog_id=" +bmf::ARGV.at("itog") +" OR itog_id IS NULL)"); where.empty()){ mpre("Условия выборки", __LINE__);
 			}else if(sql = "INSERT INTO " +table +" SELECT * FROM file." +table +" WHERE " +where +";"; sql.empty()){ mpre("ОШИБКА запроса на выборку", __LINE__);
 			}else if(bmf::exec(sql)){ mpre("ОШИБКА копирования данных во временную таблицу", __LINE__);
 			}else{ //mpre("Создание копии таблицы file." +table +" > " +table +" " +sql, __LINE__);
@@ -261,6 +286,14 @@ int main(int argc, char **argv){
 				}else if(bmf::exec("BEGIN TRANSACTION")){ mpre("Сбой запуска транзакции сохранения набора данных", __LINE__);
 				}else if(bmf::exec("INSERT OR REPLACE INTO file.mp_bmf_index SELECT * FROM mp_bmf_index;")){ mpre("ОШИБКА копирования данных во временную таблицу", __LINE__);
 				}else if(bmf::exec("INSERT OR REPLACE INTO file.mp_bmf_dataset_map SELECT * FROM mp_bmf_dataset_map;")){ mpre("ОШИБКА копирования данных во временную таблицу", __LINE__);
+				//}else if(bmf::exec("UPDATE mp_bmf_test WHERE id=" +(BMF_))){
+				}else if([&](){ // Увеличение количества эпох набора данных
+					if(bmf::ARGV.end() == bmf::ARGV.find("ds")){ //mpre("Не указан набор данных", __LINE__);
+					}else if(int ds = atoi(bmf::ARGV.at("ds").c_str()); !ds){ mpre("Указан не сущетсвующий набор данных", __LINE__);
+					}else if(std::string sql = "UPDATE mp_bmf_dataset SET epoch=epoch+1 WHERE id="+ to_string(ds); sql.empty()){ mpre("Запрос на обновление количества эпох в наборе данных", __LINE__);
+					}else if(bmf::exec(sql)){ mpre("ОШИБКА обновления количества эпох в наборе данных", __LINE__);
+					}else{ //mpre("Инкремент эпох в наборе данных " +sql, __LINE__);
+					}return false; }()){ mpre("ОШИБКА инкремента количеста эпох", __LINE__);
 				}else if(bmf::exec("COMMIT TRANSACTION")){ mpre("Сбой запуска транзакции сохранения набора данных", __LINE__);
 				}else{ //mpre("Сохранение результатов расчета", __LINE__);
 				}return false; }()){ mpre("ОШИБКА сохранения значений таблиц", __LINE__);
@@ -286,7 +319,7 @@ int main(int argc, char **argv){
 			if([&](){ // Выборка по условию
 				if(where.empty()){// std::cerr << __LINE__ << " Условие на выборку записей не указано" << endl;
 				}else if(string sql = [&](string sql, string values = ""){
-					for(TMs::iterator itr = where.begin(); itr != where.end(); itr++){
+					for(auto itr = where.begin(); itr != where.end(); itr++){
 						string key = itr->first;
 						string val = itr->second;
 						string separ = (values.size() ? " AND " : "");
@@ -305,13 +338,13 @@ int main(int argc, char **argv){
 				}else if(!row.empty()){// std::cerr << __LINE__ << " Запись уже найдена по условиям << " << row["id"] << endl; mpre(where, __LINE__); mpre(insert, __LINE__); mpre(update, __LINE__);
 				}else if(insert.erase("id"); (insert.end() != insert.find("id"))){ mpre("ОШИБКА Устанавливаем нулевой идентификатор", __LINE__);
 				}else if(string sql = [&](string sql, string fields = "", string values = ""){
-					for(TMs::iterator itr = where.begin(); itr != where.end(); itr++){
+					for(auto itr = where.begin(); itr != where.end(); itr++){
 						string key = itr->first;
 						string val = itr->second;
 						string separ = (fields.size() ? ", " : "");
 						fields += separ+ "`"+ key+ "`";
 						values += separ+ "'"+ val+ "'";
-					} for(TMs::iterator itr = insert.begin(); itr != insert.end(); itr++){
+					} for(auto itr = insert.begin(); itr != insert.end(); itr++){
 						string key = itr->first;
 						string val = itr->second;
 						string separ = (fields.size() ? ", " : "");
@@ -329,7 +362,7 @@ int main(int argc, char **argv){
 				if(update.empty()){ //std::cerr << __LINE__ << " Условия обновления не указаны" << endl;
 				}else if(row.empty()){ std::cerr << __LINE__ << " Запись для обновления не найдена " << endl;
 				}else if(string sql = [&](string sql, string fields = "", string values = ""){
-					for(TMs::iterator itr = update.begin(); itr != update.end(); itr++){
+					for(auto itr = update.begin(); itr != update.end(); itr++){
 						if(string key = itr->first; (key == "id")){ // Сохраняем идентификатора записи
 						}else if(key.substr(0, 1) == "_"){ // Технические поля
 						}else{
@@ -389,9 +422,9 @@ int main(int argc, char **argv){
 		}return false; }()){ mpre("ОШИБКА функции БД", __LINE__);
 	}else if([&](bool skip = true){ // Подключение базы
 		if([&](){ // Имя базы данных
-			if(bmf::ARGV.end() == bmf::ARGV.find("-db")){ mpre("ОШИБКА БД для сохранения не задана -db", __LINE__);
-			}else if(0 >= bmf::ARGV.at("-db").length()){ mpre("База данных для сохранения не указана", __LINE__);
-			}else if(bmf::dbname = bmf::ARGV.at("-db"); (0 >= bmf::dbname.length())){ mpre("ОШИБКА имя файла для БД не задано", __LINE__);
+			if(bmf::ARGV.end() == bmf::ARGV.find("db")){ mpre("ОШИБКА БД для сохранения не задана -db", __LINE__);
+			}else if(0 >= bmf::ARGV.at("db").length()){ mpre("База данных для сохранения не указана", __LINE__);
+			}else if(bmf::dbname = bmf::ARGV.at("db"); (0 >= bmf::dbname.length())){ mpre("ОШИБКА имя файла для БД не задано", __LINE__);
 			}else{ //mpre("База данных"+ string, __LINE__);
 			}return false; }()){ mpre("ОШИБКА получения имени базы данных", __LINE__);
 		}else if([&](){ // Получение пути до файла БД
@@ -412,7 +445,7 @@ int main(int argc, char **argv){
 			}else if(bmf::exec("CREATE TABLE IF NOT EXISTS `mp_bmf_itog_values` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,`time` INTEGER,`index_type_id` INTEGER,`clump_id` INTEGER,`name` TEXT,`value` INTEGER,`itog_values_option_id` INTEGER,`bin` INTEGER, UNIQUE(name))"); false){ mpre("ОШИБКА создания значения итога", __LINE__);
 			}else if(bmf::exec("CREATE TABLE IF NOT EXISTS `mp_bmf_itog_titles` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,`time` INTEGER, `clump_id` INTEGER, `itog_values_id` INTEGER, `value` INTEGER, `name` INTEGER, `text` TEXT, UNIQUE(itog_values_id,name))"); false){ mpre("ОШИБКА создания значения итога", __LINE__);
 			}else if(bmf::exec("CREATE TABLE IF NOT EXISTS `mp_bmf_dano_titles` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,`time` INTEGER, `clump_id` INTEGER, `dano_values_id` INTEGER, `value` INTEGER, `name` INTEGER, `text` TEXT, UNIQUE(dano_values_id,name))"); false){ mpre("ОШИБКА создания значения итога", __LINE__);
-			}else if(bmf::exec("CREATE TABLE IF NOT EXISTS `mp_bmf_dataset` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,`time` INTEGER, `clump_id` INTEGER, `name` TEXT, `md5` TEXT, `count` INTEGER, UNIQUE(`md5`))"); false){ mpre("ОШИБКА создания списка наборов данных", __LINE__);
+			}else if(bmf::exec("CREATE TABLE IF NOT EXISTS `mp_bmf_dataset` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,`time` INTEGER, `clump_id` INTEGER, `name` TEXT, `md5` TEXT, `count` INTEGER, `epoch` INTEGER, UNIQUE(`md5`))"); false){ mpre("ОШИБКА создания списка наборов данных", __LINE__);
 			}else if(bmf::exec("CREATE TABLE IF NOT EXISTS `mp_bmf_dataset_map` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,`time` INTEGER, `dataset_id` INTEGER, `alias` TEXT, `alias_id` INTEGER,`itog_id` INTEGER, `map` TEXT, FOREIGN KEY (dataset_id) REFERENCES mp_bmf_dataset(id) ON DELETE CASCADE, UNIQUE(`dataset_id`,`alias`,`alias_id`))"); false){ mpre("ОШИБКА создания списка наборов данных", __LINE__);
 			}else if(bmf::exec("CREATE INDEX IF NOT EXISTS `mp_bmf_dataset_map-dataset_id-alias-alias_id` ON mp_bmf_dataset_map(dataset_id,alias,alias_id);"); false){ mpre("ОШИБКА создания идекса списка наборов данных", __LINE__);
 			}else if(bmf::exec("CREATE INDEX IF NOT EXISTS `mp_bmf_dataset_map-itog_id` ON mp_bmf_dataset_map(itog_id);"); false){ mpre("ОШИБКА создания идекса списка наборов данных", __LINE__);
@@ -1337,7 +1370,7 @@ int main(int argc, char **argv){
 		}else if([&](){ // Перемешивание
 			if(1 >= in.size()){ //mpre("Не перемешиваем одно значение", __LINE__);
 			}else if(in.is_object()){ mpre("Обьект не перемешиваем", __LINE__);
-			}else if(string random = (bmf::ARGV.end() == bmf::ARGV.find("-rand") ? "0" : bmf::ARGV.at("-rand")); (0 >= random.length())){ mpre("ОШИБКА аргумент перемешивания не задан -rand", __LINE__);
+			}else if(string random = (bmf::ARGV.end() == bmf::ARGV.find("rand") ? "0" : bmf::ARGV.at("rand")); (0 >= random.length())){ mpre("ОШИБКА аргумент перемешивания не задан -rand", __LINE__);
 			}else if(string::npos != random.find_last_not_of("0123456789")){ mpre("ОШИБКА формат перемешивания задан неправильно "+ random, __LINE__);
 			}else if("0" == random){ //mpre("Перемешивание отключено -rand " +random, __LINE__);
 			}else if(std::random_device rd;  false){ mpre("ОШИБКА создания случайного значения", __LINE__);
@@ -1380,7 +1413,7 @@ int main(int argc, char **argv){
 		}else if([&](){ // Установка набора данных
 			if(std::string _md5 = md5(bmf::ARGV.at("-")); _md5.empty()){ mpre("ОШИБКА расчета хеша набора обучающих данных", __LINE__);
 			}else if(TMs bmf_dataset = {{"time", to_string(time(0))}, {"clump_id", bmf::clump_id}, {"count", to_string(in.size())}}; bmf_dataset.empty()){ mpre("ОШИБКА создания записи нового набора данных", __LINE__);
-			}else if(bmf::dataset = bmf::fk("mp_bmf_dataset", {{"md5", _md5}}, bmf_dataset, {}); bmf::dataset.empty()){ mpre("ОШИБКА добавления нового набора данных", __LINE__);
+			}else if(bmf::dataset = bmf::fk("mp_bmf_dataset", {{"md5", _md5}, {"epoch", "0"}}, bmf_dataset, {}); bmf::dataset.empty()){ mpre("ОШИБКА добавления нового набора данных", __LINE__);
 			}else{ mpre("Набор данных " +bmf::dataset["id"] +" " +bmf::dataset["md5"], __LINE__);
 			}return bmf::dataset.empty(); }()){ mpre("ОШИБКА устанвоки набора данных", __LINE__);
 		}else if([&](int progress = 0){ for(auto& dano_itr:BMF_DANO_EX.at("")){ // Двоичная карта исходников
@@ -1405,8 +1438,8 @@ int main(int argc, char **argv){
 			}else if(TMs itog = itog_itr.second; itog.empty()){ mpre("ОШИБКА выборки итога", __LINE__);
 			}else if([&](bool pass = false){ // Пропуск расчета по условию -itog
 				if(itog_itr.second.end() == itog_itr.second.find("id")){ mpre("ОШИБКА поле идентификатора у итога не найдено", __LINE__);
-				}else if(bmf::ARGV.end() == bmf::ARGV.find("-itog")){ //mpre("Условие не установлено", __LINE__);
-				}else if(std::string itog = bmf::ARGV.at("-itog"); itog.empty()){ mpre("ОШИБКА итог не указан", __LINE__);
+				}else if(bmf::ARGV.end() == bmf::ARGV.find("itog")){ //mpre("Условие не установлено", __LINE__);
+				}else if(std::string itog = bmf::ARGV.at("itog"); itog.empty()){ mpre("ОШИБКА итог не указан", __LINE__);
 				}else if(pass = (itog_itr.second.at("id") == itog); false){ mpre("ОШИБКА расчета пропуска по номеру итога", __LINE__);
 				}else if(int npos = itog.find("."); (std::string::npos == npos)){ mpre("Делитель не найден", __LINE__);
 				}else if(int divider = atoi((std::string::npos == npos) ? itog.c_str() : itog.substr(0, npos).c_str()); !divider){ mpre("ОШИБКА получения делителя " +itog, __LINE__);
@@ -1442,7 +1475,7 @@ int main(int argc, char **argv){
 	}else if(bmf::dataset = [&](){ // Выборка набора данных для расчета
 		if(!bmf::dataset.empty()){ //mpre("Набор данных для расчета установлен при загрузке", __LINE__);
 		}else if(BMF_DATASET_EX.end() == BMF_DATASET_EX.find("")){ mpre("ОШИБКА не найден список набора данных", __LINE__);
-		}else if(std::string ds = (bmf::ARGV.end() == bmf::ARGV.find("-ds") ? "" : bmf::ARGV.at("-ds")); false){ mpre("ОШИБКА выборки идентификатора набора данных", __LINE__);
+		}else if(std::string ds = (bmf::ARGV.end() == bmf::ARGV.find("ds") ? "" : bmf::ARGV.at("ds")); false){ mpre("ОШИБКА выборки идентификатора набора данных", __LINE__);
 		}else if(bmf::dataset = erb(BMF_DATASET_EX, {{"id", ds}}); !bmf::dataset.empty()){ //mpre("Набор данных указанный в командной строке", __LINE__);
 		}else if(bmf::Open(false)){ mpre("ОШИБКА подключения к БД", __LINE__);
 		}else if([&](){ for(auto& dataset_itr:BMF_DATASET_EX.at("")){ // Вывод списка набора данных
@@ -1462,14 +1495,14 @@ int main(int argc, char **argv){
 				}else if(count += dataset_count; (0 > count)){ mpre("ОШИБКА расчета количества сигналов", __LINE__);
 				}else{ //mpre("Карта itog " +itog_map.at("map"), __LINE__); mpre("Карта index " +index_map.at("map"), __LINE__); mpre("Разница count=" +to_string(count) +" ers=" +to_string(ers), __LINE__);
 				}}return (!ers ? 1 : (float)(count-ers)/count); }(); (0 > diff)){ mpre("ОШИБКА расчета результата набора данных", __LINE__);
-			}else{ mpre("Набор данных:" +dataset["id"] +" количество:"+ dataset["count"] +" точность:"+ to_string(diff), __LINE__);
+			}else{ mpre("Набор #" +dataset["id"] +" количество:"+ dataset["count"] +" точность:"+ to_string(diff) +("0" == dataset["epoch"] ? "" : " эпох:" +dataset["epoch"]), __LINE__);
 			}}return false; }()){ mpre("ОШИБКА отображения списка набора данных", __LINE__);
 		}else if(bmf::Close()){ mpre("ОШИБКА закрытия БД", __LINE__);
 		}else{ mpre("Выберете набор данных для расчета -ds и количество -epoch", __LINE__);
 		}return bmf::dataset; }(); bmf::dataset.empty()){ //mpre("ОШИБКА набор данных не установлен", __LINE__);
 	}else if(int loop = [&](int loop = 0){ // Количетсво повторений
-		if(int epoch = (bmf::ARGV.end() == bmf::ARGV.find("-epoch") ? 0 : atoi(bmf::ARGV.at("-epoch").c_str())); (0 > epoch)){ mpre("ОШИБКА расчета количества эпох", __LINE__);
-		}else if(bmf::ARGV.end() == bmf::ARGV.find("-epoch")){ mpre("Для обучения укажите количество эпох -epoch", __LINE__);
+		if(int epoch = (bmf::ARGV.end() == bmf::ARGV.find("epoch") ? 0 : atoi(bmf::ARGV.at("epoch").c_str())); (0 > epoch)){ mpre("ОШИБКА расчета количества эпох", __LINE__);
+		}else if(bmf::ARGV.end() == bmf::ARGV.find("epoch")){ mpre("Для обучения укажите количество эпох epoch", __LINE__);
 		}else if(!epoch){ loop = -1; mpre("Указано нулевое количество эпох расчитываем до полного совпадения", __LINE__);
 		}else if(loop = epoch){ //mpre("Набор данных -ds " +bmf::dataset.at("id")+ " количество эпох -epoch " +to_string(loop), __LINE__);
 		}else{ mpre("ОШИБКА расчтеа количества повторений", __LINE__);
@@ -1539,8 +1572,8 @@ int main(int argc, char **argv){
 		}else{ //mpre("Результаты расчета Общее количество/Последней эпохи " +to_string(errors) +"/" +to_string(err) +"\n", __LINE__);
 		}}while(!(pass = !pass)); return errors; }(); false){ mpre("ОШИБКА перебора эпох", __LINE__);
 	}else if([&](){ // Вывод итоговых значений
-		if(bmf::ARGV.end() == bmf::ARGV.find("-dano")){ //mpre("Данные для расчета не указаны", __LINE__);
-		}else if(nlohmann::json _in = ("" == bmf::ARGV.at("-dano") ? in : nlohmann::json::parse(bmf::ARGV.at("-dano"))); false){ mpre("ОШИБКА разбора строки атрибута -dano", __LINE__);
+		if(bmf::ARGV.end() == bmf::ARGV.find("dano")){ //mpre("Данные для расчета не указаны", __LINE__);
+		}else if(nlohmann::json _in = ("" == bmf::ARGV.at("dano") ? in : nlohmann::json::parse(bmf::ARGV.at("dano"))); false){ mpre("ОШИБКА разбора строки атрибута -dano", __LINE__);
 		}else if(nlohmann::json j = [&](nlohmann::json j = {}){ for(auto& js:_in.items()){ // Расчет списка теста
 				if(nlohmann::json el = js.value(); el.empty()){ mpre("ОШИБКА элемент не найден", __LINE__);
 				}else if(string key = js.key(); (0 >= key.length())){ mpre("ОШИБКА расчета ключа", __LINE__);
@@ -1592,11 +1625,11 @@ int main(int argc, char **argv){
 		}else if([&](){ //mpre("Сохранение результатов в тест", __LINE__);
 			if(bmf::exec("CREATE TABLE IF NOT EXISTS mp_bmf_test (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL UNIQUE,`time` INTEGER, `date` TEXT, `size` INTEGER, `args` TEXT, `change` INTEGER, `duration` INTEGER, `index` INTEGER, `epoch` INTEGER, `loop` INTEGER, `first` REAL, `last` REAL, `clump` TEXT)"); false){ mpre("ОШИБКА создания значения итога", __LINE__);
 			}else if(string date = [&](string date = ""){ char mbstr[100]; time_t t = time(nullptr); std::strftime(mbstr, sizeof(mbstr), "%Y-%m-%d_%X", std::localtime(&t)); date = string(mbstr); return date; }(); (0 >= date.length())){ mpre("ОШИБКА расчета времени", __LINE__);
-			}else if(nlohmann::json arg = [&](nlohmann::json arg = {}){ arg = bmf::ARGV; arg.erase("-"); arg.erase("-dano"); return arg; }(); arg.empty()){ mpre("ОШИБКА получения строки аргументов", __LINE__);
+			}else if(nlohmann::json arg = [&](nlohmann::json arg = {}){ arg = bmf::ARGV; arg.erase("-"); arg.erase("dano"); return arg; }(); arg.empty()){ mpre("ОШИБКА получения строки аргументов", __LINE__);
 			}else if(auto microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9 -bmf::microtime; false){ mpre("ОШИБКА расчета времени", __LINE__);
 			}else if(std::string first = [&](std::string _first = ""){ char first[10]; sprintf(first, "%0.4f", bmf::pips_first); _first = first; return _first; }(); false){ mpre("ОШИБКА получения первого процента", __LINE__);
 			}else if(std::string last = [&](std::string _last = ""){ char last[10]; sprintf(last, "%0.4f", bmf::pips_last); _last = last; return _last; }(); false){ mpre("ОШИБКА получения первого процента", __LINE__);
-			}else if(std::string epoch = (bmf::ARGV.end() == bmf::ARGV.find("-epoch") ? "" : bmf::ARGV.at("-epoch")); false){ mpre("ОШИБКА расчета количества эпох указанного в консоли", __LINE__);
+			}else if(std::string epoch = (bmf::ARGV.end() == bmf::ARGV.find("epoch") ? "" : bmf::ARGV.at("epoch")); false){ mpre("ОШИБКА расчета количества эпох указанного в консоли", __LINE__);
 			}else if(std::string size = (BMF_INDEX_EX.end() == BMF_INDEX_EX.find("") ? "" : to_string(BMF_INDEX_EX.at("").size())); false){ mpre("ОШИБКА расчета размера модели", __LINE__);
 			}else if(TMs test = bmf::fk("mp_bmf_test", {}, {{"time", to_string(bmf::timestamp)}, {"date", date}, {"size", to_string(in.size())}, {"change", to_string(errors)}, {"duration", to_string(microtime)}, {"clump", bmf::clump_id}, {"epoch", epoch}, {"loop", to_string(bmf::loop)}, {"first", first}, {"last", (0 <= bmf::pips_last ? last : "")}, {"index", size}, {"args", arg.dump()}}, {}); test.empty()){ mpre("ОШИБКА сохранения результатов тестов", __LINE__);
 			}else{ //mpre("Сохранение статистики id "+ test["id"], __LINE__);
