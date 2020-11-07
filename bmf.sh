@@ -26,6 +26,7 @@ cat clump/iris_1.json | ./bimorph clump/iris.sqlite -
 cat clump/iris_2.json | ./bimorph clump/iris.sqlite -
 cat clump/iris_3.json | ./bimorph clump/iris.sqlite -
 
+./bimorph clump/iris.sqlite; echo "\n" # ?cache=shared
 ./bimorph clump/iris.sqlite ds=1 epoch=100 # ?cache=shared
 ./bimorph clump/iris.sqlite ds=2 epoch=100 # ?cache=shared
 #./bimorph clump/iris.sqlite -ds 3 -epoch 100 # ?cache=shared
