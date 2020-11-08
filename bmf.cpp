@@ -307,19 +307,12 @@ int main(int argc, char **argv){
 			}else{
 			}return 0; }); false){ mpre("ОШИБКА создания списка таблиц временной БД", __LINE__);
 		}else if(bmf::Open = ([&](bool tmp, int result = 0){ // Открытие соединения с БД
-			//if(std::string mem = ":memory:"; mem.empty()){ mpre("ОШИБКА выборки временного файла", __LINE__);
 			if(std::string mem = (((bmf::ARGV.end() != bmf::ARGV.find("mem")) && tmp) ? bmf::ARGV.at("mem") : ""); false){ mpre("ОШИБКА выборки временной таблицы", __LINE__);
-			/*if(std::string mem = [&](std::string mem = ""){ // Имя оперативной БД
-				if(bmf::ARGV.end() == bmf::ARGV.find("mem")){ //mpre("Не указан ключ создание оперативной БД", __LINE__);
-				}else{
-				}return mem; }(); false){ mpre("ОШИБКА расчета имени оперативной БД", __LINE__);*/
 			}else if(std::string dbname = "file:" +bmf::dbname +"?cache=shared&mode=rwc&_journal_mode=WAL"; dbname.empty()){ mpre("ОШИБКА формирования имени основной БД", __LINE__);
 			}else if(std::string _dbname = (mem.empty() ? dbname : "file:" +mem +"?cache=shared"); dbname.empty()){ mpre("ОШИБКА установки свойств соединения", __LINE__);
 			}else if(result != sqlite3_open(_dbname.c_str(), &bmf::db); (SQLITE_OK != result)){ std::cerr << __LINE__ << " ОШИБКА открытия базы данных << " << bmf::dbname << endl;
-			//}else if(mpre("Подключение основной БД " +dbname, __LINE__); false){ mpre("ОШИБКА уведомоления", __LINE__);
 			}else if([&](){ // Копирования динамических таблиц
 				if(mem.empty()){ //mpre("Не подключаем оперативную БД только основная " +dbname, __LINE__);
-				//}else if(mpre("Подключенена оперативная БД " +_dbname, __LINE__); false){ mpre("ОШИБКА уведомоления", __LINE__);
 				}else if(bmf::exec("ATTACH DATABASE '" +dbname +"' AS file;")){ mpre("ОШИБКА подключения оперативной БД", __LINE__);
 				}else if(bmf::Mem("mp_bmf_index", true)){ mpre("ОШИБКА создания копии таблицы", __LINE__); // Запрос на создание оперативной таблицу морфов
 				}else if(bmf::Mem("mp_bmf_dataset_map", true)){ mpre("ОШИБКА создания копии таблицы", __LINE__); // Запрос на создание оперативной таблицу морфов
@@ -333,9 +326,7 @@ int main(int argc, char **argv){
 				if(bmf::databases.end() == bmf::databases.find("file")){ //mpre("Не сохраняем результаты расчетов", __LINE__);
 				}else if(bmf::exec("BEGIN TRANSACTION")){ mpre("Сбой запуска транзакции сохранения набора данных", __LINE__);
 				}else if(bmf::Mem("mp_bmf_index", false)){ mpre("ОШИБКА сохранения оперативной структуры", __LINE__); // Запрос на сохранение оперативной таблицу морфов
-				//}else if(bmf::exec("DROP TABLE IF EXISTS mp_bmf_index")){ mpre("ОШИБКА удаления", __LINE__);
 				}else if(bmf::Mem("mp_bmf_dataset_map", false)){ mpre("ОШИБКА сохранения оперативных карт", __LINE__); // Запрос на сохранение оперативной таблицу морфов
-				//}else if(bmf::exec("DROP TABLE IF EXISTS mp_bmf_dataset_map")){ mpre("ОШИБКА удаления", __LINE__);
 				}else if([&](){ // Увеличение количества эпох набора данных
 					if(bmf::ARGV.end() == bmf::ARGV.find("ds")){ //mpre("Не указан набор данных", __LINE__);
 					}else if(int ds = atoi(bmf::ARGV.at("ds").c_str()); !ds){ mpre("Указан не сущетсвующий набор данных", __LINE__);
@@ -1532,6 +1523,8 @@ int main(int argc, char **argv){
 		}else if(BMF_DATASET_EX.end() == BMF_DATASET_EX.find("")){ mpre("ОШИБКА не найден список набора данных", __LINE__);
 		}else if(std::string ds = (bmf::ARGV.end() == bmf::ARGV.find("ds") ? "" : bmf::ARGV.at("ds")); false){ mpre("ОШИБКА выборки идентификатора набора данных", __LINE__);
 		}else if(bmf::dataset = erb(BMF_DATASET_EX, {{"id", ds}}); !bmf::dataset.empty()){ //mpre("Набор данных указанный в командной строке", __LINE__);
+		}else if(std::map<string, boost::dynamic_bitset<>> ITOG; false){ mpre("Справочник карт", __LINE__);
+		}else if(std::map<string, boost::dynamic_bitset<>> INDEX; false){ mpre("Справочник карт", __LINE__);
 		}else if(bmf::Open(false)){ mpre("ОШИБКА подключения к БД", __LINE__);
 		}else if([&](){ for(auto& dataset_itr:BMF_DATASET_EX.at("")){ // Вывод списка набора данных
 			if(TMs dataset = dataset_itr.second; dataset.empty()){ mpre("ОШИБКА выборки набора данных", __LINE__);
@@ -1542,15 +1535,33 @@ int main(int argc, char **argv){
 				if(TMs itog = itog_itr.second; itog.empty()){ mpre("ОШИБКА выборки итога", __LINE__);
 				}else if(TMs itog_map = bmf::fk("mp_bmf_dataset_map", {{"dataset_id", dataset.at("id")}, {"alias", "itog"}, {"alias_id", itog.at("id")}}, {}, {}); itog_map.empty()){ //mpre(TMs({{"dataset_id", dataset.at("id")}, {"alias", "itog"}, {"alias_id", itog.at("id")}}), "Условия", __LINE__); //mpre("ОШИБКА выборки расчета итога", __LINE__);
 				}else if(boost::dynamic_bitset<> gmap(itog_map.at("map")); gmap.empty()){ mpre("ОШИБКА установки карты итога", __LINE__);
+				}else if(ITOG[itog.at("id")] = gmap; ITOG.empty()){ mpre("ОШИБКА сохраенения карты итога", __LINE__);
 				}else if(TMs index_map = bmf::fk("mp_bmf_dataset_map", {{"dataset_id", dataset.at("id")}, {"alias", "index"}, {"alias_id", itog.at("index_id")}}, {}, {}); false){ mpre("ОШИБКА выборки расчета итога", __LINE__);
 				}else if(std::string map = (index_map.end() == index_map.find("map") ? std::string(dataset_count, '0') : index_map.at("map")); map.empty()){ mpre("ОШИБКА расчета карты", __LINE__);
 				}else if(boost::dynamic_bitset<> imap(map); imap.empty()){ mpre("ОШИБКА установки карты морфа", __LINE__);
+				}else if(INDEX[itog.at("id")] = imap; INDEX.empty()){ mpre("ОШИБКА сохраенения карты морфа", __LINE__);
 				}else if(auto temp = gmap ^ imap; temp.empty()){ mpre("Получение разнциы результатов", __LINE__);
 				}else if(ers += temp.count(); (0 > ers)){ mpre("ОШИБКА инкремента разницы", __LINE__);
 				}else if(count += dataset_count; (0 > count)){ mpre("ОШИБКА расчета количества сигналов", __LINE__);
 				}else{ //mpre("Карта itog " +itog_map.at("map"), __LINE__); mpre("Карта index " +index_map.at("map"), __LINE__); mpre("Разница count=" +to_string(count) +" ers=" +to_string(ers), __LINE__);
 				}}return (!ers ? 1 : (float)(count-ers)/count); }(); (0 > diff)){ mpre("ОШИБКА расчета результата набора данных", __LINE__);
-			}else{ mpre("Набор #" +dataset["id"] +" количество:"+ dataset["count"] +" точность:"+ to_string(diff) +("0" == dataset["epoch"] ? "" : " эпох:" +dataset["epoch"]), __LINE__);
+			}else if(float perc = [&](int count = 0){ for(int i = 0; i < dataset_count; i++){ // Совпадение по значениям
+				if(int ers = [&](int ers = 0){ for( auto itog_itr:BMF_ITOG_EX.at("")){ // Проверка всех итогов
+					if(TMs itog = itog_itr.second; itog.empty()){ mpre("ОШИБКА выборки итога", __LINE__);
+					}else if(itog.end() == itog.find("id")){ mpre("ОШИБКА у итога не найдено поле идентификатора", __LINE__);
+					}else if(ITOG.end() == ITOG.find(itog.at("id"))){ mpre("ОШИБКА в справочнике карт итог не найден", __LINE__);
+					}else if(boost::dynamic_bitset<> gmap = ITOG.at(itog.at("id")); gmap.empty()){ mpre("ОШИБКА восстановления карты итога", __LINE__);
+					}else if(INDEX.end() == INDEX.find(itog.at("id"))){ mpre("ОШИБКА в справочнике карт морфа итог не найден", __LINE__);
+					}else if(boost::dynamic_bitset<> imap = INDEX.at(itog.at("id")); imap.empty()){ mpre("ОШИБКА восстановления карты морфа итога", __LINE__);
+					}else if(gmap.test(i) == imap.test(i)){ //mpre("Значения равны", __LINE__);
+					}else if(ers++; (0 >= ers)){ mpre("Инкремент ошибки", __LINE__);
+					}else{ //mpre("Не совпадение itog_id=" +itog.at("id") +" i=" +to_string(i), __LINE__);
+					}}return ers; }(); (0 > ers)){ mpre("ОШИБКА расчета значения", __LINE__);
+				}else if(count += (ers ? 0 : 1); (0 > count)){ mpre("ОШИБКА количество правильных ответов", __LINE__);
+				}else{ //mpre("Количество правильных ответов i=" +to_string(i) +" dataset_count=" +to_string(dataset_count) +" count=" +to_string(count) +" ers=" +to_string(ers), __LINE__);
+				}}return (float)(count*100)/dataset_count; }(); (0 > perc)){ mpre("ОШИБКА расчета процента полных совпадений по значениям", __LINE__);
+			}else if(string _perc = [&](string _perc = ""){ char chr[10]; sprintf(chr ,"%.2f" ,perc); return string(chr); }(); _perc.empty()){ mpre("ОШИБКА расчета строки процента ошибки", __LINE__);
+			}else{ mpre("Набор #" +dataset["id"] +" количество:"+ dataset["count"] +" точность:"+ to_string(diff) +" (" +_perc +"%)" +("0" == dataset["epoch"] ? "" : " эпох:" +dataset["epoch"]), __LINE__);
 			}}return false; }()){ mpre("ОШИБКА отображения списка набора данных", __LINE__);
 		}else if(bmf::Close()){ mpre("ОШИБКА закрытия БД", __LINE__);
 		}else{ mpre("Выберете набор данных для расчета -ds и количество -epoch", __LINE__);
