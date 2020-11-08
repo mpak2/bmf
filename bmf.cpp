@@ -234,19 +234,31 @@ int main(int argc, char **argv){
 				}else if(TMs index = bmf::fk("file.sqlite_master", {{"type", "table"}, {"name", table}}, {}, {}); index.empty()){ mpre("Таблица не найдена "+ table, __LINE__);
 				}else if(index.end() == index.find("sql")){ mpre("ОШИБКА поле запроса на создание таблицы не найдено", __LINE__);
 				}else if(std::string sql = index.at("sql"); sql.empty()){ mpre("ОШИБКА получения запроса на создание таблицы index", __LINE__);
-				}else if(std::string::size_type start = sql.find(table); start == std::string::npos){ mpre("ОШИБКА имя таблицы в запросе не найдено", __LINE__);
-				}else if(sql.replace(start, table.size(), table); sql.empty()){ mpre("ОШИБКА замены имени таблицы", __LINE__);
+				//}else if(std::string::size_type start = sql.find(table); start == std::string::npos){ mpre("ОШИБКА имя таблицы в запросе не найдено", __LINE__);
+				//}else if(sql.replace(start, table.size(), table); sql.empty()){ mpre("ОШИБКА замены имени таблицы", __LINE__);
+				//}else if(bmf::exec("DROP TABLE IF EXISTS " +table)){ mpre("ОШИБКА удаления таблицы", __LINE__);
 				}else if(bmf::exec(sql)){ mpre("ОШИБКА создания копии БД "+ sql, __LINE__);
-				}else if(std::string where = (bmf::ARGV.end() == bmf::ARGV.find("itog") ? "1" : "(itog_id=" +bmf::ARGV.at("itog") +" OR itog_id IS NULL)"); where.empty()){ mpre("Условия выборки", __LINE__);
-				}else if(sql = "INSERT INTO " +table +" SELECT * FROM file." +table +" WHERE " +where +";"; sql.empty()){ mpre("ОШИБКА запроса на выборку", __LINE__);
-				}else if(bmf::exec(sql)){ mpre("ОШИБКА копирования данных во временную таблицу", __LINE__);
+				}else if(std::string where = [&](std::string where = ""){ // Условие выборки
+					if("mp_bmf_index" == table){ where += (bmf::ARGV.end() == bmf::ARGV.find("itog") ? "1" : "itog_id=" +bmf::ARGV.at("itog"));
+					}else if("mp_bmf_dataset_map" == table){ where += (/*string(bmf::dataset.empty() ? "1" : "(dataset_id=" +bmf::dataset.at("id") +" OR dataset_id IS NULL)") +" AND " +*/(bmf::ARGV.end() == bmf::ARGV.find("itog") ? "1" : "(itog_id=" +bmf::ARGV.at("itog") +" OR itog_id IS NULL)")); //"dataset_id=" +bmf::dataset.at("id")) +" AND " +
+					}else{ mpre("ОШИБКА условие для таблицы не найдено " +table, __LINE__);
+					}return where; }(); where.empty()){ mpre("ОШИБКА составления запроса на выборку", __LINE__);
+				}else if(bmf::exec("INSERT INTO " +table +" SELECT * FROM file." +table +" WHERE " +where +";")){ mpre("ОШИБКА копирования данных во временную таблицу", __LINE__);
 				}else{ //mpre("Создание копии таблицы file." +table +" > " +table +" " +sql, __LINE__);
 				}return false; }()){ mpre("ОШИБКА копирования структуры таблиц во временную БД", __LINE__);
 			}else if([&](){ // Перенос расчетов в основную БД
 				if(create){ //mpre("Создаем структуру " +table, __LINE__);
-				//}else if(bmf::exec("INSERT OR REPLACE INTO file." +table +" SELECT * FROM " +table +";"); true){ //mpre("ОШИБКА копирования данных во временную таблицу", __LINE__);
-				}else if(TMMi _INDEX = bmf::Tab("SELECT * FROM `" +table +"` WHERE clump_id=':memory:'"); _INDEX.empty()){ //mpre("Таблица не содержит изменений", __LINE__);
-				}else if([&](){ for(auto& index_itr:_INDEX){ // Добавление новых данных
+				}else if([&](bool skip = false){ //Пропуск расчета одной таблицы
+					if(false){ //mpre("Ничего не делаем", __LINE__);
+					//}else if("mp_bmf_dataset_map" == table){ //mpre("Не пропускаем " +table, __LINE__);
+					//}else if("mp_bmf_index" == table){ //mpre("Не пропускаем " +table, __LINE__);
+					}else if(bmf::exec("INSERT OR REPLACE INTO file." +table +" SELECT * FROM " +table +";"); false){ mpre("ОШИБКА копирования данных во временную таблицу", __LINE__);
+					}else if(bmf::exec("DROP TABLE IF EXISTS " +table +";")){ mpre("ОШИБКА удаления таблицы", __LINE__);
+					}else if(skip = !skip; false){ mpre("ОШИБКА инкремента пропуска", __LINE__);
+					}else{ //mpre("Пропуск таблицы " +table, __LINE__);
+					}return skip; }()){ //mpre("Короткий вариант " +table, __LINE__);*/
+				/*}else if(TMMi _INDEX = bmf::Tab("SELECT * FROM `" +table +"` WHERE clump_id=':memory:'"); _INDEX.empty()){ //mpre("Таблица не содержит изменений", __LINE__);
+				}else if([&](bool skip = true){ for(auto& index_itr:_INDEX){ // Добавление новых данных
 					if(int id = index_itr.first; !id){ mpre("ОШИБКА выборки идентификатора записи", __LINE__);
 					}else if(TMs index = index_itr.second; index.empty()){ mpre("ОШИБКА получения поля по итератору", __LINE__);
 					}else if(index.end() == index.find("id")){ mpre("ОШИБКА у записи не найден идентификатор", __LINE__);
@@ -261,55 +273,69 @@ int main(int argc, char **argv){
 						}else if(TMs where = {{"dataset_id", index.at("dataset_id")}, {"alias", index.at("alias")}, {"alias_id", index.at("alias_id")}}; where.empty()){ mpre("ОШИБКА устанвоки условий обновления", __LINE__);
 						}else if(index = bmf::fk("file." +table, where, index, index); index.empty()){ mpre("ОШИБКА обновления записи в основной таблице", __LINE__);
 						}else if(!(skip = true)){ mpre("ОШИБКА установки признака пропуска", __LINE__);
-						}else{ //mpre("Обновляем таблицу карт", __LINE__);
+						}else{ //mpre(index, "Обновляем таблицу карт", __LINE__);
 						} return skip; }()){ //mpre("Пропуск общего обновления", __LINE__);
 					}else if(index = bmf::fk("file." +table, {}, index, {}); index.empty()){ mpre("ОШИБКА сохранения новой записи в основную таблицу", __LINE__);
-					}else{ //mpre(index, "Добавляем запись в основную таблицу", __LINE__);
-					}}return false; }()){ mpre("ОШИБКА добавления новых данных в основную таблицу", __LINE__);
-				}else if("mp_bmf_index" != table){ //mpre("Только для таблицы модели", __LINE__);
+					}else if(index.at("id") == to_string(id)){ //mpre("Идентификатор не изменился", __LINE__);
+					}else if(TMs dataset_map = bmf::fk("mp_bmf_dataset_map", {{"alias", "index"}, {"alias_id", to_string(id)}}, {}, {{"alias_id", index.at("id")}}); dataset_map.empty()){ mpre("ОШИБКА коррекции связи карты с морфом", __LINE__);
+					//}else if(mpre(dataset_map, "Редактирование связи " +to_string(id) +" > " +index.at("id"), __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
+					}else if(index_itr.second = index; index.empty()){ mpre("ОШИБКА сохранения идентификатора в списке", __LINE__);
+					}else if(skip = !skip; false){ mpre("ОШИБКА инкремента признака пропуска", __LINE__);
+					}else{ mpre(index, "Добавляем запись в основную таблицу " +to_string(index_itr.first), __LINE__);
+					}}return skip; }()){ //mpre("Пропуск коррекции связей", __LINE__);
 				}else if(TMMi INDEX = bmf::Tab("SELECT * FROM `" +table +"` WHERE `clump_id`<>':memory:'"); INDEX.empty()){ //mpre("Таблица не содержит данных для коррекции", __LINE__);
-				}else if([&](){ for(auto index_itr:INDEX){ // Добавление новых данных
+				}else if([&](){ for(auto index_itr:INDEX){ // Коррекция связей
 					if(int id = index_itr.first; !id){ mpre("ОШИБКА выборки идентификатора записи", __LINE__);
 					}else if(TMs index = index_itr.second; index.empty()){ mpre("ОШИБКА получения поля по итератору", __LINE__);
 					}else if(index.end() == index.find("id")){ mpre("ОШИБКА у записи не найден идентификатор", __LINE__);
 					}else if(std::to_string(id) != index.at("id")){ mpre("ОШИБКА ключ поля не равен идентификатору записи", __LINE__);
 					}else if(index.end() == index.find("index_id")){ mpre("ОШИБКА связь со старшим морфом не найдена", __LINE__);
-					}else if(int index_id = atoi(index.at("index_id").c_str()); false){ mpre("ОШИБКА расчета идентификатора старшего потомка", __LINE__);
-					}else if(TMs index_1 = (_INDEX.end() == _INDEX.find(index_id) ? index_1 : _INDEX.at(index_id)); false){ mpre("ОШИБКА получения старшего потомка", __LINE__);
+					}else if(int _index_id = atoi(index.at("index_id").c_str()); false){ mpre("ОШИБКА расчета идентификатора старшего потомка", __LINE__);
+					}else if(TMs index_1 = (_INDEX.end() == _INDEX.find(_index_id) ? index_1 : _INDEX.at(_index_id)); false){ mpre("ОШИБКА получения старшего потомка", __LINE__);
 					}else if(index.end() == index.find("bmf-index")){ mpre("ОШИБКА связь со старшим морфом не найдена", __LINE__);
-					}else if(int bmf_index = atoi(index.at("bmf-index").c_str()); false){ mpre("ОШИБКА расчета идентификатора старшего потомка", __LINE__);
-					}else if(TMs index_0 = (_INDEX.end() == _INDEX.find(bmf_index) ? index_0 : _INDEX.at(bmf_index)); false){ mpre("ОШИБКА получения старшего потомка", __LINE__);
+					}else if(int _bmf_index = atoi(index.at("bmf-index").c_str()); false){ mpre("ОШИБКА расчета идентификатора старшего потомка", __LINE__);
+					}else if(TMs index_0 = (_INDEX.end() == _INDEX.find(_bmf_index) ? index_0 : _INDEX.at(_bmf_index)); false){ mpre("ОШИБКА получения старшего потомка", __LINE__);
 					}else if(index_1.empty() && index_0.empty()){ //mpre("Нет изменений не обновляем связи", __LINE__);
-					}else if(index["index_id"] = (index_1.end() == index_1.find("id") ? index["index_id"] : index_1.at("id")); false){ mpre("ОШИБКА установки связи старшего потомка", __LINE__);
-					}else if(index["bmf-index"] = (index_0.end() == index_0.find("id") ? index["bmf-index"] : index_0.at("id")); false){ mpre("ОШИБКА установки связи младшего потомка", __LINE__);
+					}else if(std::string index_id = (index_1.end() == index_1.find("id") ? index["index_id"] : index_1.at("id")); false){ mpre("ОШИБКА установки связи старшего потомка", __LINE__);
+					}else if(std::string bmf_index = (index_0.end() == index_0.find("id") ? index["bmf-index"] : index_0.at("id")); false){ mpre("ОШИБКА установки связи младшего потомка", __LINE__);
+					}else if((index["index_id"] == index_id) && (index["bmf-index"] == bmf_index)){ //mpre("Не сохраняем", __LINE__);
 					}else if(index = bmf::fk("file." +table, {{"id", index.at("id")}}, {}, index); index.empty()){ mpre("ОШИБКА коррекции новой связи в основной таблице", __LINE__);
 					}else{ //mpre(index, "Сохранение записи в таблицу", __LINE__);
-					}}return false; }()){ mpre("ОШИБКА добавления новых данных в основную таблицу", __LINE__);
+					}}return false; }()){ mpre("ОШИБКА добавления новых данных в основную таблицу", __LINE__);*/
 				}else{
 				}return false; }()){ mpre("ОШИБКА переноса расчетов в основную БД", __LINE__);
 			}else{
 			}return 0; }); false){ mpre("ОШИБКА создания списка таблиц временной БД", __LINE__);
 		}else if(bmf::Open = ([&](bool tmp, int result = 0){ // Открытие соединения с БД
-			if(std::string dbname = (tmp ? "file::memory:?cache=shared" : "file:" +bmf::dbname +"?cache=shared&mode=rwc&_journal_mode=WAL"); dbname.empty()){ mpre("ОШИБКА установки свойств соединения", __LINE__);
-			}else if(result != sqlite3_open(dbname.c_str(), &bmf::db); (SQLITE_OK != result)){ std::cerr << __LINE__ << " ОШИБКА открытия базы данных << " << bmf::dbname << endl;
-			//}else if(mpre("Открытие БД " +dbname, __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
+			//if(std::string mem = ":memory:"; mem.empty()){ mpre("ОШИБКА выборки временного файла", __LINE__);
+			if(std::string mem = (((bmf::ARGV.end() != bmf::ARGV.find("mem")) && tmp) ? bmf::ARGV.at("mem") : ""); false){ mpre("ОШИБКА выборки временной таблицы", __LINE__);
+			/*if(std::string mem = [&](std::string mem = ""){ // Имя оперативной БД
+				if(bmf::ARGV.end() == bmf::ARGV.find("mem")){ //mpre("Не указан ключ создание оперативной БД", __LINE__);
+				}else{
+				}return mem; }(); false){ mpre("ОШИБКА расчета имени оперативной БД", __LINE__);*/
+			}else if(std::string dbname = "file:" +bmf::dbname +"?cache=shared&mode=rwc&_journal_mode=WAL"; dbname.empty()){ mpre("ОШИБКА формирования имени основной БД", __LINE__);
+			}else if(std::string _dbname = (mem.empty() ? dbname : "file:" +mem +"?cache=shared"); dbname.empty()){ mpre("ОШИБКА установки свойств соединения", __LINE__);
+			}else if(result != sqlite3_open(_dbname.c_str(), &bmf::db); (SQLITE_OK != result)){ std::cerr << __LINE__ << " ОШИБКА открытия базы данных << " << bmf::dbname << endl;
+			//}else if(mpre("Подключение основной БД " +dbname, __LINE__); false){ mpre("ОШИБКА уведомоления", __LINE__);
 			}else if([&](){ // Копирования динамических таблиц
-				if(!tmp){ //mpre("Толко основная БД " +dbname, __LINE__);
-				}else if(std::string dbname = "file:" +bmf::dbname +"?cache=shared&mode=rwc&_journal_mode=WAL"; dbname.empty()){ mpre("ОШИБКА установки свойств соединения", __LINE__);
+				if(mem.empty()){ //mpre("Не подключаем оперативную БД только основная " +dbname, __LINE__);
+				//}else if(mpre("Подключенена оперативная БД " +_dbname, __LINE__); false){ mpre("ОШИБКА уведомоления", __LINE__);
 				}else if(bmf::exec("ATTACH DATABASE '" +dbname +"' AS file;")){ mpre("ОШИБКА подключения оперативной БД", __LINE__);
 				}else if(bmf::Mem("mp_bmf_index", true)){ mpre("ОШИБКА создания копии таблицы", __LINE__); // Запрос на создание оперативной таблицу морфов
 				}else if(bmf::Mem("mp_bmf_dataset_map", true)){ mpre("ОШИБКА создания копии таблицы", __LINE__); // Запрос на создание оперативной таблицу морфов
-				}else{ //mpre("Подключение динамических таблиц " +dbname, __LINE__);
+				}else{ //mpre("Подключение оперативной БД " +dbname, __LINE__);
 				}return false; }()){ mpre("ОШИБКА копирования основных файлов", __LINE__);
 			}else if(bmf::Databases()){ mpre("ОШИБКА получения списка БД", __LINE__);
-			}else{ //mpre("Подключение основной БД " +dbname, __LINE__);
+			}else{ //mpre(bmf::databases, "Подключенные БД", __LINE__);
 			}return result; }); false){ mpre("ОШИБКА подключения к базе данных", __LINE__);
 		}else if(bmf::Close = ([&](){ // Закрытие соединения с БД
 			if([&](){ // Сохранение результатов расчета
 				if(bmf::databases.end() == bmf::databases.find("file")){ //mpre("Не сохраняем результаты расчетов", __LINE__);
 				}else if(bmf::exec("BEGIN TRANSACTION")){ mpre("Сбой запуска транзакции сохранения набора данных", __LINE__);
 				}else if(bmf::Mem("mp_bmf_index", false)){ mpre("ОШИБКА сохранения оперативной структуры", __LINE__); // Запрос на сохранение оперативной таблицу морфов
+				//}else if(bmf::exec("DROP TABLE IF EXISTS mp_bmf_index")){ mpre("ОШИБКА удаления", __LINE__);
 				}else if(bmf::Mem("mp_bmf_dataset_map", false)){ mpre("ОШИБКА сохранения оперативных карт", __LINE__); // Запрос на сохранение оперативной таблицу морфов
+				//}else if(bmf::exec("DROP TABLE IF EXISTS mp_bmf_dataset_map")){ mpre("ОШИБКА удаления", __LINE__);
 				}else if([&](){ // Увеличение количества эпох набора данных
 					if(bmf::ARGV.end() == bmf::ARGV.find("ds")){ //mpre("Не указан набор данных", __LINE__);
 					}else if(int ds = atoi(bmf::ARGV.at("ds").c_str()); !ds){ mpre("Указан не сущетсвующий набор данных", __LINE__);
@@ -1102,7 +1128,7 @@ int main(int argc, char **argv){
 						}else if(bmf::COUNT[index.at("id")] = to_string(count +1); (bmf::COUNT.end() == bmf::COUNT.find(index.at("id")))){ mpre("ОШИБКА обновления счетчика родителя", __LINE__);
 						}else{ //mpre("Обновления счетчика нового морфа и родителя", __LINE__);
 						} return false; }()){ mpre("ОШИБКА установки счетчиков", __LINE__);
-					}else{ //mpre("Добавление нового морфа " +index.at("id") +" > " +_index.at("id"), __LINE__);
+					}else{ //mpre(_index, "Добавление нового морфа " +index.at("id") +" > " +_index.at("id"), __LINE__);
 					} return false; }()){ mpre("ОШИБКА Добавление морфа", __LINE__);
 				}else if([&](){ // Расчет значения
 					if(TMs dataset_map = bmf::Maps(index, stairs.at("parent")); dataset_map.empty()){ mpre("ОШИБКА расчета значений наборов данных", __LINE__);
@@ -1514,7 +1540,7 @@ int main(int argc, char **argv){
 			}else if(BMF_ITOG_EX.end() == BMF_ITOG_EX.find("")){ mpre("ОШИБКА список итогов не установлен", __LINE__);
 			}else if(float diff = [&](int ers = 0, int count = 0){ for(auto itog_itr:BMF_ITOG_EX.at("")){ // Расчет результата поитогово
 				if(TMs itog = itog_itr.second; itog.empty()){ mpre("ОШИБКА выборки итога", __LINE__);
-				}else if(TMs itog_map = bmf::fk("mp_bmf_dataset_map", {{"dataset_id", dataset.at("id")}, {"alias", "itog"}, {"alias_id", itog.at("id")}}, {}, {}); false){ mpre("ОШИБКА выборки расчета итога", __LINE__);
+				}else if(TMs itog_map = bmf::fk("mp_bmf_dataset_map", {{"dataset_id", dataset.at("id")}, {"alias", "itog"}, {"alias_id", itog.at("id")}}, {}, {}); itog_map.empty()){ //mpre(TMs({{"dataset_id", dataset.at("id")}, {"alias", "itog"}, {"alias_id", itog.at("id")}}), "Условия", __LINE__); //mpre("ОШИБКА выборки расчета итога", __LINE__);
 				}else if(boost::dynamic_bitset<> gmap(itog_map.at("map")); gmap.empty()){ mpre("ОШИБКА установки карты итога", __LINE__);
 				}else if(TMs index_map = bmf::fk("mp_bmf_dataset_map", {{"dataset_id", dataset.at("id")}, {"alias", "index"}, {"alias_id", itog.at("index_id")}}, {}, {}); false){ mpre("ОШИБКА выборки расчета итога", __LINE__);
 				}else if(std::string map = (index_map.end() == index_map.find("map") ? std::string(dataset_count, '0') : index_map.at("map")); map.empty()){ mpre("ОШИБКА расчета карты", __LINE__);
