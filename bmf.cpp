@@ -153,7 +153,7 @@ int main(int argc, char **argv){
 				}return skip; }()){ // Признак загрузки
 			}else if([&](bool skip = false){ // Установка БД
 				if(std::string::npos != npos){ //mpre("Задан аргумент", __LINE__);
-				}else if(bmf::ARGV.end() != bmf::ARGV.find("db")){ mpre("ОШИБКА БД уже задана `" +bmf::ARGV.at("db") + "` " +arg, __LINE__);
+				}else if(bmf::ARGV.end() != bmf::ARGV.find("db")){ //mpre("ОШИБКА дублирование аргументов командной строки `" +bmf::ARGV.at("db") + "` " +arg, __LINE__);
 				}else if(bmf::ARGV.insert(make_pair("db", arg)); bmf::ARGV.empty()){ mpre("ОШИБКА установки нового артибута в массив", __LINE__);
 				}else if(!(skip = true)){ mpre("Установка значения пропуска", __LINE__);
 				}else{ //mpre("Установка БД " +arg, __LINE__);
