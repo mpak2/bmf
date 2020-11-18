@@ -505,7 +505,7 @@ int main(int argc, char **argv){
 		}else if([&](){ // Получение пути до файла БД
 			if(int npos = bmf::dbname.rfind("/"); false){ //mpre("Слешей в пути до скопления не найдено", __LINE__);
 			}else if(bmf::clump_id = (std::string::npos == npos ? bmf::dbname : bmf::dbname.substr(npos+1, bmf::dbname.length())); (0 >= bmf::clump_id.length())){ mpre("ОШИБКА сокращения пути до файла", __LINE__);
-			}else{ mpre("Путь до БД сокращен "+ bmf::clump_id, __LINE__);
+			}else{ //mpre("Путь до БД сокращен "+ bmf::clump_id, __LINE__);
 			}return (0 >= bmf::clump_id.length()); }()){ mpre("ОШИБКА получения скопления", __LINE__);
 		}else if(std::experimental::filesystem::perms p = std::experimental::filesystem::status(bmf::dbname).permissions(); ((p & std::experimental::filesystem::perms::owner_write) == std::experimental::filesystem::perms::none)){ mpre("ОШИБКА файл БД не доступен для записи $chmod u+w "+ bmf::dbname, __LINE__);
 		}else if(bmf::Open(false)){ mpre("ОШИБКА подключения к БД", __LINE__);
@@ -1599,11 +1599,11 @@ int main(int argc, char **argv){
 			}else{ mpre("Набор #" +dataset["id"] +" количество:"+ dataset["count"] +" точность:"+ to_string(diff) +" (" +_perc +"%)" +("0" == dataset["epoch"] ? "" : " эпох:" +dataset["epoch"]), __LINE__);
 			}}return false; }()){ mpre("ОШИБКА отображения списка набора данных", __LINE__);
 		}else if(bmf::Close(0)){ mpre("ОШИБКА закрытия БД", __LINE__);
-		}else{ mpre("Выберете набор данных для расчета -ds и количество -epoch", __LINE__);
+		}else{ //mpre("Выберете набор данных для расчета -ds и количество -epoch", __LINE__);
 		}return bmf::dataset; }(); bmf::dataset.empty()){ //mpre("ОШИБКА набор данных не установлен", __LINE__);
 	}else if(int loop = [&](int loop = 0){ // Количетсво повторений
 		if(int epoch = (bmf::ARGV.end() == bmf::ARGV.find("epoch") ? 0 : atoi(bmf::ARGV.at("epoch").c_str())); (0 > epoch)){ mpre("ОШИБКА расчета количества эпох", __LINE__);
-		}else if(bmf::ARGV.end() == bmf::ARGV.find("epoch")){ mpre("Для обучения укажите количество эпох epoch", __LINE__);
+		}else if(bmf::ARGV.end() == bmf::ARGV.find("epoch")){ //mpre("Для обучения укажите количество эпох epoch", __LINE__);
 		}else if(!epoch){ loop = -1; mpre("Указано нулевое количество эпох расчитываем до полного совпадения", __LINE__);
 		}else if(loop = epoch){ //mpre("Набор данных -ds " +bmf::dataset.at("id")+ " количество эпох -epoch " +to_string(loop), __LINE__);
 		}else{ mpre("ОШИБКА расчтеа количества повторений", __LINE__);
