@@ -82,7 +82,7 @@ int main(int argc, char **argv){
 			}else if(nlohmann::json json; false){ pre("ОШИБКА загрузки в json");
 			}else if(json["itog"] = itog; json.empty()){ mpre("ОШИБКА добавления итога", __LINE__);
 			}else if(json["dano"] = dano; json.empty()){ pre("ОШИБКА Загрузка исходников");
-			}else if(json["csv"] = _csv; json.empty()){ pre("ОШИБКА Загрузка исходников");
+			//}else if(json["csv"] = _csv; json.empty()){ pre("ОШИБКА Загрузка исходников");
 			//}else if(dump(itog, __LINE__); true){ mpre("ОШИБКА уведомления", __LINE__);
 			}else if(JSON += (!JSON.empty() && !json.empty() ? ",\n" : ""); false){ mpre("ОШИБКА добавления переноса", __LINE__);
 			}else if(JSON += (json.empty() ? "" : "\t" +json.dump()); false){ mpre("ОШИБКА добавления строки", __LINE__);
@@ -94,7 +94,8 @@ int main(int argc, char **argv){
 					}else if(skip = !skip; false){ mpre("ОШИБКА изменения условия пропуска", __LINE__);
 					}else{ //mpre("Расчет пропуска line=" +std::to_string(line) + " " +std::to_string(skip ? 1 : 0), __LINE__);
 					} return skip; }()){ //mpre("Условие пропуска записи файла " +std::to_string(lines) + " size ", __LINE__);
-				}else if(std::string num = (0 < line ? std::to_string(lines/line) : ""); false){ mpre("ОШИБКА расчета номера файла", __LINE__);
+				}else if(0 >= line){ mpre("ОШИБКА нулевая строка", __LINE__);
+				}else if(std::string num = (fin.eof() ? std::to_string(lines/line+1) : std::to_string(lines/line)); false){ mpre("ОШИБКА расчета номера файла", __LINE__);
 				}else if(std::string filename = file_dir +(num.empty() ? "" : "/"+ num) +".json"; filename.empty()){ pre("ОШИБКА составления имени файла");
 				}else if(JSON.empty()){ //mpre("Пустые данные для выгрузки " +filename, __LINE__);
 				}else if(std::ofstream fin(filename); !fin){ mpre("ОШИБКА Записи в файл "+ filename, __LINE__);
