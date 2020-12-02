@@ -1555,6 +1555,7 @@ int main(int argc, char **argv){
 		}return false; }()){ mpre("ОШИБКА расчета исходников", __LINE__);
 	}else if(bmf::dataset = [&](){ // Выборка набора данных для расчета
 		if(!bmf::dataset.empty()){ //mpre("Набор данных для расчета установлен при загрузке", __LINE__);
+		}else if(bmf::ARGV.end() != bmf::ARGV.find("dano")){ //mpre("Расчетный пример", __LINE__);
 		}else if(BMF_DATASET_EX.end() == BMF_DATASET_EX.find("")){ mpre("ОШИБКА не найден список набора данных", __LINE__);
 		}else if(std::string ds = (bmf::ARGV.end() == bmf::ARGV.find("ds") ? "" : bmf::ARGV.at("ds")); false){ mpre("ОШИБКА выборки идентификатора набора данных", __LINE__);
 		}else if(bmf::dataset = erb(BMF_DATASET_EX, {{"id", ds}}); !bmf::dataset.empty()){ //mpre("Набор данных указанный в командной строке", __LINE__);
@@ -1584,7 +1585,7 @@ int main(int argc, char **argv){
 				if(int ers = [&](int ers = 0){ for( auto itog_itr:BMF_ITOG_EX.at("")){ // Проверка всех итогов
 					if(TMs itog = itog_itr.second; itog.empty()){ mpre("ОШИБКА выборки итога", __LINE__);
 					}else if(itog.end() == itog.find("id")){ mpre("ОШИБКА у итога не найдено поле идентификатора", __LINE__);
-					}else if(ITOG.end() == ITOG.find(itog.at("id"))){ mpre("ОШИБКА в справочнике карт итог не найден", __LINE__);
+					}else if(ITOG.end() == ITOG.find(itog.at("id"))){ mpre("ОШИБКА в справочнике карт итог не найден " +itog.at("id"), __LINE__);
 					}else if(boost::dynamic_bitset<> gmap = ITOG.at(itog.at("id")); gmap.empty()){ mpre("ОШИБКА восстановления карты итога", __LINE__);
 					}else if(INDEX.end() == INDEX.find(itog.at("id"))){ mpre("ОШИБКА в справочнике карт морфа итог не найден", __LINE__);
 					}else if(boost::dynamic_bitset<> imap = INDEX.at(itog.at("id")); imap.empty()){ mpre("ОШИБКА восстановления карты морфа итога", __LINE__);
@@ -1676,7 +1677,8 @@ int main(int argc, char **argv){
 		}}while(!(pass = !pass)); return errors; }(); false){ mpre("ОШИБКА перебора эпох", __LINE__);
 	}else if([&](){ // Вывод итоговых значений
 		if(bmf::ARGV.end() == bmf::ARGV.find("dano")){ //mpre("Данные для расчета не указаны", __LINE__);
-		}else if(nlohmann::json _in = ("" == bmf::ARGV.at("dano") ? in : nlohmann::json::parse(bmf::ARGV.at("dano"))); false){ mpre("ОШИБКА разбора строки атрибута -dano", __LINE__);
+		}else if(nlohmann::json _in = ("" == bmf::ARGV.at("dano") ? in : nlohmann::json::parse(bmf::ARGV.at("dano"))); _in.empty()){ mpre("ОШИБКА разбора строки атрибута -dano", __LINE__);
+		//}else if(true){ mpre("Проверка", __LINE__);
 		}else if(nlohmann::json j = [&](nlohmann::json j = {}){ for(auto& js:_in.items()){ // Расчет списка теста
 				if(nlohmann::json el = js.value(); el.empty()){ mpre("ОШИБКА элемент не найден", __LINE__);
 				}else if(string key = js.key(); (0 >= key.length())){ mpre("ОШИБКА расчета ключа", __LINE__);
