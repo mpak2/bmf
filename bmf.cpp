@@ -174,7 +174,7 @@ int main(int argc, char **argv){
 			if(bmf::ARGV.end() == bmf::ARGV.find("-v")){ //mpre("Пропускаем отображение версии", __LINE__);
 			}else if(skip = !skip; false){ mpre("Условия выхода", __LINE__);
 			}else{ std::cout << endl;
-				std::cout << "bimotph v7.1" << endl;
+				std::cout << "bimotph v7.2" << endl;
 				std::cout << "Copyright (C) 2020 биморф.рф" << endl;
 				std::cout << "Нет НИКАКИХ ГАРАНТИЙ до степени, разрешённой законом." << endl << endl;
 				std::cout << "Лицензия freemium https://ru.wikipedia.org/wiki/Freemium" << endl;
@@ -870,6 +870,9 @@ int main(int argc, char **argv){
 				}else if(TMs dataset_map = bmf::fk("mp_bmf_dataset_map", {{"dataset_id", bmf::dataset.at("id")}, {"alias", "dano"}, {"alias_id", dano_itr.second.at("id")}}, {}, {}); false){ mpre("ОШИБКА выборки карты исходника", __LINE__);
 				}else if(std::string _map = (dataset_map.end() == dataset_map.find("map") ? std::string(dataset_count, '0') : dataset_map.at("map")); _map.empty()){ mpre("ОШИБКА получения карты исходника", __LINE__);
 				}else if(boost::dynamic_bitset<> map = boost::dynamic_bitset<>(_map); (dataset_count != map.size())){ mpre("ОШИБКА расчета карты исходника", __LINE__);
+				}else if(stairs.end() == stairs.find("parent")){ mpre("Отсутсвует имя связи в ступени", __LINE__);
+				}else if(bool val = ("index_id" == stairs.at("parent") ? true : false); false){ mpre("ОШИБКА получения предпочтительного значения исходника", __LINE__);
+				}else if(map.test(key) == val){ //mpre("Предпочтительное значение исходника", __LINE__);
 				}else if(map.test(key) != map.test(prev)){ //mpre("Изменившийся исходник", __LINE__);
 				}else if(_DANO.erase(dano_itr.first); false){ mpre("ОШИБКА неизменившегося исходника", __LINE__);
 				}else{ //mpre("Удаление исходника " +std::to_string(dano_itr.first), __LINE__);
@@ -879,7 +882,7 @@ int main(int argc, char **argv){
 				}else if(_dano = dano_itr->second; _dano.empty()){ mpre("ОШИБКА выборки оставшегося значения", __LINE__);
 				}else{ //mpre(_dano, "Оставшееся значение", __LINE__);
 				}return _dano; }(); _dano.empty()){ mpre("ОШИБКА выборки оставшегося значения", __LINE__);
-			}else{ //mpre(stairs, "Ступень", __LINE__); mpre(_BMF_DANO_EX.at(""), "Список", __LINE__); mpre(_DANO, "Выбор", __LINE__); mpre(_dano, "Результат", __LINE__); //mpre("ОШИБКА функции выбора исходного значения", __LINE__);
+			}else{ //mpre(stairs, "Ступень", __LINE__); //mpre(_BMF_DANO_EX.at(""), "Список", __LINE__); mpre(_DANO, "Выбор", __LINE__); mpre(_dano, "Результат", __LINE__); //mpre("ОШИБКА функции выбора исходного значения", __LINE__);
 			}return _dano; }); false){ mpre("ОШИБКА установки функции выбора Исходного значения", __LINE__);
 		}else if(bmf::Vals = ([&](TMs VALUE, string alias, int key, TM3i& BMF_VALS, TM3i& BMF_VALUES, TM3i& BMF_TITLES){ // Установка входных значений
 			if([&](TMMi VALS = {}){ // Расчет знаков
