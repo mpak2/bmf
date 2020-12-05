@@ -32,6 +32,9 @@ cat clump/iris_3.json | ./bimorph clump/iris.sqlite -
 ./bimorph clump/iris.sqlite ds=1 mem=:memory: itog=1 epoch=100 # ?cache=shared
 ./bimorph clump/iris.sqlite ds=1 mem=:memory: itog=2 epoch=100 # ?cache=shared
 ./bimorph clump/iris.sqlite ds=1 mem=:memory: itog=3 epoch=100 # ?cache=shared
+#sqlite3 clump/iris.sqlite "DELETE FROM mp_bmf_dataset";
+#sqlite3 clump/iris.sqlite "SELECT COUNT(*) FROM mp_bmf_dataset";
+#sqlite3 clump/iris.sqlite "SELECT COUNT(*) FROM mp_bmf_dataset_map";
 #./bimorph clump/iris.sqlite ds=2 mem=:memory: epoch=100 # ?cache=shared
 #./bimorph clump/iris.sqlite ds=2 mem=:memory: epoch=100 # ?cache=shared
 
