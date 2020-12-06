@@ -239,8 +239,6 @@ int main(int argc, char **argv){
 				}else if(std::string where = [&](std::string where = "1"){ // Создание условий на выборку
 					if(bmf::ARGV.end() == bmf::ARGV.find("itog")){ //mpre("Пропуск условий", __LINE__);
 					}else if(std::string itog_id = bmf::ARGV.at("itog"); itog_id.empty()){ mpre("ОШИБКА номер итога не указан", __LINE__);
-					}else if("mp_bmf_itog" == table){ where = "id=" +itog_id;
-					}else if("mp_bmf_index" == table){ where = "itog_id=" +itog_id;
 					}else if("mp_bmf_dataset_map" == table){ where = "itog_id=" +itog_id +" OR itog_id IS NULL";
 					}else{ //mpre("Условия для выборки не указаны " +table +" " +where, __LINE__);
 					}return where; }(); where.empty()){ mpre("ОШИБКА получения условия выборки", __LINE__);
@@ -253,6 +251,7 @@ int main(int argc, char **argv){
 				}else if(static TMMi INDEX; false){ mpre("ОШИБКА установки статического списка морфов", __LINE__);
 				}else if([&](){ // Сохранение таблицы mp_bmf_index
 					if("mp_bmf_index" != table){ //mpre("Сохранение только для mp_bmf_index", __LINE__);
+					}else if(!INDEX.empty()){ mpre("ОШИБКА справочник новых морфов не пуст", __LINE__);
 					//}else if(INDEX = bmf::Tab("SELECT * FROM file." +table); false){ mpre("Таблица не содержит записей " +table, __LINE__);
 					}else if(TMMi ROWS = bmf::Tab("SELECT * FROM main." +table +" WHERE clump_id=':memory:'"); ROWS.empty()){ //mpre("Таблица не содержит изменений " +table, __LINE__);
 					}else if([&](){ for(auto row_itr:ROWS){ //for(auto row_itr = ROWS.begin(); row_itr != ROWS.end(); row_itr++){ // Добавление новых записей
@@ -281,7 +280,7 @@ int main(int argc, char **argv){
 					}else if(bmf::exec("UPDATE main." +table +" SET clump_id='" +bmf::clump_id +"' WHERE clump_id=':memory:'")){ mpre("ОШИБКА обновления скопления таблицы", __LINE__);
 					}else{ //mpre("Сохраняем " +table, __LINE__);
 					}return false; }()){ mpre("ОШИБКА сохранения таблицы", __LINE__);
-				}else if([&](){ // Сохранение таблицы mp_bmf_itog
+				/*}else if([&](){ // Сохранение таблицы mp_bmf_itog
 					if("mp_bmf_itog" != table){ //mpre("Сохранение только для mp_bmf_index", __LINE__);
 					}else if(TMMi ROWS = bmf::Tab("SELECT * FROM main." +table); ROWS.empty()){ mpre("Таблица не содержит данных " +table, __LINE__);
 					}else if(TMMi _ROWS = bmf::Tab("SELECT * FROM file." +table); _ROWS.empty()){ mpre("Таблица не содержит данных " +table, __LINE__);
@@ -298,7 +297,7 @@ int main(int argc, char **argv){
 						}else{ //mpre("Сохранение итога " +row.at("id"), __LINE__);
 						}}return false; }()){ mpre("ОШИБКА установки изменений в таблицу", __LINE__);
 					}else{ //mpre("Сохранение таблицы " +table, __LINE__);
-					}return false; }()){ mpre("ОШИБКА сохранения таблицы", __LINE__);
+					}return false; }()){ mpre("ОШИБКА сохранения таблицы", __LINE__);*/
 				}else if([&](){ // Сохранение таблицы mp_bmf_dataset_map
 					if("mp_bmf_dataset_map" != table){ //mpre("Сохранение только для таблицы", __LINE__);
 					}else if(TMMi ROWS = bmf::Tab("SELECT * FROM main." +table +" WHERE clump_id=':memory:'"); ROWS.empty()){ //mpre("Таблица не содержит изменений " +table, __LINE__);
@@ -366,9 +365,12 @@ int main(int argc, char **argv){
 					if(TMs table = tables_itr.second; table.empty()){ mpre("ОШИБКА получения свойств таблицы", __LINE__);
 					}else if(int npos = table.at("name").find("sqlite_"); (std::string::npos != npos)){ //mpre("Служебная таблица не копируем `" +table.at("name") +"`", __LINE__);
 					}else if(table.end() == table.find("name")){ mpre("ОШИБКА имя таблицы в свойствах не найдено", __LINE__);
-					}else if("mp_bmf_dataset" == table.at("name")){ //mpre("Не дублируем список эпох " +table.at("name"), __LINE__);
+					}else if("mp_bmf_test" == table.at("name")){ //mpre("Таблица тестов", __LINE__);
+					}else if("mp_bmf_dataset" == table.at("name")){ //mpre("Таблица тестов", __LINE__);
+					}else if(int npos = table.at("name").find("_dano"); (std::string::npos != npos)){ //mpre("Информация дано `" +table.at("name") +"`", __LINE__);
+					}else if(int npos = table.at("name").find("_itog"); (std::string::npos != npos)){ //mpre("Информация итоги `" +table.at("name") +"`", __LINE__);
 					}else if(bmf::Mem(table.at("name"), 1)){ mpre("ОШИБКА создания копии таблицы", __LINE__); // Запрос на создание оперативной таблицу морфов
-					}else{ //mpre("Сохранение таблицы " +table.at("name"), __LINE__);
+					}else{ //mpre("Создание таблицы " +table.at("name"), __LINE__);
 					}}return false; }()){ mpre("ОШИБКА", __LINE__);
 				//}else if(bmf::Mem("mp_bmf_itog", 1)){ mpre("ОШИБКА создания копии таблицы", __LINE__); // Запрос на создание оперативной таблицу морфов
 				//}else if(bmf::Mem("mp_bmf_index", 1)){ mpre("ОШИБКА создания копии таблицы", __LINE__); // Запрос на создание оперативной таблицу морфов
@@ -1167,7 +1169,7 @@ int main(int argc, char **argv){
 					}else if(map == _map){ //mpre("Данные согласованы " +map " != " +_map, __LINE__);
 					}else if(std::string map_ = (25 >= map.length() ? map : map.substr(0, 25) +"..."); map_.empty()){ mpre("ОШИБКА получения короткой строки карты", __LINE__);
 					}else if(std::string _map_ = (25 >= _map.length() ? _map : _map.substr(0, 25) +"..."); _map_.empty()){ mpre("ОШИБКА получения короткой строки карты", __LINE__);
-					}else{ mpre("Данные не согласованы " +index.at("id") +" map=" +map_ +" _map=" +_map_, __LINE__);
+					}else{ mpre("Данные не согласованы " +(dataset_map.end() == dataset_map.find("id") ? "" : dataset_map.at("id")) +" map=" +map +" " +std::to_string(map.length()) +" _map=" +_map +" " +std::to_string(_map.length()), __LINE__);
 					}return false; }()){ mpre("ОШИБКА проверка согласованности данных", __LINE__);
 				}else if([&](){ // Добавление нового морфа
 					if(_stairs.end() == _stairs.find("index_id")){ //mpre("Поле морфа в направлении не найдено", __LINE__);

@@ -29,9 +29,13 @@ cat clump/iris_1.json | ./bimorph clump/iris.sqlite -
 cat clump/iris_2.json | ./bimorph clump/iris.sqlite -
 cat clump/iris_3.json | ./bimorph clump/iris.sqlite -
 ./bimorph clump/iris.sqlite; echo "\n" # ?cache=shared
-./bimorph clump/iris.sqlite ds=1 mem=:memory: itog=1 epoch=100 # ?cache=shared
-./bimorph clump/iris.sqlite ds=1 mem=:memory: itog=2 epoch=100 # ?cache=shared
-./bimorph clump/iris.sqlite ds=1 mem=:memory: itog=3 epoch=100 # ?cache=shared
+for loop  in {1..3}; do
+	for itog in {1..3}; do ./bimorph clump/iris.sqlite ds=1 mem=/tmp/iris_itog_$itog.sqlite itog=$itog epoch=100; done # ?cache=shared
+	for itog in {1..3}; do ./bimorph clump/iris.sqlite ds=2 mem=/tmp/iris_itog_$itog.sqlite itog=$itog epoch=100; done # ?cache=shared
+	for itog in {1..3}; do ./bimorph clump/iris.sqlite ds=3 mem=/tmp/iris_itog_$itog.sqlite itog=$itog epoch=100; done # ?cache=shared
+done
+#./bimorph clump/iris.sqlite ds=1 mem=:memory: itog=2 epoch=100 # ?cache=shared
+#./bimorph clump/iris.sqlite ds=1 mem=:memory: itog=3 epoch=100 # ?cache=shared
 #sqlite3 clump/iris.sqlite "DELETE FROM mp_bmf_dataset";
 #sqlite3 clump/iris.sqlite "SELECT COUNT(*) FROM mp_bmf_dataset";
 #sqlite3 clump/iris.sqlite "SELECT COUNT(*) FROM mp_bmf_dataset_map";
@@ -42,11 +46,11 @@ cat clump/iris_3.json | ./bimorph clump/iris.sqlite -
 #./bimorph clump/iris.sqlite ds=2 itog=2 epoch=100 # ?cache=shared
 #./bimorph clump/iris.sqlite ds=2 itog=3 epoch=100 # ?cache=shared
 #./bimorph clump/iris.sqlite -ds 3 -epoch 100 # ?cache=shared
-./bimorph clump/iris.sqlite # ?cache=shared
 #./bimorph clump/iris.sqlite -ds 1 -epoch 100 # ?cache=shared
 #./bimorph clump/iris.sqlite -ds 2 -epoch 100 # ?cache=shared
 #./bimorph clump/iris.sqlite -ds 3 -epoch 100 # ?cache=shared
 #cat clump/iris.json | ./bimorph - clump/iris.sqlite -c -rand 1 -epoch 100 # ?cache=shared
+./bimorph clump/iris.sqlite # ?cache=shared
 sqlite3 clump/iris.sqlite -column -header "SELECT * FROM mp_bmf_test ORDER BY id DESC LIMIT 10; SELECT COUNT(*) AS count, MIN(duration) AS min_duration, AVG(duration) as avg_duration, MAX(duration) AS max_duration, AVG('index') as avg_bmf FROM mp_bmf_test;"
 
 #	#sqlite3 clump/iris.sqlite -column -header "SELECT MAX(depth) FROM mp_bmf_index"
