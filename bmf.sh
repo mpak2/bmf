@@ -29,12 +29,15 @@ cat clump/iris_1.json | ./bimorph clump/iris.sqlite -
 cat clump/iris_2.json | ./bimorph clump/iris.sqlite -
 cat clump/iris_3.json | ./bimorph clump/iris.sqlite -
 ./bimorph clump/iris.sqlite; echo "\n" # ?cache=shared
-for loop  in {1..3}; do
-	for itog in {1..3}; do ./bimorph clump/iris.sqlite ds=1 mem=/tmp/iris_itog_$itog.sqlite itog=$itog epoch=100; done # ?cache=shared
-	for itog in {1..3}; do ./bimorph clump/iris.sqlite ds=2 mem=/tmp/iris_itog_$itog.sqlite itog=$itog epoch=100; done # ?cache=shared
-	for itog in {1..3}; do ./bimorph clump/iris.sqlite ds=3 mem=/tmp/iris_itog_$itog.sqlite itog=$itog epoch=100; done # ?cache=shared
+for loop in {1..3}; do
+	#for ds in {1..3}; do
+		echo "Поток $ds"
+		for itog in {1..3}; do
+			./bimorph clump/iris.sqlite ds=1 mem=/tmp/iris_itog_$itog.sqlite itog=$itog epoch=100; # ?cache=shareda
+		done
+	#done
 done
-#./bimorph clump/iris.sqlite ds=1 mem=:memory: itog=2 epoch=100 # ?cache=shared
+#./bimorph clump/iris.sqlite ds=2 mem=:memory: itog=1 epoch=100 # ?cache=shared
 #./bimorph clump/iris.sqlite ds=1 mem=:memory: itog=3 epoch=100 # ?cache=shared
 #sqlite3 clump/iris.sqlite "DELETE FROM mp_bmf_dataset";
 #sqlite3 clump/iris.sqlite "SELECT COUNT(*) FROM mp_bmf_dataset";

@@ -253,7 +253,7 @@ int main(int argc, char **argv){
 					if("mp_bmf_index" != table){ //mpre("Сохранение только для mp_bmf_index", __LINE__);
 					}else if(!INDEX.empty()){ mpre("ОШИБКА справочник новых морфов не пуст", __LINE__);
 					//}else if(INDEX = bmf::Tab("SELECT * FROM file." +table); false){ mpre("Таблица не содержит записей " +table, __LINE__);
-					}else if(TMMi ROWS = bmf::Tab("SELECT * FROM main." +table +" WHERE clump_id=':memory:'"); ROWS.empty()){ //mpre("Таблица не содержит изменений " +table, __LINE__);
+					}else if(TMMi ROWS = bmf::Tab("SELECT * FROM main." +table +" WHERE clump_id=':memory:' ORDER BY id DESC"); ROWS.empty()){ //mpre("Таблица не содержит изменений " +table, __LINE__);
 					}else if([&](){ for(auto row_itr:ROWS){ //for(auto row_itr = ROWS.begin(); row_itr != ROWS.end(); row_itr++){ // Добавление новых записей
 						if(TMs row = row_itr.second; row.empty()){ mpre("ОШИБКА получения новой записи", __LINE__);
 						}else if(row.end() == row.find("id")){ mpre("ОШИБКА поле идентификатора не задано", __LINE__);
@@ -262,54 +262,55 @@ int main(int argc, char **argv){
 						}else if(row.erase("id"); false){ mpre("ОШИБКА удаления идентификатора", __LINE__);
 						}else if(TMs _row = bmf::fk("file." +table, {}, row, {}); _row.empty()){ mpre("ОШИБКА сохранения новой записи в основную таблицу", __LINE__);
 						}else if(INDEX[id] = _row; INDEX.empty()){ mpre("ОШИБКА установки обновленного списка морфов", __LINE__);
-						}else{ //mpre(row, "Старая запись " +id, __LINE__); mpre(_row, "Новая запись", __LINE__);
+						//}else if(std::to_string(id) == _row.at("id")){ //mpre("Идентификатор не изменился", __LINE__);
+						}else{ //mpre(_row, "Новая запись", __LINE__);
 						}}return false; }()){ mpre("ОШИБКА добавления новых записей в основую БД", __LINE__);
 					}else if(TMMi ROWS = bmf::Tab("SELECT * FROM main." +table +" WHERE clump_id<>':memory:'"); false){ mpre("Таблица не содержит данных " +table, __LINE__);
-					}else if(TMMi _ROWS = bmf::Tab("SELECT * FROM file." +table); false){ mpre("Основная таблица не содержит данных " +table, __LINE__);
 					}else if([&](){ for(auto row_itr:ROWS){ //for(auto row_itr = ROWS.begin(); row_itr != ROWS.end(); row_itr++){ // Добавление новых записей
 						if(TMs row = row_itr.second; row.empty()){ mpre("ОШИБКА получения новой записи", __LINE__);
 						}else if(row.end() == row.find("id")){ mpre("ОШИБКА у морфа не найдено поле идентификатора", __LINE__);
-						}else if(int row_id = atoi(row.at("id").c_str()); !row_id){ mpre("ОШИБКА расчета идентификатора морфа", __LINE__);
-						}else if(_ROWS.end() == _ROWS.find(row_id)){ //mpre("Морф не найден в старых данных", __LINE__);
-						}else if(TMs _row = _ROWS.at(row_id); _row.empty()){ mpre("ОШИБКА выборки старого морфа", __LINE__);
-						}else if(row == _row){ //mpre("Изменений связей не найдено", __LINE__);
+						}else if(std::string row_id = row.at("id"); row_id.empty()){ mpre("ОШИБКА расчета идентификатора морфа", __LINE__);
 						}else if(row.erase("id"); false){ mpre("ОШИБКА удаления идентификатора нового морфа", __LINE__);
-						}else if(TMs file_row = bmf::fk("file." +table, {{"id", std::to_string(row_id)}}, {}, row); file_row.empty()){ mpre("ОШИБКА сохранения обновленной записи в основную БД", __LINE__);
+						}else if([&](){ // Старший морф
+							if(row.end() == row.find("index_id")){ mpre("ОШИБКА поле старшей связи не найдено", __LINE__);
+							}else if(row.at("index_id").empty()){ //mpre("Пустое значение идентификатора старшего морфа", __LINE__);
+							}else if(int index_id = atoi(row.at("index_id").c_str()); !index_id){ //mpre("Идентификатор морфа не задан", __LINE__);
+							}else if(INDEX.end() == INDEX.find(index_id)){ //mpre("Нет в списке новых морфов", __LINE__);
+							}else if(TMs index = INDEX.at(index_id); index.empty()){ mpre("ОШИБКА выборки связанного морфа", __LINE__);
+							}else if(index.end() == index.find("id")){ mpre("ОШИБКА у морфа не найдено поле идентификатора", __LINE__);
+							}else if(row["index_id"] = index.at("id"); false){ mpre("ОШИБКА установки идентификаторм морфа", __LINE__);
+							}else{ //mpre("Новая старшая связь " +_row.at("id"), __LINE__);
+							}return row.empty(); }()){ mpre("ОШИБКА установки старшего морфа", __LINE__);
+						}else if([&](){ // Старший морф
+							if(row.end() == row.find("bmf-index")){ mpre("ОШИБКА поле старшей связи не найдено", __LINE__);
+							}else if(row.at("bmf-index").empty()){ //mpre("Пустое значение идентификатора старшего морфа", __LINE__);
+							}else if(int bmf_index = atoi(row.at("bmf-index").c_str()); !bmf_index){ //mpre("Идентификатор морфа не задан", __LINE__);
+							}else if(INDEX.end() == INDEX.find(bmf_index)){ //mpre("Нет в списке новых морфов", __LINE__);
+							}else if(TMs index = INDEX.at(bmf_index); index.empty()){ mpre("ОШИБКА выборки связанного морфа", __LINE__);
+							}else if(index.end() == index.find("id")){ mpre("ОШИБКА у морфа не найдено поле идентификатора", __LINE__);
+							}else if(row["bmf-index"] = index.at("id"); false){ mpre("ОШИБКА установки идентификаторм морфа", __LINE__);
+							}else{ //mpre("Новая старшая связь " +_row.at("id"), __LINE__);
+							}return row.empty(); }()){ mpre("ОШИБКА установки старшего морфа", __LINE__);
+						}else if(TMs file_row = bmf::fk("file." +table, {{"id", row_id}}, {}, row); file_row.empty()){ mpre("ОШИБКА сохранения обновленной записи в основную БД", __LINE__);
 						}else{ //mpre("Обновление морфа " +row.at("id"), __LINE__);
 						}}return false; }()){ mpre("ОШИБКА добавления новых записей в основую БД", __LINE__);
-					}else if(bmf::exec("UPDATE main." +table +" SET clump_id='" +bmf::clump_id +"' WHERE clump_id=':memory:'")){ mpre("ОШИБКА обновления скопления таблицы", __LINE__);
 					}else{ //mpre("Сохраняем " +table, __LINE__);
 					}return false; }()){ mpre("ОШИБКА сохранения таблицы", __LINE__);
-				/*}else if([&](){ // Сохранение таблицы mp_bmf_itog
-					if("mp_bmf_itog" != table){ //mpre("Сохранение только для mp_bmf_index", __LINE__);
-					}else if(TMMi ROWS = bmf::Tab("SELECT * FROM main." +table); ROWS.empty()){ mpre("Таблица не содержит данных " +table, __LINE__);
-					}else if(TMMi _ROWS = bmf::Tab("SELECT * FROM file." +table); _ROWS.empty()){ mpre("Таблица не содержит данных " +table, __LINE__);
-					}else if([&](){ for(auto row_itr:ROWS){
-						if(TMs row = row_itr.second; row.empty()){ mpre("ОШИБКА получения новой записи", __LINE__);
-						}else if(row.end() == row.find("id")){ mpre("ОШИБКА у записи отсутствует поле идентификатора", __LINE__);
-						}else if(int id = atoi(row.at("id").c_str()); !id){ mpre("ОШИБКА получения идентификатора итога", __LINE__);
-						}else if(_ROWS.end() == _ROWS.find(id)){ mpre("ОШИБКА итог не найден в основой таблице", __LINE__);
-						}else if(TMs _row = _ROWS.at(id); _row.empty()){ mpre("ОШИБКА выборки старой записи", __LINE__);
-						}else if(_row.end() == _row.find("index_id")){ mpre("ОШИБКА старая запись не содержит поля идентификатора морфа", __LINE__);
-						}else if(row.end() == row.find("index_id")){ mpre("ОШИБКА не содержит поля идентификатора морфа", __LINE__);
-						}else if(row.at("index_id") == _row.at("index_id")){ //mpre("Идентификатор корневого морфа не изменен", __LINE__);
-						}else if(TMs _row = bmf::fk("file." +table, {{"id", row.at("id")}}, {}, {{"index_id", row.at("index_id")}}); _row.empty()){ mpre("ОШИБКА сохранения новой записи в основную таблицу", __LINE__);
-						}else{ //mpre("Сохранение итога " +row.at("id"), __LINE__);
-						}}return false; }()){ mpre("ОШИБКА установки изменений в таблицу", __LINE__);
-					}else{ //mpre("Сохранение таблицы " +table, __LINE__);
-					}return false; }()){ mpre("ОШИБКА сохранения таблицы", __LINE__);*/
 				}else if([&](){ // Сохранение таблицы mp_bmf_dataset_map
 					if("mp_bmf_dataset_map" != table){ //mpre("Сохранение только для таблицы", __LINE__);
-					}else if(TMMi ROWS = bmf::Tab("SELECT * FROM main." +table +" WHERE clump_id=':memory:'"); ROWS.empty()){ //mpre("Таблица не содержит изменений " +table, __LINE__);
+					}else if(INDEX.empty()){ //mpre("Нет изменений", __LINE__);
+					}else if(std::string sql = "SELECT * FROM main." +table +" WHERE alias='index' AND dataset_id=" +bmf::dataset.at("id"); sql.empty()){ mpre("Запрос на выборку карт", __LINE__);
+					//}else if(mpre(sql, "Запрос выборки карт", __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
+					}else if(TMMi ROWS = bmf::Tab(sql); ROWS.empty()){ //mpre("Таблица не содержит изменений " +table, __LINE__);
 					}else if([&](){ for(auto row_itr:ROWS){ //for(auto row_itr = ROWS.begin(); row_itr != ROWS.end(); row_itr++){ // Добавление новых записей
 						if(TMs row = row_itr.second; row.empty()){ mpre("ОШИБКА получения новой записи", __LINE__);
 						}else if(row.end() == row.find("id")){ mpre("ОШИБКА поле идентификатора не задано", __LINE__);
-						}else if(int id = atoi(row.at("id").c_str()); !id){ mpre("ОШИБКА выборки идентификатора новой записи", __LINE__);
+						}else if(int row_id = atoi(row.at("id").c_str()); !row_id){ mpre("ОШИБКА выборки идентификатора новой записи", __LINE__);
 						}else if(row.erase("id"); false){ mpre("ОШИБКА удаления идентификатора", __LINE__);
 						}else if(row["clump_id"] = bmf::clump_id; (row.end() == row.find("clump_id"))){ mpre("ОШИБКА установки файла базы", __LINE__);
 						}else if([&](){ // Замена идентификатора морфа
 							if(row.end() == row.find("alias")){ mpre("ОШИБКА запись не содержит поля alias", __LINE__);
-							}else if("index" != row.at("alias")){ mpre("Замена только для карт морфов", __LINE__);
+							}else if("index" != row.at("alias")){ mpre("ОШИБКА Замена только для карт морфов", __LINE__);
 							}else if(row.end() == row.find("alias_id")){ mpre("ОШИБКА запись не содержит поля идентификатора алиаса", __LINE__);
 							}else if(int index_id = atoi(row.at("alias_id").c_str()); !index_id){ mpre("ОШИБКА выборки идентификатора алиаса", __LINE__);
 							}else if(INDEX.end() == INDEX.find(index_id)){ //mpre("Список морфов не содержит указанного идентификатора", __LINE__);
@@ -329,7 +330,6 @@ int main(int argc, char **argv){
 						}else{
 						}}return false; }()){ mpre("ОШИБКА добавления новых записей в основую БД", __LINE__);
 					}else if(INDEX.clear(); !INDEX.empty()){ mpre("ОШИБКА обнуления списка морфов", __LINE__);
-					}else if(bmf::exec("UPDATE main." +table +" SET clump_id='" +bmf::clump_id +"' WHERE clump_id=':memory:'")){ mpre("ОШИБКА обновления скопления таблицы", __LINE__);
 					}else{
 					}return false; }()){ mpre("ОШИБКА сохранения таблицы", __LINE__);
 				}else if([&](bool skip = false){ // Сравнение таблиц между собой
@@ -363,8 +363,9 @@ int main(int argc, char **argv){
 				}else if(TMMi tables = bmf::Tab("SELECT * FROM file.sqlite_master WHERE type='table'"); tables.empty()){ mpre("ОШИБКА получения списка таблиц БД", __LINE__);
 				}else if([&](){ for(auto tables_itr:tables){ // Создание копии всех таблиц
 					if(TMs table = tables_itr.second; table.empty()){ mpre("ОШИБКА получения свойств таблицы", __LINE__);
-					}else if(int npos = table.at("name").find("sqlite_"); (std::string::npos != npos)){ //mpre("Служебная таблица не копируем `" +table.at("name") +"`", __LINE__);
 					}else if(table.end() == table.find("name")){ mpre("ОШИБКА имя таблицы в свойствах не найдено", __LINE__);
+					}else if(int npos = table.at("name").find("sqlite_"); (std::string::npos != npos)){ //mpre("Служебная таблица не копируем `" +table.at("name") +"`", __LINE__);
+					}else if(bmf::exec("DROP TABLE IF EXISTS main." +table.at("name"))){ mpre("ОШИБКА удаления таблицы", __LINE__);
 					}else if("mp_bmf_test" == table.at("name")){ //mpre("Таблица тестов", __LINE__);
 					}else if("mp_bmf_dataset" == table.at("name")){ //mpre("Таблица тестов", __LINE__);
 					}else if(int npos = table.at("name").find("_dano"); (std::string::npos != npos)){ //mpre("Информация дано `" +table.at("name") +"`", __LINE__);
@@ -1110,14 +1111,16 @@ int main(int argc, char **argv){
 				}else if(TMs index_1 = bmf::fk("mp_bmf_index", {{"id", index.at("index_id")}}, {}, {}); false){ mpre("ОШИБКА выборки старшего потомка", __LINE__);
 				}else if(boost::dynamic_bitset<> maps1 = [&](boost::dynamic_bitset<> maps1){ // Карта морфа
 					if(index_1.empty()){ //mpre("Старшего морфа нет берем карту исходника", __LINE__);
-					}else if(TMs dataset_map = bmf::fk("mp_bmf_dataset_map", {{"dataset_id", bmf::dataset.at("id")}, {"alias", "index"}, {"alias_id", index_1.at("id")}}, {}, {}); dataset_map.empty()){ mpre("ОШИБКА выборки карты исходника", __LINE__);
+					}else if(TMs where = {{"dataset_id", bmf::dataset.at("id")}, {"alias", "index"}, {"alias_id", index_1.at("id")}}; where.empty()){ mpre("ОШИБКА получения условий выборки карты", __LINE__);
+					}else if(TMs dataset_map = bmf::fk("mp_bmf_dataset_map", where, {}, {}); dataset_map.empty()){ mpre(where, "Условия выборки карты", __LINE__); mpre("ОШИБКА выборки карты исходника", __LINE__);
 					}else if(maps1 = boost::dynamic_bitset<>(dataset_map.at("map")); maps1.empty()){ mpre("ОШИБКА загрузки данных карты", __LINE__);
 					}else{ //mpre("Карта морфа " +dataset_map.at("map"), __LINE__);
 					}return maps1; }(map); maps1.empty()){ mpre("ОШИБКА выборки карты морфа", __LINE__);
 				}else if(TMs index_0 = bmf::fk("mp_bmf_index", {{"id", index.at("bmf-index")}}, {}, {}); false){ mpre("ОШИБКА выборки младшего потомка", __LINE__);
 				}else if(boost::dynamic_bitset<> maps0 = [&](boost::dynamic_bitset<> maps0){ // Карта морфа
 					if(index_0.empty()){ //mpre("Старшего морфа нет берем карту исходника", __LINE__);
-					}else if(TMs dataset_map = bmf::fk("mp_bmf_dataset_map", {{"dataset_id", bmf::dataset.at("id")}, {"alias", "index"}, {"alias_id", index_0.at("id")}}, {}, {}); dataset_map.empty()){ mpre("ОШИБКА выборки карты исходника", __LINE__);
+					}else if(TMs where = {{"dataset_id", bmf::dataset.at("id")}, {"alias", "index"}, {"alias_id", index_0.at("id")}}; where.empty()){ mpre("ОШИБКА выборки условия карты", __LINE__);
+					}else if(TMs dataset_map = bmf::fk("mp_bmf_dataset_map", where, {}, {}); dataset_map.empty()){ mpre(where, "Условие выборки карты", __LINE__); mpre("ОШИБКА выборки карты исходника", __LINE__);
 					}else if(maps0 = boost::dynamic_bitset<>(dataset_map.at("map")); maps0.empty()){ mpre("ОШИБКА загрузки данных карты", __LINE__);
 					}else{ //mpre("Карта морфа " +dataset_map.at("map"), __LINE__);
 					}return maps0; }(map); maps0.empty()){ mpre("ОШИБКА выборки карты морфа", __LINE__);
@@ -1353,6 +1356,14 @@ int main(int argc, char **argv){
 			if(BMF_DATASET_EX.end() == BMF_DATASET_EX.find("")){ mpre("ОШИБКА список обучающих выборок не установлен", __LINE__);
 			}else if([&](){ for(auto dataset_itr:BMF_DATASET_EX.at("")){ // Расчет списка набора данных
 				if(TMs dataset = dataset_itr.second; dataset.empty()){ mpre("ОШИБКА выборки набора данных", __LINE__);
+				}else if([&](bool skip = false){ // Пропуск расчета итога
+					if(bmf::ARGV.end() == bmf::ARGV.find("itog")){ //mpre("Итог не указан", __LINE__);
+					}else if(std::string itog_id = bmf::ARGV.at("itog"); itog_id.empty()){ mpre("ОШИБКА выборки итога", __LINE__);
+					}else if(bmf::ARGV.end() == bmf::ARGV.find("ds")){ mpre("ОШИБКА не указан набор данных", __LINE__);
+					}else if(bmf::ARGV.at("ds") == dataset.at("id")){ //mpre("Указан итог и совпадение", __LINE__);
+					}else if(skip = !skip; false){ mpre("ОШИБКА Инкремент пропуска", __LINE__);
+					}else{ //mpre("Условие пропуска сработало", __LINE__);
+					}return skip; }()){ //mpre("Пропускаем расчет итога " +dataset.at("id"), __LINE__);
 				}else if(int dataset_count = atoi(dataset.end() == dataset.find("count") ? "0" : dataset.at("count").c_str()); !dataset_count){ mpre("ОШИБКА расчета количества примеров в выборке", __LINE__);
 				}else if(boost::dynamic_bitset<> _mp = [&](boost::dynamic_bitset<> _mp = {}){ // Карта исходного значения
 					if(TMs dataset_map = bmf::fk("mp_bmf_dataset_map", {{"dataset_id", dataset.at("id")}, {"alias", "dano"}, {"alias_id", index.at("dano_id")}}, {}, {}); false){ mpre("ОШИБКА выборки карты расчетов исходников", __LINE__);
@@ -1673,7 +1684,7 @@ int main(int argc, char **argv){
 					}else{ //mpre("Проверка пропуска", __LINE__);
 					}return itog_id; }(); (!itog_id.empty() && (itog.at("id") != itog_id))){ //mpre("Пропуск обучения параметра itog_id=" +itog_id, __LINE__);
 				}else if(itog.end() == itog.find("id")){ mpre("ОШИБКА не найден идентификатор итога", __LINE__);
-				}else if(TMs dataset_map = bmf::fk("mp_bmf_dataset_map", {{"dataset_id", bmf::dataset.at("id")}, {"alias", "itog"}, {"alias_id", itog.at("id")}}, {}, {}); dataset_map.empty()){ //mpre("Неизвестное итоговое значение", __LINE__); //mpre("ОШИБКА установки карты исходника набора данных", __LINE__);
+				}else if(TMs dataset_map = bmf::fk("mp_bmf_dataset_map", {{"dataset_id", bmf::dataset.at("id")}, {"alias", "itog"}, {"alias_id", itog.at("id")}}, {}, {}); dataset_map.empty()){ mpre("ОШИБКА выборки карты исходника набора данных", __LINE__);
 				}else if(dataset_map.end() == dataset_map.find("map")){ mpre("ОШИБКА поле карты и неайдено у итога", __LINE__);
 				}else if(boost::dynamic_bitset<> ITOG(dataset_map.at("map")); ITOG.empty()){ mpre("ОШИБКА получения результата расчета", __LINE__);
 				}else if(key >= ITOG.size()){ mpre("ОШИБКА карта итога меньше количество примеров в выборке", __LINE__);
@@ -1694,10 +1705,10 @@ int main(int argc, char **argv){
 				}else if(int dataset_count = atoi(bmf::dataset.at("count").c_str()); !dataset_count){ mpre("ОШИБКА расчета размера карты", __LINE__);
 				}else if(std::string map = [&](std::string map = ""){ // Карта корневого морфа
 					if(TMs where = {{"dataset_id", bmf::dataset.at("id")}, {"alias", "index"}, {"alias_id", index.at("id")}}; where.empty()){ //mpre("ОШИБКА задания условий на выборку карты", __LINE__);
-					}else if(TMs dataset_map = bmf::fk("mp_bmf_dataset_map", where, {}, {}); false){ mpre("ОШИБКА выборки карты корневого морфа", __LINE__);
-					}else if(map = (dataset_map.end() == dataset_map.find("map") ? std::string(dataset_count, '0') : dataset_map.at("map")); map.empty()){ mpre("ОШИБКА установки карты основного морфа", __LINE__);
-					}else if(dataset_map = bmf::fk("mp_bmf_dataset_map", where, {{"map", map}}, {}); dataset_map.empty()){ mpre("ОШИБКА добавления карты корневого морфа", __LINE__);
-					}else if(dataset_map.end() == dataset_map.find("map")){ mpre("ОШИБКА в карте нет поля битовой карты", __LINE__);
+					}else if(TMs dataset_map = bmf::fk("mp_bmf_dataset_map", where, {}, {}); dataset_map.empty()){ mpre("ОШИБКА выборки карты корневого морфа", __LINE__);
+					//}else if(map = (dataset_map.end() == dataset_map.find("map") ? std::string(dataset_count, '0') : dataset_map.at("map")); map.empty()){ mpre("ОШИБКА установки карты основного морфа", __LINE__);
+					//}else if(dataset_map = bmf::fk("mp_bmf_dataset_map", where, {{"map", map}}, {}); dataset_map.empty()){ mpre("ОШИБКА добавления карты корневого морфа", __LINE__);
+					//}else if(dataset_map.end() == dataset_map.find("map")){ mpre("ОШИБКА в карте нет поля битовой карты", __LINE__);
 					}else if(map = dataset_map.at("map"); map.empty()){ mpre("ОШИБКА выборки карты корневого морфа", __LINE__);
 					}else{ //mpre("Добавление карты корневого морфа map=" +map, __LINE__);
 					}return map; }(); false){ mpre("ОШИБКА расчета карты корневого морфа", __LINE__);
