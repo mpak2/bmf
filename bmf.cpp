@@ -30,7 +30,7 @@
 #include <experimental/filesystem> // Права доступа к файлу
 #include <string.h> // strpos
 #include <thread>
-//#include <mutex>
+#include <mutex>
 #include <future> // Асинхноррное выполение потоков
 //#include <vector>
 //#include <cctype>
@@ -50,7 +50,6 @@
 
 #include <db_cxx.h>
 #include <dbstl_map.h>
-//#include <iterator>
 
 //#define CL_HPP_MINIMUM_OPENCL_VERSION 110
 //#define CL_HPP_TARGET_OPENCL_VERSION 210
@@ -71,7 +70,7 @@ typedef std::map<string, TMs> TMMs;
 typedef std::map<int, TMs> TMMi;
 typedef std::map<string, TMMi> TM3i;
 
-//std::recursive_mutex mu;
+std::recursive_mutex mu;
 
 #include "bmf.c"
 
@@ -223,7 +222,7 @@ int main(int argc, char **argv){
 		}else if(skip = !skip; false){ mpre("Условие выхода", __LINE__);
 		}else{
 		}return skip; }()){ exit(mpre("Остановка выполнения", __LINE__));
-	}else if([&](){ // Соединение
+	}else if([&](){ // Подключение БД
 		if([&](){ // Имя базы данных
 			if(bmf::ARGV.end() == bmf::ARGV.find("db")){ mpre("ОШИБКА БД для сохранения не задана -db", __LINE__);
 			}else if(0 >= bmf::ARGV.at("db").length()){ mpre("База данных для сохранения не указана", __LINE__);
@@ -240,19 +239,17 @@ int main(int argc, char **argv){
 			}else if(const std::string ENV_FOLDER = bmf::dbname; false){ mpre("ОШИБКА установки константы", __LINE__);
 			}else if(!fs::exists(ENV_FOLDER) && !fs::create_directory(ENV_FOLDER)){ mpre("ОШИБКА директория БД не задана", __LINE__);
 			}else if(dbstl::dbstl_startup(); false){ mpre("ОШИБКА инициализации БД", __LINE__);
-			//}else if(auto penv = dbstl::open_env(ENV_FOLDER.c_str(), 0u, DB_INIT_MPOOL | DB_CREATE ); false){ mpre("ОШИБКА задания переменных среды", __LINE__);
-			}else if(DbEnv* penv = new DbEnv(DB_CXX_NO_EXCEPTIONS); (nullptr == penv)){ mpre("ОШИБКА открытия окружения", __LINE__);
-			}else if(penv->set_lk_detect(DB_LOCK_MINWRITE); false){ mpre("ОШИБКА установки блокировки", __LINE__);
-			}else if(penv->open(bmf::dbname.c_str(), DB_CREATE | DB_INIT_MPOOL | DB_RECOVER | DB_INIT_LOCK | DB_INIT_LOG | DB_INIT_TXN | DB_THREAD, 0); (nullptr == penv)){ mpre("ОШИБКА окружения", __LINE__);
-			//}else if(penv->set_timeout(1000000, DB_SET_TXN_TIMEOUT); false){ mpre("ОШИБКА установки таймаута транзакции", __LINE__);
-			//}else if(auto txn = dbstl::begin_txn(0, penv); false){ mpre("ОШИБКА начала транзакции", __LINE__);
+			//}else if(auto penv = dbstl::open_env(ENV_FOLDER.c_str(), 0u, DB_INIT_MPOOL | DB_CREATE | DB_INIT_LOCK | DB_THREAD); false){ mpre("ОШИБКА создания переменной среды", __LINE__);
+			}else if(auto penv = dbstl::open_env(ENV_FOLDER.c_str(), 0u, DB_INIT_MPOOL | DB_CREATE); false){ mpre("ОШИБКА задания переменных среды", __LINE__);
+			}else if(auto db = dbstl::open_db(penv, "iris.db", DB_BTREE, DB_CREATE, 0u); false){ mpre("ОШИБКА открытия БД", __LINE__);
+			//}else if(struct TestElement{ std::string id; std::string name; }; false){ mpre("ОШИБКА создания структуры", __LINE__);
 			}else if(dbstl::DbstlElemTraits<TMs>::instance()->set_size_function([](const TMs& elem){ // size
 				u_int32_t size = (sizeof(std::string::size_type) + std::to_string(elem.size()).length());
 				for(auto elem_itr:elem){
 					size += sizeof(std::string::size_type) + elem_itr.first.length();
 					size += sizeof(std::string::size_type) + elem_itr.second.length();
 				}return size; }); false){ mpre("ОШИБКА установки функции размера", __LINE__);
-			}else if(dbstl::DbstlElemTraits<TMs>::instance()->set_copy_function([](void* dest, const TMs& elem){ // copy
+			}else if(dbstl::DbstlElemTraits<TMs>::instance()->set_copy_function([](void* dest, const TMs& elem){
 				std::function save_str = [&](const std::string& str, void* dest){
 					auto size = str.length();
 					memcpy(dest, &size, sizeof(size));
@@ -280,52 +277,25 @@ int main(int argc, char **argv){
 					std::string val; src = restore_str(val, src);
 					elem.insert(make_pair(key, val));
 				}}); false){ mpre("ОШИБКА установки функции перезаписи", __LINE__);
-			//}else if(auto db = dbstl::open_db(penv, "test.db", DB_BTREE, DB_CREATE, 0u); false){ mpre("ОШИБКА открытия БД", __LINE__);
-			}else if(Db* db = new Db(penv, DB_CXX_NO_EXCEPTIONS); (nullptr == db)){ mpre("ОШИБКА созадния новой БД", __LINE__);
-			}else if(db->open(NULL, "test.db", NULL, DB_BTREE, DB_CREATE, 0); (nullptr == db)){ mpre("ОШИБКА открытия файла", __LINE__);
-			//}else if(0 != penv->open(penv, "iris.db", DB_CREATE | DB_INIT_LOCK | DB_INIT_LOG | DB_INIT_MPOOL | DB_INIT_TXN | DB_RECOVER | DB_THREAD, S_IRUSR | S_IWUSR)){ mpre("ОШИБКА открытия БД", __LINE__);
 			}else if(dbstl::db_map<std::string, TMs> test(db, penv); false){ mpre("ОШИБКА регистрации хранилища", __LINE__);
-			}else if([&](){ for(auto index_itr:test){ // Список сохраненных значений
-				if(TMs row = index_itr.second; row.empty()){ mpre("ОШИБКА элемент не найден", __LINE__);
-				}else if(row.end() == row.find("Текущее время")){ mpre("ОШИБКА поле с временем не найдено", __LINE__);
-				}else if(int time = atoi(row["Текущее время"].c_str()); !time){ mpre("ОШИБКА получения времени", __LINE__);
-				}else{ mpre(index_itr.second, "Время с прошлого запуска "+ to_string(std::time(0) - time), __LINE__);
-				}}return false; }()){ mpre("ОШИБКА отображения значений", __LINE__);
-			}else if([&](){ for(auto index_itr:test){ // Список сохраненных значений
-				mpre("Удаление элемента "+ index_itr.first, __LINE__); test.erase(index_itr.first);
-				}return false; }()){ mpre("ОШИБКА отображения значений", __LINE__);
-			}else if([&](){ //for(int i = 30; i <= 33; i++){
-				TMs row = {{"Текущее время", to_string(std::time(0))}};
-				std::string id = to_string(test.size());
-				mpre("Добавление элемента "+ id, __LINE__);
-				DbTxn* txn; penv->txn_begin(0, &txn, 0);
-				test[id] = row;
-				txn->commit(DB_TXN_SYNC);
-				return false; }()){ mpre("ОШИБКА создания цикла копирования", __LINE__);
+			}else if([&](){ for(int i = 2; i <= 4; i++){
+						//mpre("Добавление элемента "+ to_string(i), __LINE__); TMs row = {{"key1", "val1"}, {"key2", "val2"}}; test[to_string(i)] = row;
+						//mpre("Удаление элемента "+ to_string(i), __LINE__); test.erase(to_string(i));
+					}return false; }()){ mpre("ОШИБКА создания цикла копирования", __LINE__);
+			}else if([&](){ for(auto test_itr:test){ // Перебор списка
+					mpre(test_itr.second, "Элемент " +test_itr.first, __LINE__);
+				}return false; }()){ mpre("ОШИБКА перебора списка", __LINE__);
+			//}else if(auto [itr, status] = elementsMap["added key 5"] = {"added id 5", "added name 5"}; false){ mpre("ОШИБКА добавления новых данных", __LINE__);
 			/*}else if(std::transform(
 					elementsMap.begin(dbstl::ReadModifyWriteOption::no_read_modify_write(), true),
 					elementsMap.end(),
 					std::ostream_iterator<std::string>(std::cout, "\n"),
-					[](const auto data) -> std::string { return  data.first + "=> { }"; }
-				a); false){ mpre("ОШИБКА вывода содержимого", __LINE__);*/
-			//}else if(auto txn = dbstl::begin_txn(0, penv); false){ mpre("ОШИБКА начала транзакции", __LINE__);
-			//}else if(db->begin_txn(0, penv); false){ mpre("ОШИБКА создания транзакции", __LINE__);
-			//}else if(db->begin_txn(0, this); false){ mpre("ОШИБКА открытия транзакции", __LINE__);
-			//}else if(db::set_txn_begin_flags(); false){ mpre("ОШИБКА открытия транзакции", __LINE__);
-			}else if([&](){ // Изменение значенияa
-				if(false){ mpre("Пропуск", __LINE__);
-				}else if(DbTxn* txn; (nullptr == txn)){ mpre("ОШИБКА созадния коммита", __LINE__);
-				}else if(penv->txn_begin(0, &txn, 0); (nullptr == txn)){ mpre("ОШИБКА транзакции", __LINE__);
-				}else if(TMs row = test.begin()->second; row.empty()){ mpre("ОШИБКА получения последнего значения", __LINE__);
-				}else if(row["_Еще одно поле"] = "Значение"; false){ mpre("ОШИБКА изменения", __LINE__);
-				}else if(test.begin()->second = row; false){ mpre("ОШИБКА сохранения", __LINE__);
-				}else if(txn->commit(0); (nullptr == txn)){ mpre("ОШИБКА транзакции", __LINE__);
-				}else{
-				}return false; }()){ mpre("ОШИБКА изменения", __LINE__);
+					[](const auto data) -> std::string { return  data.first + "=> { id: " + data.second.id + ", name: " + data.second.name + "}"; }
+				); false){ mpre("ОШИБКА вывода содержимого", __LINE__);*/
 			}else{ mpre("Подключение к БД " +bmf::dbname, __LINE__);
 			}return true; }()){ mpre("Тест подключения к БД", __LINE__);
 		}else{
-		}return false; }()){ mpre("ОШИБКА соединения", __LINE__);
+		}return false; }()){ mpre("ОШИБКА подключения БД", __LINE__);
 	}else if([&](){ // Функции БД
 		if(bmf::exec = ([&](string sql, bool pass = false, int sleep = 0, int result = 1){ do{ // Запрос к БД
 			if(!(result = 0)){ //mpre("Пропускаем запрос", __LINE__);
@@ -455,7 +425,7 @@ int main(int argc, char **argv){
 			}return TAB; }); false){ mpre("ОШИБКА установки функции выборки списка таблциы", __LINE__);
 		}else{
 		}return false; }()){ mpre("ОШИБКА функции БД", __LINE__);
-	}else if([&](bool skip = true){ // Функции
+	}else if([&](bool skip = true){ // Подключение базы
 		if(bmf::Tree = ([&](TMs bmf_index, int key){ // Отображение дерева
 			if(string after_char = "  "; (0 >= after_char.length())){ mpre("ОШИБКА установки префикса отображения", __LINE__);
 			}else if(TMMi STAIRS = [&](TMMi STAIRS = {}){ // Заполнение буфера
@@ -879,7 +849,7 @@ int main(int argc, char **argv){
 									} return nn; }(); false){ mpre("ОШИБКА результат точка", __LINE__);
 								}else if(TMs vals = [&](TMs vals = {}){ // Проверка и выборка глобального знака
 									if(false){ mpre("Пропуск", __LINE__);
-									//}else if(std::lock_guard<std::recursive_mutex> lock(mu); false){ mpre("ОШИБКА установки блокировки", __LINE__);
+									}else if(std::lock_guard<std::recursive_mutex> lock(mu); false){ mpre("ОШИБКА установки блокировки", __LINE__);
 									}else if(vals = erb(*BMF, {{"clump_id", bmf::clump_id}, {alias+ "_values_id", values.at("id")}, {"name", to_string(nn)}}); !vals.empty()){ //mpre(vals, __LINE__, "Знак `"+ values["name"]+ "` уже добавлен "+ to_string(nn));
 									}else if(("-" != _value.substr(0, 1)) && (0 == nn)){ //mpre("Не создаем положительный знак отрицания", __LINE__);
 									//}else if(bmf::ARGV.end() != bmf::ARGV.find("-t")){ mpre(values, __LINE__, "Значение"); mpre("ОШИБКА в многопоточном режиме недопустимо создание новых знаков "+ alias+ "_values_id="+ values.at("id")+ " name="+ to_string(nn), __LINE__);
