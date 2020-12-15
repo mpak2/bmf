@@ -10,8 +10,7 @@ int mpre(string mess, int line, string comment = ""){
 }
 
 int mpre(TMs row, int line, string comment = "", string prefix = "", string key = ""){
-	if(std::lock_guard<std::recursive_mutex> lock(mu); false){ mpre("ОШИБКА блокировки", __LINE__);
-	}else if(string num = [&](string num = ""){ // Получение ключа
+	if(string num = [&](string num = ""){ // Получение ключа
 			if("" != key){ num = key;
 			}else if(row.end() != row.find("id")){ num = row["id"];
 			}else{ //mpre("Ни ключ ни идентификатор не задан", __LINE__);
@@ -31,8 +30,7 @@ int mpre(TMs row, int line, string comment = "", string prefix = "", string key 
 
 int mpre(TMMi& TAB, int line, string comment = ""){
 	std::cerr << "Array";
-	if(std::lock_guard<std::recursive_mutex> lock(mu); false){ mpre("ОШИБКА блокировки", __LINE__);
-	}else if(line > 0){
+	if(line > 0){
 		std::cerr << "__" << std::to_string(line) << "__";
 	}; std::cerr << "( // " << comment << "\n";
 	for(auto itr = TAB.begin(); itr != TAB.end(); itr++){
@@ -48,8 +46,7 @@ int mpre(TMMi& TAB, int line, string comment = ""){
 
 int mpre(TMMs& TAB, int line, string comment = ""){
 	std::cerr << "Array";
-	if(std::lock_guard<std::recursive_mutex> lock(mu); false){ mpre("ОШИБКА блокировки", __LINE__);
-	}else if(line > 0){
+	if(line > 0){
 		std::cerr << "__" << std::to_string(line) << "__";
 	}; std::cerr << "( // " << comment << "\n";
 	for(auto& itr:TAB){
@@ -65,8 +62,7 @@ int mpre(TMMs& TAB, int line, string comment = ""){
 
 int mpre(TM3i& TABS, int line, string comment = ""){
 	std::cerr << "Array";
-	if(std::lock_guard<std::recursive_mutex> lock(mu); false){ mpre("ОШИБКА блокировки", __LINE__);
-	}else if(line > 0){
+	if(line > 0){
 		std::cerr << "__" << std::to_string(line) << "__";
 	}; std::cerr << "( // " << comment << "\n";
 	for(auto &tab_itr:TABS){
@@ -91,7 +87,6 @@ int mpre(TM3i& TABS, int line, string comment = ""){
 
 
 TMMi rb(TMMi& TAB, TMs values, bool debug = false, TMMi LIST = {}){
-	//std::lock_guard<std::recursive_mutex> lock(mu);
 	for(auto &tab_itr:TAB){
 		bool keep = true; int id = tab_itr.first;
 		TMs row = tab_itr.second;
@@ -227,7 +222,7 @@ TMMi rb(TM3i& TABS, TMs values, bool debug = false, TMMi LIST = {}){
 	}else if(TABS.end() == TABS.find("")){ //mpre("Данные отсутствуют", __LINE__);
 	}else if(TABS.at("").empty()){ //mpre("Пропускаем пустые массивы", __LINE__);
 	}else if(string fields = ""; 0 < fields.length()){ mpre("ОШИБКА значение полня должно быть пустым", __LINE__);
-	}else if(std::lock_guard<std::recursive_mutex> lock(mu); false){ mpre("ОШИБКА блокировки", __LINE__);
+	//}else if(std::lock_guard<std::recursive_mutex> lock(mu); false){ mpre("ОШИБКА блокировки", __LINE__);
 	}else if([&](){ for(auto& values_itr:values){ // Поле индекса
 			if(string field = values_itr.first; (0 >= field.length())){ mpre("ОШИБКА получения имени поля", __LINE__);
 			}else if(fields += (0 >= fields.length() ? "" : ",")+ field; (0 >= fields.length())){ mpre("ОШИБКА инкремента имени поля к строке полей", __LINE__);

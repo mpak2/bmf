@@ -27,6 +27,8 @@
 #cat clump/iris.json | ./bimorph clump/iris_3.sqlite - # ?cache=shared
 
 #mv clump/iris.sqlite /tmp
+
+#mv -f clump/iris/* /tmp/
 cat clump/iris_1.json | ./bimorph clump/iris -
 #cat clump/iris_2.json | ./bimorph clump/iris.sqlite -
 #cat clump/iris_3.json | ./bimorph clump/iris.sqlite -

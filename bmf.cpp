@@ -30,7 +30,7 @@
 #include <experimental/filesystem> // Права доступа к файлу
 #include <string.h> // strpos
 #include <thread>
-#include <mutex>
+//#include <mutex>
 #include <future> // Асинхноррное выполение потоков
 //#include <vector>
 //#include <cctype>
@@ -50,6 +50,7 @@
 
 #include <db_cxx.h>
 #include <dbstl_map.h>
+//#include <iterator>
 
 //#define CL_HPP_MINIMUM_OPENCL_VERSION 110
 //#define CL_HPP_TARGET_OPENCL_VERSION 210
@@ -70,7 +71,7 @@ typedef std::map<string, TMs> TMMs;
 typedef std::map<int, TMs> TMMi;
 typedef std::map<string, TMMi> TM3i;
 
-std::recursive_mutex mu;
+//std::recursive_mutex mu;
 
 #include "bmf.c"
 
@@ -222,6 +223,109 @@ int main(int argc, char **argv){
 		}else if(skip = !skip; false){ mpre("Условие выхода", __LINE__);
 		}else{
 		}return skip; }()){ exit(mpre("Остановка выполнения", __LINE__));
+	}else if([&](){ // Соединение
+		if([&](){ // Имя базы данных
+			if(bmf::ARGV.end() == bmf::ARGV.find("db")){ mpre("ОШИБКА БД для сохранения не задана -db", __LINE__);
+			}else if(0 >= bmf::ARGV.at("db").length()){ mpre("База данных для сохранения не указана", __LINE__);
+			}else if(bmf::dbname = bmf::ARGV.at("db"); (0 >= bmf::dbname.length())){ mpre("ОШИБКА имя файла для БД не задано", __LINE__);
+			}else{ //mpre("База данных "+ bmf::dbname, __LINE__);
+			}return false; }()){ mpre("ОШИБКА получения имени базы данных", __LINE__);
+		}else if([&](){ // Получение пути до файла БД
+			if(int npos = bmf::dbname.rfind("/"); false){ //mpre("Слешей в пути до скопления не найдено", __LINE__);
+			}else if(bmf::clump_id = (std::string::npos == npos ? bmf::dbname : bmf::dbname.substr(npos+1, bmf::dbname.length())); (0 >= bmf::clump_id.length())){ mpre("ОШИБКА сокращения пути до файла", __LINE__);
+			}else{ //mpre("Путь до БД сокращен "+ bmf::clump_id, __LINE__);
+			}return (0 >= bmf::clump_id.length()); }()){ mpre("ОШИБКА получения скопления", __LINE__);
+		}else if([&](){
+			if(false){ mpre("ОШИБКА", __LINE__);
+			}else if(const std::string ENV_FOLDER = bmf::dbname; false){ mpre("ОШИБКА установки константы", __LINE__);
+			}else if(!fs::exists(ENV_FOLDER) && !fs::create_directory(ENV_FOLDER)){ mpre("ОШИБКА директория БД не задана", __LINE__);
+			}else if(dbstl::dbstl_startup(); false){ mpre("ОШИБКА инициализации БД", __LINE__);
+			//}else if(auto penv = dbstl::open_env(ENV_FOLDER.c_str(), 0u, DB_INIT_MPOOL | DB_CREATE ); false){ mpre("ОШИБКА задания переменных среды", __LINE__);
+			}else if(DbEnv* penv = new DbEnv(DB_CXX_NO_EXCEPTIONS); (nullptr == penv)){ mpre("ОШИБКА открытия окружения", __LINE__);
+			}else if(penv->set_lk_detect(DB_LOCK_MINWRITE); false){ mpre("ОШИБКА установки блокировки", __LINE__);
+			}else if(penv->open(bmf::dbname.c_str(), DB_CREATE | DB_INIT_MPOOL | DB_RECOVER | DB_INIT_LOCK | DB_INIT_LOG | DB_INIT_TXN | DB_THREAD, 0); (nullptr == penv)){ mpre("ОШИБКА окружения", __LINE__);
+			//}else if(penv->set_timeout(1000000, DB_SET_TXN_TIMEOUT); false){ mpre("ОШИБКА установки таймаута транзакции", __LINE__);
+			//}else if(auto txn = dbstl::begin_txn(0, penv); false){ mpre("ОШИБКА начала транзакции", __LINE__);
+			}else if(dbstl::DbstlElemTraits<TMs>::instance()->set_size_function([](const TMs& elem){ // size
+				u_int32_t size = (sizeof(std::string::size_type) + std::to_string(elem.size()).length());
+				for(auto elem_itr:elem){
+					size += sizeof(std::string::size_type) + elem_itr.first.length();
+					size += sizeof(std::string::size_type) + elem_itr.second.length();
+				}return size; }); false){ mpre("ОШИБКА установки функции размера", __LINE__);
+			}else if(dbstl::DbstlElemTraits<TMs>::instance()->set_copy_function([](void* dest, const TMs& elem){ // copy
+				std::function save_str = [&](const std::string& str, void* dest){
+					auto size = str.length();
+					memcpy(dest, &size, sizeof(size));
+					char* charDest = static_cast<char*>(dest) + sizeof(size);
+					memcpy(charDest, str.data(), str.length());
+					return charDest + str.length();
+				}; //dest = save_str(elem.id, dest); dest = save_str(elem.name, dest);
+				std::string size = std::to_string(elem.size()); dest = save_str(size, dest);
+				for(auto elem_itr:elem){
+					dest = save_str(elem_itr.first, dest);
+					dest = save_str(elem_itr.second, dest);
+				}}); false){ mpre("ОШИБКА установки функции сохранения", __LINE__);
+			}else if(dbstl::DbstlElemTraits<TMs>::instance()->set_restore_function([](TMs& elem, const void* src){ // restore
+				std::function restore_str = [&](std::string& str, const void* src){
+					std::string::size_type size;
+					memcpy(&size, src, sizeof(size));
+					str.reserve(size);
+					const char* strSrc = static_cast<const char*>(src) + sizeof(size);
+					str.insert(0, strSrc, size);
+					return strSrc + size;
+				}; //src = restore_str(elem.id, src); src = restore_str(elem.name, src);
+				std::string size; src = restore_str(size, src);
+				for(int i = atoi(size.c_str()); i >0; i--){
+					std::string key; src = restore_str(key, src);
+					std::string val; src = restore_str(val, src);
+					elem.insert(make_pair(key, val));
+				}}); false){ mpre("ОШИБКА установки функции перезаписи", __LINE__);
+			//}else if(auto db = dbstl::open_db(penv, "test.db", DB_BTREE, DB_CREATE, 0u); false){ mpre("ОШИБКА открытия БД", __LINE__);
+			}else if(Db* db = new Db(penv, DB_CXX_NO_EXCEPTIONS); (nullptr == db)){ mpre("ОШИБКА созадния новой БД", __LINE__);
+			}else if(db->open(NULL, "test.db", NULL, DB_BTREE, DB_CREATE, 0); (nullptr == db)){ mpre("ОШИБКА открытия файла", __LINE__);
+			//}else if(0 != penv->open(penv, "iris.db", DB_CREATE | DB_INIT_LOCK | DB_INIT_LOG | DB_INIT_MPOOL | DB_INIT_TXN | DB_RECOVER | DB_THREAD, S_IRUSR | S_IWUSR)){ mpre("ОШИБКА открытия БД", __LINE__);
+			}else if(dbstl::db_map<std::string, TMs> test(db, penv); false){ mpre("ОШИБКА регистрации хранилища", __LINE__);
+			}else if([&](){ for(auto index_itr:test){ // Список сохраненных значений
+				if(TMs row = index_itr.second; row.empty()){ mpre("ОШИБКА элемент не найден", __LINE__);
+				}else if(row.end() == row.find("Текущее время")){ mpre("ОШИБКА поле с временем не найдено", __LINE__);
+				}else if(int time = atoi(row["Текущее время"].c_str()); !time){ mpre("ОШИБКА получения времени", __LINE__);
+				}else{ mpre(index_itr.second, "Время с прошлого запуска "+ to_string(std::time(0) - time), __LINE__);
+				}}return false; }()){ mpre("ОШИБКА отображения значений", __LINE__);
+			}else if([&](){ for(auto index_itr:test){ // Список сохраненных значений
+				mpre("Удаление элемента "+ index_itr.first, __LINE__); test.erase(index_itr.first);
+				}return false; }()){ mpre("ОШИБКА отображения значений", __LINE__);
+			}else if([&](){ //for(int i = 30; i <= 33; i++){
+				TMs row = {{"Текущее время", to_string(std::time(0))}};
+				std::string id = to_string(test.size());
+				mpre("Добавление элемента "+ id, __LINE__);
+				DbTxn* txn; penv->txn_begin(0, &txn, 0);
+				test[id] = row;
+				txn->commit(DB_TXN_SYNC);
+				return false; }()){ mpre("ОШИБКА создания цикла копирования", __LINE__);
+			/*}else if(std::transform(
+					elementsMap.begin(dbstl::ReadModifyWriteOption::no_read_modify_write(), true),
+					elementsMap.end(),
+					std::ostream_iterator<std::string>(std::cout, "\n"),
+					[](const auto data) -> std::string { return  data.first + "=> { }"; }
+				a); false){ mpre("ОШИБКА вывода содержимого", __LINE__);*/
+			//}else if(auto txn = dbstl::begin_txn(0, penv); false){ mpre("ОШИБКА начала транзакции", __LINE__);
+			//}else if(db->begin_txn(0, penv); false){ mpre("ОШИБКА создания транзакции", __LINE__);
+			//}else if(db->begin_txn(0, this); false){ mpre("ОШИБКА открытия транзакции", __LINE__);
+			//}else if(db::set_txn_begin_flags(); false){ mpre("ОШИБКА открытия транзакции", __LINE__);
+			}else if([&](){ // Изменение значенияa
+				if(false){ mpre("Пропуск", __LINE__);
+				}else if(DbTxn* txn; (nullptr == txn)){ mpre("ОШИБКА созадния коммита", __LINE__);
+				}else if(penv->txn_begin(0, &txn, 0); (nullptr == txn)){ mpre("ОШИБКА транзакции", __LINE__);
+				}else if(TMs row = test.begin()->second; row.empty()){ mpre("ОШИБКА получения последнего значения", __LINE__);
+				}else if(row["_Еще одно поле"] = "Значение"; false){ mpre("ОШИБКА изменения", __LINE__);
+				}else if(test.begin()->second = row; false){ mpre("ОШИБКА сохранения", __LINE__);
+				}else if(txn->commit(0); (nullptr == txn)){ mpre("ОШИБКА транзакции", __LINE__);
+				}else{
+				}return false; }()){ mpre("ОШИБКА изменения", __LINE__);
+			}else{ mpre("Подключение к БД " +bmf::dbname, __LINE__);
+			}return true; }()){ mpre("Тест подключения к БД", __LINE__);
+		}else{
+		}return false; }()){ mpre("ОШИБКА соединения", __LINE__);
 	}else if([&](){ // Функции БД
 		if(bmf::exec = ([&](string sql, bool pass = false, int sleep = 0, int result = 1){ do{ // Запрос к БД
 			if(!(result = 0)){ //mpre("Пропускаем запрос", __LINE__);
@@ -351,67 +455,8 @@ int main(int argc, char **argv){
 			}return TAB; }); false){ mpre("ОШИБКА установки функции выборки списка таблциы", __LINE__);
 		}else{
 		}return false; }()){ mpre("ОШИБКА функции БД", __LINE__);
-	}else if([&](bool skip = true){ // Подключение базы
-		if([&](){ // Имя базы данных
-			if(bmf::ARGV.end() == bmf::ARGV.find("db")){ mpre("ОШИБКА БД для сохранения не задана -db", __LINE__);
-			}else if(0 >= bmf::ARGV.at("db").length()){ mpre("База данных для сохранения не указана", __LINE__);
-			}else if(bmf::dbname = bmf::ARGV.at("db"); (0 >= bmf::dbname.length())){ mpre("ОШИБКА имя файла для БД не задано", __LINE__);
-			}else{ //mpre("База данных "+ bmf::dbname, __LINE__);
-			}return false; }()){ mpre("ОШИБКА получения имени базы данных", __LINE__);
-		}else if([&](){ // Получение пути до файла БД
-			if(int npos = bmf::dbname.rfind("/"); false){ //mpre("Слешей в пути до скопления не найдено", __LINE__);
-			}else if(bmf::clump_id = (std::string::npos == npos ? bmf::dbname : bmf::dbname.substr(npos+1, bmf::dbname.length())); (0 >= bmf::clump_id.length())){ mpre("ОШИБКА сокращения пути до файла", __LINE__);
-			}else{ //mpre("Путь до БД сокращен "+ bmf::clump_id, __LINE__);
-			}return (0 >= bmf::clump_id.length()); }()){ mpre("ОШИБКА получения скопления", __LINE__);
-		}else if([&](){
-			if(false){ mpre("ОШИБКА", __LINE__);
-			}else if(const std::string ENV_FOLDER = bmf::dbname; false){ mpre("ОШИБКА установки константы", __LINE__);
-			}else if(!fs::exists(ENV_FOLDER) && !fs::create_directory(ENV_FOLDER)){ mpre("ОШИБКА директория БД не задана", __LINE__);
-			}else if(dbstl::dbstl_startup(); false){ mpre("ОШИБКА инициализации БД", __LINE__);
-			//}else if(auto penv = dbstl::open_env(ENV_FOLDER.c_str(), 0u, DB_INIT_MPOOL | DB_CREATE | DB_INIT_LOCK | DB_THREAD); false){ mpre("ОШИБКА создания переменной среды", __LINE__);
-			}else if(auto penv = dbstl::open_env(ENV_FOLDER.c_str(), 0u, DB_INIT_MPOOL | DB_CREATE); false){ mpre("ОШИБКА задания переменных среды", __LINE__);
-			}else if(auto db = dbstl::open_db(penv, "iris.db", DB_BTREE, DB_CREATE, 0u); false){ mpre("ОШИБКА открытия БД", __LINE__);
-			}else if(struct TestElement{ std::string id; std::string name; }; false){ mpre("ОШИБКА создания структуры", __LINE__);
-			/*}else if(dbstl::DbstlElemTraits<TestElement>::instance()->set_size_function([](const TestElement& element){ // size
-						u_int32_t size = 0;
-						size += sizeof(std::string::size_type) + element.id.length();
-						size += sizeof(std::string::size_type) + element.name.length();
-						return size;
-					}); false){ mpre("ОШИБКА установки функции размера", __LINE__);*/
-			}else if(dbstl::DbstlElemTraits<TestElement>::instance()->set_copy_function([](void* dest, const TestElement& elem){
-						std::function save_str = [&](const std::string& str, void* dest){
-							auto size = str.length();
-							memcpy(dest, &size, sizeof(size));
-							char* charDest = static_cast<char*>(dest) + sizeof(size);
-							memcpy(charDest, str.data(), str.length());
-							return charDest + str.length();
-						}; dest = save_str(elem.id, dest); dest = save_str(elem.name, dest);
-					}); false){ mpre("ОШИБКА установки функции сохранения", __LINE__);
-			}else if(dbstl::DbstlElemTraits<TestElement>::instance()->set_restore_function([](TestElement& elem, const void* src){ // restore
-						std::function restore_str = [&](std::string& str, const void* src){
-							std::string::size_type size;
-							memcpy(&size, src, sizeof(size));
-							str.reserve(size);
-							const char* strSrc = static_cast<const char*>(src) + sizeof(size);
-							str.insert(0, strSrc, size);
-							return strSrc + size;
-						}; src = restore_str(elem.id, src); src = restore_str(elem.name, src);
-					}); false){ mpre("ОШИБКА установки функции перезаписи", __LINE__);
-			}else if(dbstl::db_map<std::string, TestElement> elementsMap(db, penv); false){ mpre("ОШИБКА регистрации хранилища", __LINE__);
-			}else if([&](){ for(int i = 1; i <= 4; i++){
-						mpre("Добавление элемента "+ to_string(i), __LINE__); elementsMap["added key " +to_string(i)] = {to_string(i), to_string(i)};
-						//mpre("Удаление элемента "+ to_string(i), __LINE__); elementsMap.erase("added key " +to_string(i));
-					}return false; }()){ mpre("ОШИБКА создания цикла копирования", __LINE__);
-			//}else if(auto [itr, status] = elementsMap["added key 5"] = {"added id 5", "added name 5"}; false){ mpre("ОШИБКА добавления новых данных", __LINE__);
-			}else if(std::transform(
-					elementsMap.begin(dbstl::ReadModifyWriteOption::no_read_modify_write(), true),
-					elementsMap.end(),
-					std::ostream_iterator<std::string>(std::cout, "\n"),
-					[](const auto data) -> std::string { return  data.first + "=> { id: " + data.second.id + ", name: " + data.second.name + "}"; }
-				); false){ mpre("ОШИБКА вывода содержимого", __LINE__);
-			}else{ mpre("Подключение к БД " +bmf::dbname, __LINE__);
-			}return true; }()){ mpre("Тест подключения к БД", __LINE__);
-		}else if(bmf::Tree = ([&](TMs bmf_index, int key){ // Отображение дерева
+	}else if([&](bool skip = true){ // Функции
+		if(bmf::Tree = ([&](TMs bmf_index, int key){ // Отображение дерева
 			if(string after_char = "  "; (0 >= after_char.length())){ mpre("ОШИБКА установки префикса отображения", __LINE__);
 			}else if(TMMi STAIRS = [&](TMMi STAIRS = {}){ // Заполнение буфера
 				if(bmf_index.end() == bmf_index.find("id")){ mpre("ОШИБКА у морфа не указан идентификатор", __LINE__);
@@ -834,7 +879,7 @@ int main(int argc, char **argv){
 									} return nn; }(); false){ mpre("ОШИБКА результат точка", __LINE__);
 								}else if(TMs vals = [&](TMs vals = {}){ // Проверка и выборка глобального знака
 									if(false){ mpre("Пропуск", __LINE__);
-									}else if(std::lock_guard<std::recursive_mutex> lock(mu); false){ mpre("ОШИБКА установки блокировки", __LINE__);
+									//}else if(std::lock_guard<std::recursive_mutex> lock(mu); false){ mpre("ОШИБКА установки блокировки", __LINE__);
 									}else if(vals = erb(*BMF, {{"clump_id", bmf::clump_id}, {alias+ "_values_id", values.at("id")}, {"name", to_string(nn)}}); !vals.empty()){ //mpre(vals, __LINE__, "Знак `"+ values["name"]+ "` уже добавлен "+ to_string(nn));
 									}else if(("-" != _value.substr(0, 1)) && (0 == nn)){ //mpre("Не создаем положительный знак отрицания", __LINE__);
 									//}else if(bmf::ARGV.end() != bmf::ARGV.find("-t")){ mpre(values, __LINE__, "Значение"); mpre("ОШИБКА в многопоточном режиме недопустимо создание новых знаков "+ alias+ "_values_id="+ values.at("id")+ " name="+ to_string(nn), __LINE__);
