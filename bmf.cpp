@@ -240,7 +240,9 @@ int main(int argc, char **argv){
 			}else if(!fs::exists(ENV_FOLDER) && !fs::create_directory(ENV_FOLDER)){ mpre("ОШИБКА директория БД не задана", __LINE__);
 			}else if(dbstl::dbstl_startup(); false){ mpre("ОШИБКА инициализации БД", __LINE__);
 			//}else if(auto penv = dbstl::open_env(ENV_FOLDER.c_str(), 0u, DB_INIT_MPOOL | DB_CREATE | DB_INIT_LOCK | DB_THREAD); false){ mpre("ОШИБКА создания переменной среды", __LINE__);
-			}else if(auto penv = dbstl::open_env(ENV_FOLDER.c_str(), 0u, DB_INIT_MPOOL | DB_CREATE); false){ mpre("ОШИБКА задания переменных среды", __LINE__);
+			//}else if(auto penv = dbstl::open_env(ENV_FOLDER.c_str(), 0u, DB_INIT_MPOOL | DB_CREATE); false){ mpre("ОШИБКА задания переменных среды", __LINE__);
+			}else if(DbEnv *penv = new DbEnv(DB_CXX_NO_EXCEPTIONS); (nullptr == penv)){ mpre("ОШИБКА создания окружения", __LINE__);
+			}else if(penv->open(bmf::dbname.c_str(), DB_CREATE | DB_INIT_MPOOL, 0); (nullptr == penv)){ mpre("ОШИБКА подключения к окружению", __LINE__);
 			}else if(auto db = dbstl::open_db(penv, "iris.db", DB_BTREE, DB_CREATE, 0u); false){ mpre("ОШИБКА открытия БД", __LINE__);
 			//}else if(struct TestElement{ std::string id; std::string name; }; false){ mpre("ОШИБКА создания структуры", __LINE__);
 			}else if(dbstl::DbstlElemTraits<TMs>::instance()->set_size_function([](const TMs& elem){ // size
@@ -285,6 +287,7 @@ int main(int argc, char **argv){
 				}else{ mpre(row, "Запись " +to_string(std::time(0) - time), __LINE__); //mpre("Время с прошлой записи " +to_string(std::time(0) - time), __LINE__);
 				}return false; }()){ mpre("ОШИБКА проверки значения в БД", __LINE__);
 			}else if([&](){ for(int i = 0; i <= 0; i++){
+				
 				mpre("Добавление элемента "+ to_string(i), __LINE__); TMs row = {{"Текущее время", std::to_string(std::time(0))}}; test[to_string(i)] = row;
 				//mpre("Удаление элемента "+ to_string(i), __LINE__); test.erase(to_string(i));
 				}return false; }()){ mpre("ОШИБКА создания цикла копирования", __LINE__);
