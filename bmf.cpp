@@ -281,13 +281,12 @@ int main(int argc, char **argv){
 				}}); false){ mpre("ОШИБКА установки функции перезаписи", __LINE__);
 			}else if(dbstl::db_map<std::string, TMs> test(db, penv); false){ mpre("ОШИБКА регистрации хранилища", __LINE__);
 			}else if([&](){ // Проверка изменений
-				if(TMs row = test.begin()->second; row.empty()){ mpre("ОШИБКА нулевой элемент не задан в базе", __LINE__);
+				if(TMs row = test.begin()->second; row.empty()){ mpre("Нулевой элемент не задан в базе", __LINE__);
 				}else if(row.end() == row.find("Текущее время")){ mpre("ОШИБКА в элементе не найдено поле текущего времени", __LINE__);
 				}else if(int time = atoi(row.at("Текущее время").c_str()); !time){ mpre("ОШИБКА получения текущего времени", __LINE__);
 				}else{ mpre(row, "Запись " +to_string(std::time(0) - time), __LINE__); //mpre("Время с прошлой записи " +to_string(std::time(0) - time), __LINE__);
 				}return false; }()){ mpre("ОШИБКА проверки значения в БД", __LINE__);
 			}else if([&](){ for(int i = 0; i <= 0; i++){
-				
 				mpre("Добавление элемента "+ to_string(i), __LINE__); TMs row = {{"Текущее время", std::to_string(std::time(0))}}; test[to_string(i)] = row;
 				//mpre("Удаление элемента "+ to_string(i), __LINE__); test.erase(to_string(i));
 				}return false; }()){ mpre("ОШИБКА создания цикла копирования", __LINE__);
