@@ -198,8 +198,8 @@ int main(int argc, char **argv){
 			if(bmf::ARGV.end() == bmf::ARGV.find("-v")){ //mpre("Пропускаем отображение версии", __LINE__);
 			}else if(skip = !skip; false){ mpre("Условия выхода", __LINE__);
 			}else{ std::cout << endl;
-				std::cout << "bimorph v7.2" << endl;
-				std::cout << "Copyright (C) 2020 биморф.рф" << endl;
+				std::cout << "bimorph v8.0" << endl;
+				std::cout << "Copyright (C) 2021 биморф.рф" << endl;
 				std::cout << "Нет НИКАКИХ ГАРАНТИЙ до степени, разрешённой законом." << endl << endl;
 				std::cout << "Лицензия freemium https://ru.wikipedia.org/wiki/Freemium" << endl;
 				std::cout << "Данная версия является условной бесплатной с граничением сети в "+ to_string(bmf::size_max)+ " морфов" << endl;
@@ -216,24 +216,23 @@ int main(int argc, char **argv){
 			}else if(string file = (1 <= argc ? argv[0] : "./bimorph"); (0 >= file.length())){ mpre("ОШИБКА получения имени файла", __LINE__);
 			}else{ std::cout << endl;
 				std::cout << "Использование: "+ file+ " [КЛЮЧИ]… [SQLITE ФАЙЛ]… [КЛЮЧИ]…" << endl;
-				std::cout << "-epoch		количество эпох выполнения при полном совпадении процесс обучения останавливается" << endl;
-				std::cout << "-db		файл sqlite базы данных в которых хранится модель" << endl;
-				std::cout << "-itog		номер итога для обучения -itog 3.2" << endl;
-				std::cout << "-rand		перемешивание списка для более равномерных результатов" << endl;
+				std::cout << "epoch		количество эпох выполнения при полном совпадении процесс обучения останавливается" << endl;
+				std::cout << "db		файл sqlite базы данных в которых хранится модель" << endl;
+				std::cout << "itog		номер итога для обучения" << endl;
 				std::cout << "-v		показать информацию о версии" << endl;
 				std::cout << "-h		показать эту справку и выйти" << endl;
-				std::cout << "-dano		параметры расчета в формате json при пустом значении берет из стандартного ввода -" << endl;
+				std::cout << "dano		параметры расчета в формате json при пустом значении берет из стандартного ввода -" << endl;
 				//std::cout << "-thread		количество потоков обучения" << endl;
 				//std::cout << "-tt	установка тестовых данных из выборки" << endl;
 				std::cout << "-c		обнулить результаты предыдущих обучений" << endl;
 				std::cout << "-a		отображение атрибутов параметров консоли" << endl << endl;
 
-				std::cout << "Пример обучения $echo '[{\"dano\":{\"Параметр_0\":\"0\",\"Параметр_1\":\"1\"}, \"itog\":{\"Результат\":\"1\"}}]' | "+ file+ " db.json -epoch 10" << endl;
-				std::cout << "Пример обучения из файла обучающей выборки $cat data.json | "+ file+ " db.json -epoch 10" << endl;
-				std::cout << "Пример расчета $"+ file+ " db.json -epoch 10 -dano '[{\"dano\":{\"Параметр_0\":\"0\",\"Параметр_1\":\"1\"}}]'" << endl << endl;
+				std::cout << "Пример загрузки набора данных $ cat iris.json | "+ file+ " iris -" << endl;
+				std::cout << "Пример обучения набора данных $ "+ file+ " iris ds=1 epoch=10" << endl;
+				std::cout << "Пример расчета $"+ file+ " iris dano=[{\"dano\":{\"Параметр_0\":\"0\",\"Параметр_1\":\"1\"}}]" << endl << endl;
 
 				std::cout << "Оперативная справка: http://биморф.рф/" << endl;
-				std::cout << "Об ошибках в переводе сообщений «биморф» сообщайте по адресу: <bmf@mpak.su>" << endl;
+				std::cout << "Об ошибках в переводе сообщений «биморф» сообщайте по адресу: <bimorph@mpak.su>" << endl;
 				std::cout << "Полная документация: http://биморф.рф/" << endl << endl;
 			} return true; return false; }()){ mpre("Раздел помощи", __LINE__);
 		}else if(skip = !skip; false){ mpre("Условие выхода", __LINE__);
