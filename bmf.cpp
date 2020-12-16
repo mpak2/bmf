@@ -321,20 +321,20 @@ int main(int argc, char **argv){
 			}else if(envp->open(bmf::dbname.c_str(), envFlags, 0); (nullptr == envp)){ mpre("ОШИБКА открытия окружения", __LINE__);
 			}else{ mpre("Создание окружения", __LINE__);
 			}return envp; }(); (nullptr == envp)){ mpre("ОШИБКА подключения окружения БД", __LINE__);
-		/*}else if(Db *dbp = [&](Db *db = NULL){ // Подключение БД
-			if(Db *db = new Db(envp, DB_CXX_NO_EXCEPTIONS); (nullptr == db)){ mpre("ОШИБКА создания БД", __LINE__);
-			}else if(db->set_flags(DB_DUPSORT)){ mpre("ОШИБКА включения сортировки", __LINE__);
-			}else if(u_int32_t openFlags = DB_CREATE | DB_READ_UNCOMMITTED | DB_AUTO_COMMIT | DB_THREAD; !openFlags){ mpre("ОШИБКА устанвоки флагов", __LINE__);
-			}else if(db->open(NULL, "iris.db", NULL, DB_BTREE, openFlags, 0)){ mpre("ОШИБКА открытия БД", __LINE__);
-			}else if(dbstl::register_db(db); false){ mpre("ОШИБКА регистрации БД", __LINE__);
-			}else{ //mpre("Открытие БД", __LINE__);
-			}return db; }(); false){ mpre("ОШИБКА подключения к БД", __LINE__);*/
 		}else if(dbstl::dbstl_startup(); false){ mpre("ОШИБКА запуска", __LINE__);
 		}else if(dbstl::register_db_env(envp); false){ mpre("ОШИБКА регистрации окружения", __LINE__);
+		}else if(Db *dbp = [&](Db *db = NULL){ // Открытие БД
+			if(db = new Db(envp, DB_CXX_NO_EXCEPTIONS); false){ mpre("ОШИБКА создания соединения", __LINE__);
+			}else if(db->set_flags(DB_DUP); false){ mpre("ОШИБКА установки флага", __LINE__);
+			}else if(u_int32_t openFlags = DB_CREATE | DB_READ_UNCOMMITTED | DB_AUTO_COMMIT | DB_THREAD; !openFlags){ mpre("ОШИБКА устанвоки флагов", __LINE__);
+			}else if(db->open(NULL, "iris.db", NULL, DB_BTREE, openFlags, 0); false){ mpre("ОШИБКА открытия БД", __LINE__);
+			}else if(dbstl::register_db(db); false){ mpre("ОШИБКА регистрации БД", __LINE__);
+			}else{
+			}return db; }(); false){ mpre("ОШИБКА открытия БД", __LINE__);
 		}else if([&](){ // Запись в БД
-			Db *dbp = new Db(envp, DB_CXX_NO_EXCEPTIONS);
+			/*Db *dbp = new Db(envp, DB_CXX_NO_EXCEPTIONS);
          dbp->set_flags(DB_DUP);
-         dbp->open(NULL, "iris.db", NULL, DB_BTREE, DB_CREATE | DB_READ_UNCOMMITTED | DB_AUTO_COMMIT, 0);
+         dbp->open(NULL, "iris.db", NULL, DB_BTREE, DB_CREATE | DB_READ_UNCOMMITTED | DB_AUTO_COMMIT, 0);*/
 
 			typedef dbstl::db_multimap<const char *, int, dbstl::ElementHolder<int>> strmap_t;
 
