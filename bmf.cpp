@@ -321,38 +321,73 @@ int main(int argc, char **argv){
 			}else if(envp->open(bmf::dbname.c_str(), envFlags, 0); (nullptr == envp)){ mpre("ОШИБКА открытия окружения", __LINE__);
 			}else{ mpre("Создание окружения", __LINE__);
 			}return envp; }(); (nullptr == envp)){ mpre("ОШИБКА подключения окружения БД", __LINE__);
+		}else if(dbstl::DbstlElemTraits<TMs>::instance()->set_size_function([](const TMs& elem){ // size
+			u_int32_t size = (sizeof(std::string::size_type) + std::to_string(elem.size()).length());
+			for(auto elem_itr:elem){
+				size += sizeof(std::string::size_type) + elem_itr.first.length();
+				size += sizeof(std::string::size_type) + elem_itr.second.length();
+			}return size; }); false){ mpre("ОШИБКА установки функции размера", __LINE__);
+		}else if(dbstl::DbstlElemTraits<TMs>::instance()->set_copy_function([](void* dest, const TMs& elem){
+			std::function save_str = [&](const std::string& str, void* dest){
+				auto size = str.length();
+				memcpy(dest, &size, sizeof(size));
+				char* charDest = static_cast<char*>(dest) + sizeof(size);
+				memcpy(charDest, str.data(), str.length());
+				return charDest + str.length();
+			}; //dest = save_str(elem.id, dest); dest = save_str(elem.name, dest);
+			std::string size = std::to_string(elem.size()); dest = save_str(size, dest);
+			for(auto elem_itr:elem){
+				dest = save_str(elem_itr.first, dest);
+				dest = save_str(elem_itr.second, dest);
+			}}); false){ mpre("ОШИБКА установки функции сохранения", __LINE__);
+		}else if(dbstl::DbstlElemTraits<TMs>::instance()->set_restore_function([](TMs& elem, const void* src){ // restore
+			std::function restore_str = [&](std::string& str, const void* src){
+				std::string::size_type size;
+				memcpy(&size, src, sizeof(size));
+				str.reserve(size);
+				const char* strSrc = static_cast<const char*>(src) + sizeof(size);
+				str.insert(0, strSrc, size);
+				return strSrc + size;
+			}; //src = restore_str(elem.id, src); src = restore_str(elem.name, src);
+			std::string size; src = restore_str(size, src);
+			for(int i = atoi(size.c_str()); i >0; i--){
+				std::string key; src = restore_str(key, src);
+				std::string val; src = restore_str(val, src);
+				elem.insert(make_pair(key, val));
+			}}); false){ mpre("ОШИБКА установки функции перезаписи", __LINE__);
 		}else if(dbstl::dbstl_startup(); false){ mpre("ОШИБКА запуска", __LINE__);
 		}else if(dbstl::register_db_env(envp); false){ mpre("ОШИБКА регистрации окружения", __LINE__);
 		}else if(Db *dbp = [&](Db *db = NULL){ // Открытие БД
 			if(db = new Db(envp, DB_CXX_NO_EXCEPTIONS); false){ mpre("ОШИБКА создания соединения", __LINE__);
-			}else if(db->set_flags(DB_DUP); false){ mpre("ОШИБКА установки флага", __LINE__);
+			//}else if(db->set_flags(DB_DUP); false){ mpre("ОШИБКА установки флага", __LINE__);
 			}else if(u_int32_t openFlags = DB_CREATE | DB_READ_UNCOMMITTED | DB_AUTO_COMMIT | DB_THREAD; !openFlags){ mpre("ОШИБКА устанвоки флагов", __LINE__);
-			}else if(db->open(NULL, "iris.db", NULL, DB_BTREE, openFlags, 0); false){ mpre("ОШИБКА открытия БД", __LINE__);
+			}else if(db->open(NULL, "test.db", NULL, DB_BTREE, openFlags, 0); false){ mpre("ОШИБКА открытия БД", __LINE__);
 			}else if(dbstl::register_db(db); false){ mpre("ОШИБКА регистрации БД", __LINE__);
 			}else{
 			}return db; }(); false){ mpre("ОШИБКА открытия БД", __LINE__);
+		}else if(dbstl::db_map<std::string, TMs> test(dbp, envp); false){ mpre("ОШИБКА регистрации хранилища", __LINE__);
 		}else if([&](){ // Запись в БД
-			/*Db *dbp = new Db(envp, DB_CXX_NO_EXCEPTIONS);
-         dbp->set_flags(DB_DUP);
-         dbp->open(NULL, "iris.db", NULL, DB_BTREE, DB_CREATE | DB_READ_UNCOMMITTED | DB_AUTO_COMMIT, 0);*/
-
-			typedef dbstl::db_multimap<const char *, int, dbstl::ElementHolder<int>> strmap_t;
-
-			strmap_t *strmap = new strmap_t(dbp, envp);
-			int max_retries = 1;   // Max retry on a deadlock
-			const char *key_strings[] = {"key 1", "key 2", "key 3", "key 4", "key 5", "key 6", "key 7", "key 8", "key 9", "key 10"};
+			//typedef dbstl::db_map<std::string, TMs> strmap_t;
+			//strmap_t *strmap = new strmap_t(dbp, envp);
+			//const char *key_strings[] = {"key 1", "key 2", "key 3", "key 4", "key 5", "key 6", "key 7", "key 8", "key 9", "key 10"};
 						  DbTxn *txn = dbstl::begin_txn(0, envp);
 						  for (int j = 0; j < 10; j++) {
-								strmap->insert(make_pair(key_strings[j], rand()));
+								TMs row = {{"key1", "val1"}, {"key2", "val2"}};
+								test.insert(make_pair(std::to_string(rand()), row));
 						  }
 						  dbstl::commit_txn(envp); //dbstl::abort_txn(envp);
 	 
 						 std::cout << __LINE__ << " : Found "
-										<< std::to_string([&](int cnt = 0){ for(strmap_t::iterator itr = strmap->begin(); itr != strmap->end(); itr++){ cnt += 1; }; return cnt; }()) //countRecords(strmap)
+										<< std::to_string([&](int cnt = 0){ for(auto itr = test.begin(); itr != test.end(); itr++){ cnt += 1; }; return cnt; }()) //countRecords(strmap)
 										<< " records in the database." << " : committing txn" << std::endl;
-				delete strmap;
-      //dbstl_exit();
-      //delete envp;
+
+
+						for(auto itr:test){
+							mpre(itr.second, "Запись " +itr.first, __LINE__);
+						}
+			//delete test;
+			dbstl::dbstl_exit();
+			delete envp;
 			return false; }()){ mpre("ОШИБКА проверки записи в БД", __LINE__);
 		}else{ mpre("Подключение БД " +bmf::dbname, __LINE__);
 		}return false; }()){ mpre("ОШИБКА подключения БД", __LINE__);
