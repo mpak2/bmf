@@ -43,13 +43,15 @@
 //#include <curses.h>
 #include <curses.h>
 #include <ncurses.h>
-//#include <stdlib.h>
+#include <stdlib.h>
 //#include <unistd.h>
 //#include <termios.h>
 #include <memory>
 
 #include <db_cxx.h>
 #include <dbstl_map.h>
+#include <pthread.h>
+#include <unistd.h>
 
 //#define CL_HPP_MINIMUM_OPENCL_VERSION 110
 //#define CL_HPP_TARGET_OPENCL_VERSION 210
@@ -234,7 +236,7 @@ int main(int argc, char **argv){
 			}else if(bmf::clump_id = (std::string::npos == npos ? bmf::dbname : bmf::dbname.substr(npos+1, bmf::dbname.length())); (0 >= bmf::clump_id.length())){ mpre("ОШИБКА сокращения пути до файла", __LINE__);
 			}else{ //mpre("Путь до БД сокращен "+ bmf::clump_id, __LINE__);
 			}return (0 >= bmf::clump_id.length()); }()){ mpre("ОШИБКА получения скопления", __LINE__);
-		}else if([&](){
+		/*}else if([&](){
 			if(false){ mpre("ОШИБКА", __LINE__);
 			}else if(const std::string ENV_FOLDER = bmf::dbname; false){ mpre("ОШИБКА установки константы", __LINE__);
 			}else if(!fs::exists(ENV_FOLDER) && !fs::create_directory(ENV_FOLDER)){ mpre("ОШИБКА директория БД не задана", __LINE__);
@@ -242,9 +244,27 @@ int main(int argc, char **argv){
 			//}else if(auto penv = dbstl::open_env(ENV_FOLDER.c_str(), 0u, DB_INIT_MPOOL | DB_CREATE | DB_INIT_LOCK | DB_THREAD); false){ mpre("ОШИБКА создания переменной среды", __LINE__);
 			//}else if(auto penv = dbstl::open_env(ENV_FOLDER.c_str(), 0u, DB_INIT_MPOOL | DB_CREATE); false){ mpre("ОШИБКА задания переменных среды", __LINE__);
 			}else if(DbEnv *penv = new DbEnv(DB_CXX_NO_EXCEPTIONS); (nullptr == penv)){ mpre("ОШИБКА создания окружения", __LINE__);
-			}else if(penv->open(bmf::dbname.c_str(), DB_CREATE | DB_INIT_MPOOL, 0); (nullptr == penv)){ mpre("ОШИБКА подключения к окружению", __LINE__);
-			}else if(auto db = dbstl::open_db(penv, "iris.db", DB_BTREE, DB_CREATE, 0u); false){ mpre("ОШИБКА открытия БД", __LINE__);
+			//}else if(penv->open(bmf::dbname.c_str(), DB_CREATE | DB_INIT_MPOOL, 0); (nullptr == penv)){ mpre("ОШИБКА подключения к окружению", __LINE__);
+			}else if(penv->open(bmf::dbname.c_str(), DB_CREATE | DB_INIT_TXN | DB_INIT_LOCK | DB_INIT_LOG | DB_INIT_MPOOL, 0); (nullptr == penv)){ mpre("ОШИБКА подключения к окружению", __LINE__);
+			}else if(penv->set_lk_detect(DB_LOCK_MINWRITE); false){ mpre("ОШИБКА включения блокировки", __LINE__);
+			}else if(auto db = dbstl::open_db(penv, "iris.db", DB_BTREE, DB_CREATE | DB_READ_UNCOMMITTED | DB_AUTO_COMMIT | DB_THREAD, 0u); false){ mpre("ОШИБКА открытия БД", __LINE__);
+			//}else if(Db* db = NULL; false){ mpre("ОШИБКА создания БД", __LINE__);
+			//}else if(db->open(NULL, "test.db", bmf::dbname.c_str(), DB_BTREE, DB_CREATE | DB_READ_UNCOMMITTED | DB_AUTO_COMMIT | DB_THREAD, 0); false){ mpre("ОШИБКА открытия БД", __LINE__);
 			//}else if(struct TestElement{ std::string id; std::string name; }; false){ mpre("ОШИБКА создания структуры", __LINE__);
+			}else if(DbEnv *env = [&](DbEnv *env = NULL){ // Создание окружения
+				if(env = new DbEnv(DB_CXX_NO_EXCEPTIONS); (env == nullptr)){ mpre("ОШИБКА установки параметра исключений", __LINE__);
+				}else if(env->set_lg_bsize(64 * 1024 * 1024); (env == nullptr)){ mpre("ОШИБКА установки блока логов", __LINE__);
+				}else if(u_int32_t envFlags = DB_CREATE | DB_RECOVER | DB_INIT_LOCK | DB_INIT_LOG | DB_INIT_TXN | DB_INIT_MPOOL | DB_THREAD; !envFlags){ mpre("ОШИБКА установки флагов на создание окружения", __LINE__);
+				}else if(env->open(NULL, envFlags, 0644); (nullptr == env)){ mpre("ОШИБКА создания окружения", __LINE__);
+				}else{ //mpre("Создание окружения БД", __LINE__);
+				}return env; }(); (nullptr == env)){ mpre("ОШИБКА создания окружения", __LINE__);
+			//}else if(Db *db = NULL; false){ mpre("ОШИБКА создания БД", __LINE__);
+			}else if(Db *db = [&](Db *db = NULL){ // Создание БД
+				if(Db *db = new Db(env, DB_CXX_NO_EXCEPTIONS); (nullptr == db)){ mpre("ОШИБКА создания БД", __LINE__);
+				}else if(u_int32_t openFlags = DB_CREATE | DB_READ_UNCOMMITTED | DB_AUTO_COMMIT; !openFlags){ mpre("ОШИБКА создания флагов БД", __LINE__);
+				}else if(db->open(NULL, bmf::dbname.c_str(), NULL, DB_BTREE, openFlags, 0); (nullptr == db)){ mpre("ОШИБКА создания БД", __LINE__);
+				}else{ mpre("Создание БД", __LINE__);
+				}return db; }()){ mpre("ОШИБКА создания БД", __LINE__);
 			}else if(dbstl::DbstlElemTraits<TMs>::instance()->set_size_function([](const TMs& elem){ // size
 				u_int32_t size = (sizeof(std::string::size_type) + std::to_string(elem.size()).length());
 				for(auto elem_itr:elem){
@@ -279,7 +299,7 @@ int main(int argc, char **argv){
 					std::string val; src = restore_str(val, src);
 					elem.insert(make_pair(key, val));
 				}}); false){ mpre("ОШИБКА установки функции перезаписи", __LINE__);
-			}else if(dbstl::db_map<std::string, TMs> test(db, penv); false){ mpre("ОШИБКА регистрации хранилища", __LINE__);
+			}else if(dbstl::db_map<std::string, TMs> test(db, env); false){ mpre("ОШИБКА регистрации хранилища", __LINE__);
 			}else if([&](){ // Проверка изменений
 				if(TMs row = test.begin()->second; row.empty()){ mpre("Нулевой элемент не задан в базе", __LINE__);
 				}else if(row.end() == row.find("Текущее время")){ mpre("ОШИБКА в элементе не найдено поле текущего времени", __LINE__);
@@ -290,19 +310,51 @@ int main(int argc, char **argv){
 				mpre("Добавление элемента "+ to_string(i), __LINE__); TMs row = {{"Текущее время", std::to_string(std::time(0))}}; test[to_string(i)] = row;
 				//mpre("Удаление элемента "+ to_string(i), __LINE__); test.erase(to_string(i));
 				}return false; }()){ mpre("ОШИБКА создания цикла копирования", __LINE__);
-			/*}else if([&](){ for(auto test_itr:test){ // Перебор списка
-					mpre(test_itr.second, "Элемент " +test_itr.first, __LINE__);
-				}return false; }()){ mpre("ОШИБКА перебора списка", __LINE__);*/
 			//}else if(auto [itr, status] = elementsMap["added key 5"] = {"added id 5", "added name 5"}; false){ mpre("ОШИБКА добавления новых данных", __LINE__);
-			/*}else if(std::transform(
-					elementsMap.begin(dbstl::ReadModifyWriteOption::no_read_modify_write(), true),
-					elementsMap.end(),
-					std::ostream_iterator<std::string>(std::cout, "\n"),
-					[](const auto data) -> std::string { return  data.first + "=> { id: " + data.second.id + ", name: " + data.second.name + "}"; }
-				); false){ mpre("ОШИБКА вывода содержимого", __LINE__);*/
 			}else{ mpre("Подключение к БД " +bmf::dbname, __LINE__);
-			}return true; }()){ mpre("Тест подключения к БД", __LINE__);
-		}else{
+			}return true; }()){ mpre("Тест подключения к БД", __LINE__);*/
+		}else if(DbEnv *envp = [&](DbEnv *envp = NULL){ // Окружение БД
+			if(envp = new DbEnv(DB_CXX_NO_EXCEPTIONS); (nullptr == envp)){ mpre("ОШИБКА создания окружения", __LINE__);
+			}else if(envp->set_lk_detect(DB_LOCK_MINWRITE); (nullptr == envp)){ mpre("ОШИБКА установки записи ошибок", __LINE__);
+			}else if(u_int32_t envFlags = DB_CREATE | DB_RECOVER | DB_INIT_LOCK | DB_INIT_LOG | DB_INIT_TXN | DB_INIT_MPOOL | DB_THREAD; !envFlags){ mpre("ОШИБКА созадания флагов окружения", __LINE__);
+			}else if(!fs::exists(bmf::dbname) && !fs::create_directory(bmf::dbname)){ mpre("ОШИБКА директория БД не задана", __LINE__);
+			}else if(envp->open(bmf::dbname.c_str(), envFlags, 0); (nullptr == envp)){ mpre("ОШИБКА открытия окружения", __LINE__);
+			}else{ mpre("Создание окружения", __LINE__);
+			}return envp; }(); (nullptr == envp)){ mpre("ОШИБКА подключения окружения БД", __LINE__);
+		/*}else if(Db *dbp = [&](Db *db = NULL){ // Подключение БД
+			if(Db *db = new Db(envp, DB_CXX_NO_EXCEPTIONS); (nullptr == db)){ mpre("ОШИБКА создания БД", __LINE__);
+			}else if(db->set_flags(DB_DUPSORT)){ mpre("ОШИБКА включения сортировки", __LINE__);
+			}else if(u_int32_t openFlags = DB_CREATE | DB_READ_UNCOMMITTED | DB_AUTO_COMMIT | DB_THREAD; !openFlags){ mpre("ОШИБКА устанвоки флагов", __LINE__);
+			}else if(db->open(NULL, "iris.db", NULL, DB_BTREE, openFlags, 0)){ mpre("ОШИБКА открытия БД", __LINE__);
+			}else if(dbstl::register_db(db); false){ mpre("ОШИБКА регистрации БД", __LINE__);
+			}else{ //mpre("Открытие БД", __LINE__);
+			}return db; }(); false){ mpre("ОШИБКА подключения к БД", __LINE__);*/
+		}else if(dbstl::dbstl_startup(); false){ mpre("ОШИБКА запуска", __LINE__);
+		}else if(dbstl::register_db_env(envp); false){ mpre("ОШИБКА регистрации окружения", __LINE__);
+		}else if([&](){ // Запись в БД
+			Db *dbp = new Db(envp, DB_CXX_NO_EXCEPTIONS);
+         dbp->set_flags(DB_DUP);
+         dbp->open(NULL, "iris.db", NULL, DB_BTREE, DB_CREATE | DB_READ_UNCOMMITTED | DB_AUTO_COMMIT, 0);
+
+			typedef dbstl::db_multimap<const char *, int, dbstl::ElementHolder<int>> strmap_t;
+
+			strmap_t *strmap = new strmap_t(dbp, envp);
+			int max_retries = 1;   // Max retry on a deadlock
+			const char *key_strings[] = {"key 1", "key 2", "key 3", "key 4", "key 5", "key 6", "key 7", "key 8", "key 9", "key 10"};
+						  DbTxn *txn = dbstl::begin_txn(0, envp);
+						  for (int j = 0; j < 10; j++) {
+								strmap->insert(make_pair(key_strings[j], rand()));
+						  }
+						  dbstl::commit_txn(envp); //dbstl::abort_txn(envp);
+	 
+						 std::cout << __LINE__ << " : Found "
+										<< std::to_string([&](int cnt = 0){ for(strmap_t::iterator itr = strmap->begin(); itr != strmap->end(); itr++){ cnt += 1; }; return cnt; }()) //countRecords(strmap)
+										<< " records in the database." << " : committing txn" << std::endl;
+				delete strmap;
+      //dbstl_exit();
+      //delete envp;
+			return false; }()){ mpre("ОШИБКА проверки записи в БД", __LINE__);
+		}else{ mpre("Подключение БД " +bmf::dbname, __LINE__);
 		}return false; }()){ mpre("ОШИБКА подключения БД", __LINE__);
 	}else if([&](){ // Функции БД
 		if(bmf::exec = ([&](string sql, bool pass = false, int sleep = 0, int result = 1){ do{ // Запрос к БД
