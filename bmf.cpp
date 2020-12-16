@@ -72,6 +72,9 @@ typedef std::map<string, TMs> TMMs;
 typedef std::map<int, TMs> TMMi;
 typedef std::map<string, TMMi> TM3i;
 
+typedef dbstl::db_map<std::string, TMs> TMMt;
+typedef std::map<std::string, Db*> TMMd;
+
 std::recursive_mutex mu;
 
 #include "bmf.c"
@@ -99,8 +102,8 @@ namespace bmf{ // Глобальные переменные
 //	TMs CACHE; // Кеш результатов расчета
 	TMs COUNT; // Кеш результатов расчета
 	TMs CALCULATE; // Список формул для быстрых расчетов для каждого из итогов
-	std::map<int, boost::dynamic_bitset<>> DANO; // Кеш результатов исходников
-	std::map<int, boost::dynamic_bitset<>> ITOG; // Кеш результатов расчета
+//	std::map<int, boost::dynamic_bitset<>> DANO; // Кеш результатов исходников
+//	std::map<int, boost::dynamic_bitset<>> ITOG; // Кеш результатов расчета
 //	std::map<int, boost::dynamic_bitset<>> MAPS; // Список битовых результатов расчета для каждого морфа
 
 	TMs databases; // Список баз данных
@@ -111,6 +114,16 @@ namespace bmf{ // Глобальные переменные
 	TMs ARGV; // Массив параметров консоли
 	int timestamp =  time(0); // Расчет выполнения участков кода
 	auto microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9;
+
+	TMMd INDEX; // Справочнк морфов
+	TMMd DATASET; // Наборы данных
+	TMMd DATASET_MAP; // Карты
+	TMMd DANO; // Исходники
+	TMMd DANO_VALUES; // Значения исходников
+	TMMd DANO_TITLES; // Заголовки исходников
+	TMMd ITOG; // Итоги
+	TMMd ITOG_VALUES; // Значения итогов
+	TMMd ITOG_TITLES; // Заголовки итогов
 
 	std::function<TMMi(string,TM3i&)> Save; // Сохранение информации в базу
 	std::function<std::string(TMs)> Calculate; // Расчет строки для расчета польской нотации
@@ -137,10 +150,12 @@ namespace bmf{ // Глобальные переменные
 	//std::function<boost::dynamic_bitset<>(TMs&)> Mapping; // Расчет карт результатов
 	std::function<TMs(TMs&)> Reindex; // Реиндексация
 	std::function<TMs(TMs&,std::string)> Maps; // Расчет карт результатов
-	std::function<bool(bool)> Open; // Открытие соединения с БД
+	//std::function<bool(bool)> Open; // Открытие соединения с БД
 	std::function<bool(int)> Close; // Закрытие соединения с БД
 	std::function<bool(string,bool)> Mem; // Расчет карт результатов
 	std::function<bool()> Databases; // Список баз данных
+
+	std::function<Db*(string)> Open; // Список баз данных
 }
 
   
@@ -183,14 +198,14 @@ int main(int argc, char **argv){
 			if(bmf::ARGV.end() == bmf::ARGV.find("-v")){ //mpre("Пропускаем отображение версии", __LINE__);
 			}else if(skip = !skip; false){ mpre("Условия выхода", __LINE__);
 			}else{ std::cout << endl;
-				std::cout << "bimotph v7.2" << endl;
+				std::cout << "bimorph v7.2" << endl;
 				std::cout << "Copyright (C) 2020 биморф.рф" << endl;
 				std::cout << "Нет НИКАКИХ ГАРАНТИЙ до степени, разрешённой законом." << endl << endl;
 				std::cout << "Лицензия freemium https://ru.wikipedia.org/wiki/Freemium" << endl;
 				std::cout << "Данная версия является условной бесплатной с граничением сети в "+ to_string(bmf::size_max)+ " морфов" << endl;
 				std::cout << "Морф — наименьшая осмысленная единица языка (логики)" << endl << endl;
 
-				std::cout << "Авторы программы -- Кривошлыков Евгений Павлович +79582014736" << endl << endl;
+				std::cout << "Авторы программы -- Кривошлыков Евгений Павлович +79618063797" << endl << endl;
 			}return skip; }()){ mpre("Информация о версии", __LINE__);
 		}else if([&](){ // Отображение атрибутов командной строки
 			if(bmf::ARGV.end() == bmf::ARGV.find("-a")){ return false; //mpre("Пропускаем отображение версии", __LINE__);
@@ -236,83 +251,6 @@ int main(int argc, char **argv){
 			}else if(bmf::clump_id = (std::string::npos == npos ? bmf::dbname : bmf::dbname.substr(npos+1, bmf::dbname.length())); (0 >= bmf::clump_id.length())){ mpre("ОШИБКА сокращения пути до файла", __LINE__);
 			}else{ //mpre("Путь до БД сокращен "+ bmf::clump_id, __LINE__);
 			}return (0 >= bmf::clump_id.length()); }()){ mpre("ОШИБКА получения скопления", __LINE__);
-		/*}else if([&](){
-			if(false){ mpre("ОШИБКА", __LINE__);
-			}else if(const std::string ENV_FOLDER = bmf::dbname; false){ mpre("ОШИБКА установки константы", __LINE__);
-			}else if(!fs::exists(ENV_FOLDER) && !fs::create_directory(ENV_FOLDER)){ mpre("ОШИБКА директория БД не задана", __LINE__);
-			}else if(dbstl::dbstl_startup(); false){ mpre("ОШИБКА инициализации БД", __LINE__);
-			//}else if(auto penv = dbstl::open_env(ENV_FOLDER.c_str(), 0u, DB_INIT_MPOOL | DB_CREATE | DB_INIT_LOCK | DB_THREAD); false){ mpre("ОШИБКА создания переменной среды", __LINE__);
-			//}else if(auto penv = dbstl::open_env(ENV_FOLDER.c_str(), 0u, DB_INIT_MPOOL | DB_CREATE); false){ mpre("ОШИБКА задания переменных среды", __LINE__);
-			}else if(DbEnv *penv = new DbEnv(DB_CXX_NO_EXCEPTIONS); (nullptr == penv)){ mpre("ОШИБКА создания окружения", __LINE__);
-			//}else if(penv->open(bmf::dbname.c_str(), DB_CREATE | DB_INIT_MPOOL, 0); (nullptr == penv)){ mpre("ОШИБКА подключения к окружению", __LINE__);
-			}else if(penv->open(bmf::dbname.c_str(), DB_CREATE | DB_INIT_TXN | DB_INIT_LOCK | DB_INIT_LOG | DB_INIT_MPOOL, 0); (nullptr == penv)){ mpre("ОШИБКА подключения к окружению", __LINE__);
-			}else if(penv->set_lk_detect(DB_LOCK_MINWRITE); false){ mpre("ОШИБКА включения блокировки", __LINE__);
-			}else if(auto db = dbstl::open_db(penv, "iris.db", DB_BTREE, DB_CREATE | DB_READ_UNCOMMITTED | DB_AUTO_COMMIT | DB_THREAD, 0u); false){ mpre("ОШИБКА открытия БД", __LINE__);
-			//}else if(Db* db = NULL; false){ mpre("ОШИБКА создания БД", __LINE__);
-			//}else if(db->open(NULL, "test.db", bmf::dbname.c_str(), DB_BTREE, DB_CREATE | DB_READ_UNCOMMITTED | DB_AUTO_COMMIT | DB_THREAD, 0); false){ mpre("ОШИБКА открытия БД", __LINE__);
-			//}else if(struct TestElement{ std::string id; std::string name; }; false){ mpre("ОШИБКА создания структуры", __LINE__);
-			}else if(DbEnv *env = [&](DbEnv *env = NULL){ // Создание окружения
-				if(env = new DbEnv(DB_CXX_NO_EXCEPTIONS); (env == nullptr)){ mpre("ОШИБКА установки параметра исключений", __LINE__);
-				}else if(env->set_lg_bsize(64 * 1024 * 1024); (env == nullptr)){ mpre("ОШИБКА установки блока логов", __LINE__);
-				}else if(u_int32_t envFlags = DB_CREATE | DB_RECOVER | DB_INIT_LOCK | DB_INIT_LOG | DB_INIT_TXN | DB_INIT_MPOOL | DB_THREAD; !envFlags){ mpre("ОШИБКА установки флагов на создание окружения", __LINE__);
-				}else if(env->open(NULL, envFlags, 0644); (nullptr == env)){ mpre("ОШИБКА создания окружения", __LINE__);
-				}else{ //mpre("Создание окружения БД", __LINE__);
-				}return env; }(); (nullptr == env)){ mpre("ОШИБКА создания окружения", __LINE__);
-			//}else if(Db *db = NULL; false){ mpre("ОШИБКА создания БД", __LINE__);
-			}else if(Db *db = [&](Db *db = NULL){ // Создание БД
-				if(Db *db = new Db(env, DB_CXX_NO_EXCEPTIONS); (nullptr == db)){ mpre("ОШИБКА создания БД", __LINE__);
-				}else if(u_int32_t openFlags = DB_CREATE | DB_READ_UNCOMMITTED | DB_AUTO_COMMIT; !openFlags){ mpre("ОШИБКА создания флагов БД", __LINE__);
-				}else if(db->open(NULL, bmf::dbname.c_str(), NULL, DB_BTREE, openFlags, 0); (nullptr == db)){ mpre("ОШИБКА создания БД", __LINE__);
-				}else{ mpre("Создание БД", __LINE__);
-				}return db; }()){ mpre("ОШИБКА создания БД", __LINE__);
-			}else if(dbstl::DbstlElemTraits<TMs>::instance()->set_size_function([](const TMs& elem){ // size
-				u_int32_t size = (sizeof(std::string::size_type) + std::to_string(elem.size()).length());
-				for(auto elem_itr:elem){
-					size += sizeof(std::string::size_type) + elem_itr.first.length();
-					size += sizeof(std::string::size_type) + elem_itr.second.length();
-				}return size; }); false){ mpre("ОШИБКА установки функции размера", __LINE__);
-			}else if(dbstl::DbstlElemTraits<TMs>::instance()->set_copy_function([](void* dest, const TMs& elem){
-				std::function save_str = [&](const std::string& str, void* dest){
-					auto size = str.length();
-					memcpy(dest, &size, sizeof(size));
-					char* charDest = static_cast<char*>(dest) + sizeof(size);
-					memcpy(charDest, str.data(), str.length());
-					return charDest + str.length();
-				}; //dest = save_str(elem.id, dest); dest = save_str(elem.name, dest);
-				std::string size = std::to_string(elem.size()); dest = save_str(size, dest);
-				for(auto elem_itr:elem){
-					dest = save_str(elem_itr.first, dest);
-					dest = save_str(elem_itr.second, dest);
-				}}); false){ mpre("ОШИБКА установки функции сохранения", __LINE__);
-			}else if(dbstl::DbstlElemTraits<TMs>::instance()->set_restore_function([](TMs& elem, const void* src){ // restore
-				std::function restore_str = [&](std::string& str, const void* src){
-					std::string::size_type size;
-					memcpy(&size, src, sizeof(size));
-					str.reserve(size);
-					const char* strSrc = static_cast<const char*>(src) + sizeof(size);
-					str.insert(0, strSrc, size);
-					return strSrc + size;
-				}; //src = restore_str(elem.id, src); src = restore_str(elem.name, src);
-				std::string size; src = restore_str(size, src);
-				for(int i = atoi(size.c_str()); i >0; i--){
-					std::string key; src = restore_str(key, src);
-					std::string val; src = restore_str(val, src);
-					elem.insert(make_pair(key, val));
-				}}); false){ mpre("ОШИБКА установки функции перезаписи", __LINE__);
-			}else if(dbstl::db_map<std::string, TMs> test(db, env); false){ mpre("ОШИБКА регистрации хранилища", __LINE__);
-			}else if([&](){ // Проверка изменений
-				if(TMs row = test.begin()->second; row.empty()){ mpre("Нулевой элемент не задан в базе", __LINE__);
-				}else if(row.end() == row.find("Текущее время")){ mpre("ОШИБКА в элементе не найдено поле текущего времени", __LINE__);
-				}else if(int time = atoi(row.at("Текущее время").c_str()); !time){ mpre("ОШИБКА получения текущего времени", __LINE__);
-				}else{ mpre(row, "Запись " +to_string(std::time(0) - time), __LINE__); //mpre("Время с прошлой записи " +to_string(std::time(0) - time), __LINE__);
-				}return false; }()){ mpre("ОШИБКА проверки значения в БД", __LINE__);
-			}else if([&](){ for(int i = 0; i <= 0; i++){
-				mpre("Добавление элемента "+ to_string(i), __LINE__); TMs row = {{"Текущее время", std::to_string(std::time(0))}}; test[to_string(i)] = row;
-				//mpre("Удаление элемента "+ to_string(i), __LINE__); test.erase(to_string(i));
-				}return false; }()){ mpre("ОШИБКА создания цикла копирования", __LINE__);
-			//}else if(auto [itr, status] = elementsMap["added key 5"] = {"added id 5", "added name 5"}; false){ mpre("ОШИБКА добавления новых данных", __LINE__);
-			}else{ mpre("Подключение к БД " +bmf::dbname, __LINE__);
-			}return true; }()){ mpre("Тест подключения к БД", __LINE__);*/
 		}else if(DbEnv *envp = [&](DbEnv *envp = NULL){ // Окружение БД
 			if(envp = new DbEnv(DB_CXX_NO_EXCEPTIONS); (nullptr == envp)){ mpre("ОШИБКА создания окружения", __LINE__);
 			}else if(envp->set_lk_detect(DB_LOCK_MINWRITE); (nullptr == envp)){ mpre("ОШИБКА установки записи ошибок", __LINE__);
@@ -357,26 +295,42 @@ int main(int argc, char **argv){
 			}}); false){ mpre("ОШИБКА установки функции перезаписи", __LINE__);
 		}else if(dbstl::dbstl_startup(); false){ mpre("ОШИБКА запуска", __LINE__);
 		}else if(dbstl::register_db_env(envp); false){ mpre("ОШИБКА регистрации окружения", __LINE__);
-		}else if(Db *dbp = [&](Db *db = NULL){ // Открытие БД
+		}else if(bmf::Open = ([&](std::string table, Db *db = NULL){ // Открытие БД
 			if(db = new Db(envp, DB_CXX_NO_EXCEPTIONS); false){ mpre("ОШИБКА создания соединения", __LINE__);
 			//}else if(db->set_flags(DB_DUP); false){ mpre("ОШИБКА установки флага", __LINE__);
 			}else if(u_int32_t openFlags = DB_CREATE | DB_READ_UNCOMMITTED | DB_AUTO_COMMIT | DB_THREAD; !openFlags){ mpre("ОШИБКА устанвоки флагов", __LINE__);
-			}else if(db->open(NULL, "test.db", NULL, DB_BTREE, openFlags, 0); false){ mpre("ОШИБКА открытия БД", __LINE__);
+			}else if(db->open(NULL, table.c_str(), NULL, DB_BTREE, openFlags, 0); false){ mpre("ОШИБКА открытия БД", __LINE__);
 			}else if(dbstl::register_db(db); false){ mpre("ОШИБКА регистрации БД", __LINE__);
-			}else{
-			}return db; }(); false){ mpre("ОШИБКА открытия БД", __LINE__);
-		}else if(dbstl::db_map<std::string, TMs> test(dbp, envp); false){ mpre("ОШИБКА регистрации хранилища", __LINE__);
+			}else{ //mpre("Прдключение таблицы " +table, __LINE__);
+			}return db; }); false){ mpre("ОШИБКА открытия БД", __LINE__);
 		}else if([&](){ // Запись в БД
-			if(DbTxn *txn = dbstl::begin_txn(0, envp); (nullptr == txn)){ mpre("ОШИБКА создания транзакции", __LINE__);
+			if(false){ //mpre("Пропуск теста", __LINE__);
+			}else if(Db *dbp = bmf::Open("test.db"); (nullptr == dbp)){ mpre("ОШИБКА подключения к таблице", __LINE__);
+			}else if(TMMt test(dbp, envp); false){ mpre("ОШИБКА регистрации хранилища", __LINE__);
+			}else if(DbTxn *txn = dbstl::begin_txn(0, envp); (nullptr == txn)){ mpre("ОШИБКА создания транзакции", __LINE__);
 			}else if([&](){ for (int j = 0; j < 10; j++){// Добавление значений в базу
 				if(TMs row = {{"key1", "val1"}, {"key2", "val2"}}; row.empty()){ mpre("ОШИБКА создания нового значения", __LINE__);
 				}else if(auto [itr, ret] = test.insert(make_pair(std::to_string(rand()), row)); !ret){ mpre("ОШИБКА сохранения значения в БД", __LINE__);
 				}else{ //mpre(row, "Сохранение занчения в базу", __LINE__);
 				}}return false; }()){ mpre("ОШИБКА добавления значений в базу", __LINE__);
 			}else if(dbstl::commit_txn(envp); false){ mpre("ОШИБКА закрытия транзакции", __LINE__);
-			}else if(int count = [&](int cnt = 0){ for(auto itr = test.begin(); itr != test.end(); itr++){ cnt += 1; }; return cnt; }(); !count){ mpre("ОШИБКА расчета количества записей в базе", __LINE__);
+			//}else if(int count = [&](int cnt = 0){ for(auto itr = test.begin(); itr != test.end(); itr++){ cnt += 1; }; return cnt; }(); !count){ mpre("ОШИБКА расчета количества записей в базе", __LINE__);
+			}else if(int count = test.size(); !count){ mpre("ОШИБКА расчета количества записей в базе", __LINE__);
 			}else{ mpre("Количество записей в базе COUNT(test)=" + std::to_string(count), __LINE__);
 			}return false; }()){ mpre("ОШИБКА проверки записи в БД", __LINE__);
+		}else if([&](){ // Подключение таблиц	
+			if(false){ mpre("Пропуск подключения таблиц", __LINE__);
+			}else if(bmf::INDEX[""] = bmf::Open("index.db"); (bmf::INDEX.end() == bmf::INDEX.find(""))){ mpre("ОШИБКА открытия соединения с базой морфов", __LINE__);
+			}else if(bmf::DATASET[""] = bmf::Open("dataset.db"); (bmf::DATASET.end() == bmf::DATASET.find(""))){ mpre("ОШИБКА открытия соединения с базой наборов данных", __LINE__);
+			}else if(bmf::DATASET_MAP[""] = bmf::Open("dataset_map.db"); (bmf::DATASET_MAP.end() == bmf::DATASET_MAP.find(""))){ mpre("ОШИБКА открытия соединения с базой карт", __LINE__);
+			}else if(bmf::DANO[""] = bmf::Open("dano.db"); (bmf::DANO.end() == bmf::DANO.find(""))){ mpre("ОШИБКА открытия соединения с базой исходных значений", __LINE__);
+			}else if(bmf::DANO_VALUES[""] = bmf::Open("dano_values.db"); (bmf::DANO_VALUES.end() == bmf::DANO_VALUES.find(""))){ mpre("ОШИБКА открытия соединения с базой значений исходников", __LINE__);
+			}else if(bmf::DANO_TITLES[""] = bmf::Open("dano_titles.db"); (bmf::DANO_TITLES.end() == bmf::DANO_TITLES.find(""))){ mpre("ОШИБКА открытия соединения с базой заголовков исходников", __LINE__);
+			}else if(bmf::ITOG[""] = bmf::Open("itog.db"); (bmf::ITOG.end() == bmf::ITOG.find(""))){ mpre("ОШИБКА открытия соединения с базой итоговых значений", __LINE__);
+			}else if(bmf::ITOG_VALUES[""] = bmf::Open("itog_values.db"); (bmf::ITOG_VALUES.end() == bmf::ITOG_VALUES.find(""))){ mpre("ОШИБКА открытия соединения с базой значений итогов", __LINE__);
+			}else if(bmf::ITOG_TITLES[""] = bmf::Open("itog_titles.db"); (bmf::ITOG_TITLES.end() == bmf::ITOG_TITLES.find(""))){ mpre("ОШИБКА открытия соединения с базой заголовков итогов", __LINE__);
+			}else{ //mpre("Подключение списка таблиц", __LINE__);
+			}return false; }()){ mpre("ОШИБКА подключения таблиц", __LINE__);
 		}else{ mpre("Подключение БД " +bmf::dbname, __LINE__);
 		}return false; }()){ mpre("ОШИБКА подключения БД", __LINE__);
 	}else if([&](){ // Функции БД
