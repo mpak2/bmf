@@ -367,28 +367,16 @@ int main(int argc, char **argv){
 			}return db; }(); false){ mpre("ОШИБКА открытия БД", __LINE__);
 		}else if(dbstl::db_map<std::string, TMs> test(dbp, envp); false){ mpre("ОШИБКА регистрации хранилища", __LINE__);
 		}else if([&](){ // Запись в БД
-			//typedef dbstl::db_map<std::string, TMs> strmap_t;
-			//strmap_t *strmap = new strmap_t(dbp, envp);
-			//const char *key_strings[] = {"key 1", "key 2", "key 3", "key 4", "key 5", "key 6", "key 7", "key 8", "key 9", "key 10"};
-						  DbTxn *txn = dbstl::begin_txn(0, envp);
-						  for (int j = 0; j < 10; j++) {
-								TMs row = {{"key1", "val1"}, {"key2", "val2"}};
-								test.insert(make_pair(std::to_string(rand()), row));
-						  }
-						  dbstl::commit_txn(envp); //dbstl::abort_txn(envp);
-	 
-						 std::cout << __LINE__ << " : Found "
-										<< std::to_string([&](int cnt = 0){ for(auto itr = test.begin(); itr != test.end(); itr++){ cnt += 1; }; return cnt; }()) //countRecords(strmap)
-										<< " records in the database." << " : committing txn" << std::endl;
-
-
-						for(auto itr:test){
-							mpre(itr.second, "Запись " +itr.first, __LINE__);
-						}
-			//delete test;
-			dbstl::dbstl_exit();
-			delete envp;
-			return false; }()){ mpre("ОШИБКА проверки записи в БД", __LINE__);
+			if(DbTxn *txn = dbstl::begin_txn(0, envp); (nullptr == txn)){ mpre("ОШИБКА создания транзакции", __LINE__);
+			}else if([&](){ for (int j = 0; j < 10; j++){// Добавление значений в базу
+				if(TMs row = {{"key1", "val1"}, {"key2", "val2"}}; row.empty()){ mpre("ОШИБКА создания нового значения", __LINE__);
+				}else if(auto [itr, ret] = test.insert(make_pair(std::to_string(rand()), row)); !ret){ mpre("ОШИБКА сохранения значения в БД", __LINE__);
+				}else{ //mpre(row, "Сохранение занчения в базу", __LINE__);
+				}}return false; }()){ mpre("ОШИБКА добавления значений в базу", __LINE__);
+			}else if(dbstl::commit_txn(envp); false){ mpre("ОШИБКА закрытия транзакции", __LINE__);
+			}else if(int count = [&](int cnt = 0){ for(auto itr = test.begin(); itr != test.end(); itr++){ cnt += 1; }; return cnt; }(); !count){ mpre("ОШИБКА расчета количества записей в базе", __LINE__);
+			}else{ mpre("Количество записей в базе COUNT(test)=" + std::to_string(count), __LINE__);
+			}return false; }()){ mpre("ОШИБКА проверки записи в БД", __LINE__);
 		}else{ mpre("Подключение БД " +bmf::dbname, __LINE__);
 		}return false; }()){ mpre("ОШИБКА подключения БД", __LINE__);
 	}else if([&](){ // Функции БД
