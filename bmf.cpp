@@ -72,8 +72,8 @@ typedef std::map<string, TMs> TMMs;
 typedef std::map<int, TMs> TMMi;
 typedef std::map<string, TMMi> TM3i;
 
-typedef dbstl::db_map<std::string, TMs> TMMt;
-typedef std::map<std::string, Db*> TMMd;
+typedef dbstl::db_map<string, TMs> TMMt;
+typedef std::map<std::string, TMMt> TMMd;
 
 std::recursive_mutex mu;
 
@@ -154,7 +154,7 @@ namespace bmf{ // Глобальные переменные
 	std::function<bool(string,bool)> Mem; // Расчет карт результатов
 	std::function<bool()> Databases; // Список баз данных
 
-	std::function<Db*(string)> Open; // Список баз данных
+	std::function<TMMt(string)> Open; // Список баз данных
 	std::function<string(TMMd&)> Id; // Расчет локального идентификатора
 	std::function<TMMi(TMMd&,TMs)> Rb; // Список баз данных
 	std::function<TMs(TMMd&,TMs)> Erb; // Список баз данных
@@ -297,18 +297,20 @@ int main(int argc, char **argv){
 			}}); false){ mpre("ОШИБКА установки функции перезаписи", __LINE__);
 		}else if(dbstl::dbstl_startup(); false){ mpre("ОШИБКА запуска", __LINE__);
 		}else if(dbstl::register_db_env(envp); false){ mpre("ОШИБКА регистрации окружения", __LINE__);
-		}else if(bmf::Open = ([&](std::string table, Db *db = NULL){ // Открытие БД
-			if(db = new Db(envp, DB_CXX_NO_EXCEPTIONS); false){ mpre("ОШИБКА создания соединения", __LINE__);
+		}else if(bmf::Open = ([&](std::string table, TMMt tab = TMMt({})){ // Открытие БД
+			if(Db *db = new Db(envp, DB_CXX_NO_EXCEPTIONS); false){ mpre("ОШИБКА создания соединения", __LINE__);
 			//}else if(db->set_flags(DB_DUP); false){ mpre("ОШИБКА установки флага", __LINE__);
 			}else if(u_int32_t openFlags = DB_CREATE | DB_READ_UNCOMMITTED | DB_AUTO_COMMIT | DB_THREAD; !openFlags){ mpre("ОШИБКА устанвоки флагов", __LINE__);
 			}else if(db->open(NULL, table.c_str(), NULL, DB_BTREE, openFlags, 0); false){ mpre("ОШИБКА открытия БД", __LINE__);
 			}else if(dbstl::register_db(db); false){ mpre("ОШИБКА регистрации БД", __LINE__);
+			}else if(TMMt test(db, envp); false){ mpre("ОШИБКА регистрации хранилища", __LINE__);
 			}else{ //mpre("Прдключение таблицы " +table, __LINE__);
-			}return db; }); false){ mpre("ОШИБКА открытия БД", __LINE__);
+			}return tab; }); false){ mpre("ОШИБКА открытия БД", __LINE__);
 		}else if([&](){ // Запись в БД
 			if(false){ //mpre("Пропуск теста", __LINE__);
-			}else if(Db *dbp = bmf::Open("test.db"); (nullptr == dbp)){ mpre("ОШИБКА подключения к таблице", __LINE__);
-			}else if(TMMt test(dbp, envp); false){ mpre("ОШИБКА регистрации хранилища", __LINE__);
+			//}else if(Db *dbp = bmf::Open("test.db"); (nullptr == dbp)){ mpre("ОШИБКА подключения к таблице", __LINE__);
+			//}else if(TMMt test(dbp, envp); false){ mpre("ОШИБКА регистрации хранилища", __LINE__);
+			}else if(TMMt test = bmf::Open("test.db"); false){ mpre("ОШИБКА создания таблицы", __LINE__);
 			}else if(DbTxn *txn = dbstl::begin_txn(0, envp); (nullptr == txn)){ mpre("ОШИБКА создания транзакции", __LINE__);
 			}else if([&](){ for (int j = 0; j < 10; j++){// Добавление значений в базу
 				if(TMs row = {{"key1", "val1"}, {"key2", "val2"}}; row.empty()){ mpre("ОШИБКА создания нового значения", __LINE__);
@@ -339,8 +341,9 @@ int main(int argc, char **argv){
 		if(bmf::Id = ([&](TMMd& ROWS, int id = -1){ // Генерация локального идентификатора
 			if(false){ mpre("ОШИБКА пропуска", __LINE__);
 			}else if(ROWS.end() == ROWS.find("")){ //mpre("Справочник не содержит данных", __LINE__);
-			//}else if(TMMi& ROW = ROWS.at(""); false){ mpre("ОШИБКА получения ссылки на массив", __LINE__);
+			}else if(TMMt TAB = ROWS.at(""); false){ mpre("ОШИБКА получения размера базы", __LINE__);
 			//}else if(int id_max = (ROW.empty() ? 0 : ROW.rbegin()->first); false){ exit(mpre("ОШИБКА получения идентификатора последней записи: "+ to_string(id_max), __LINE__));
+			}else if(int id = TAB.size()+1; !id){ mpre("ОШИБКА получения идентификатора", __LINE__);
 			//}else if(int id_min = (ROW.empty() ? 0 : ROW.begin()->first); false){ exit(mpre("ОШИБКА получения идентификатора первой записи", __LINE__));
 			//}else if(int id_next = max(abs(id_min), abs(id_max))+1; (0 >= id_next)){ mpre("ОШИБКА получения максимального значения", __LINE__);
 			//}else if(id = (id_next)*-1; (0 <= id)){ mpre("ОШИБКА устанвоки следующего id", __LINE__);
@@ -351,7 +354,7 @@ int main(int argc, char **argv){
 			mpre("Поиск списка по базе", __LINE__);
 			return _ROW; }); false){ mpre("ОШИБКА установки функции поиска списков", __LINE__);
 		}else if(bmf::Erb = ([&](TMMd& ROW, TMs where, TMs _row = {}){ // Поиск списков из базы
-			mpre("Поиск элемента по базе", __LINE__);
+			mpre(where, "Поиск элемента по базе", __LINE__);
 			return _row; }); false){ mpre("ОШИБКА установки функции поиска списков", __LINE__);
 		}else if(bmf::exec = ([&](string sql, bool pass = false, int sleep = 0, int result = 1){ do{ // Запрос к БД
 			if(!(result = 0)){ //mpre("Пропускаем запрос", __LINE__);
