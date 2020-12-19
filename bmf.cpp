@@ -1958,13 +1958,10 @@ int main(int argc, char **argv){
 				}else if(boost::dynamic_bitset<> INDEX(map); (dataset_count != map.length())){ mpre("ОШИБКА не верный размер карты", __LINE__);
 				}else if(std::string learn = (ITOG.test(key) ? "1" : "0"); (1 != learn.length())){ mpre("ОШИБКА получения бит", __LINE__);
 				}else if(std::string calc = (INDEX.test(key) ? "1" : "0"); (1 != calc.length())){ mpre("ОШИБКА получения расчета", __LINE__);
-				}else if(true){ mpre("ОШИБКА остановка перед расчетами", __LINE__);
+				}else if(mpre("Проверка", __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
 				}else if([&](){ // Обучение
 					if(learn == calc){ //mpre("Сравнение itog[" +itog.at("id") +"]=" +calc, __LINE__);
-					//}else if(mpre("Начало транзакции", __LINE__); false){ mpre("ОШИБКА транзакции", __LINE__);
-					//}else if(bmf::exec("BEGIN TRANSACTION")){ mpre("Сбой запуска начала транзакции", __LINE__);
 					}else if(string _calc = bmf::Learn(index, learn, key); (1 <= _calc.length() >= 2)){ mpre("ОШИБКА обучения морфа значение не верная длинна результата", __LINE__);
-					//}else if(mpre("Конец транзакции", __LINE__); false){ mpre("ОШИБКА транзакции", __LINE__);
 					}else if(err+=1; !err){ mpre("Инкремент ошибок", __LINE__);
 					}else{ //mpre("Обучение " +index["map"], __LINE__);
 					}return false; }()){ mpre("ОШИБКА обучения", __LINE__);
