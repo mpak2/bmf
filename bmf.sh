@@ -44,7 +44,7 @@
 #		done
 #	done
 #done
-./bimorph clump/iris ds=fc8c9622e85a712e109eb6993bdfff95 epoch=1 # ?cache=shared
+./bimorph clump/iris ds=fc8c9622e85a712e109eb6993bdfff95 epoch=100 # ?cache=shared
 #./bimorph clump/iris ds=1 mem=:memory: itog=2 epoch=1 # ?cache=shared
 #./bimorph clump/iris ds=1 mem=:memory: itog=3 epoch=1 # ?cache=shared
 #./bimorph clump/iris ds=1 mem=:memory: itog=1 epoch=1 # ?cache=shared
