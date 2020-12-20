@@ -25,3 +25,5 @@
 <br>$./bimorph iris.sqlite dano='{"Прогноз3":{"dano":{"ДлиннаЧашелистика":"4.4","ШиринаЧашелистика":"3.2","ДлиннаЛепестка":"1.3","ШиринаЛепестка":"0.2"}}}' 2>/dev/null #Iris-setosa
 
 Примеры использования https://github.com/mpak2/bmf/blob/master/bmf.sh
+
+Обсуждение https://github.com/mpak2/bmf/discussions
