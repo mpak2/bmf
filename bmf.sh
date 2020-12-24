@@ -3,6 +3,7 @@
 #sudo apt install libsqlite3-dev
 #sudo apt install libdb5.3-stl-dev
 #sudo apt install libdb5.3++-dev
+#sudo apt install libmariadbd-dev
 
 #./bimorph numeric dano={"Прогноз":{"dano":{"num1_0":"3","num1_1":"9","num1_10":"0","num1_11":"2","num1_12":"3","num1_13":"7","num1_14":"5","num1_15":"6","num1_16":"6","num1_17":"9","num1_18":"2","num1_19":"7","num1_2":"7","num1_20":"3","num1_21":"0","num1_22":"1","num1_23":"1","num1_24":"9","num1_25":"9","num1_26":"7","num1_27":"8","num1_28":"3","num1_29":"5","num1_3":"4","num1_30":"4","num1_31":"4","num1_32":"3","num1_33":"6","num1_34":"1","num1_35":"6","num1_36":"8","num1_37":"3","num1_38":"6","num1_39":"2","num1_4":"3","num1_40":"8","num1_41":"8","num1_42":"6","num1_43":"4","num1_44":"0","num1_45":"4","num1_46":"7","num1_47":"2","num1_48":"4","num1_49":"1","num1_5":"8","num1_50":"1","num1_51":"3","num1_52":"1","num1_53":"4","num1_54":"4","num1_55":"7","num1_56":"2","num1_57":"1","num1_58":"6","num1_59":"2","num1_6":"3","num1_60":"0","num1_61":"6","num1_62":"8","num1_63":"9","num1_64":"7","num1_65":"1","num1_66":"8","num1_67":"0","num1_68":"8","num1_69":"5","num1_7":"1","num1_70":"6","num1_71":"0","num1_72":"0","num1_73":"0","num1_74":"0","num1_75":"0","num1_76":"5","num1_77":"0","num1_78":"0","num1_8":"9","num1_9":"7","num2_0":"3","num2_1":"0","num2_10":"9","num2_11":"2","num2_12":"9","num2_13":"7","num2_14":"6","num2_15":"3","num2_16":"5","num2_17":"6","num2_18":"2","num2_19":"0","num2_2":"1","num2_20":"1","num2_21":"1","num2_22":"1","num2_23":"7","num2_24":"3","num2_25":"5","num2_26":"5","num2_27":"6","num2_28":"4","num2_29":"3","num2_3":"6","num2_30":"5","num2_31":"8","num2_32":"7","num2_33":"7","num2_34":"3","num2_35":"2","num2_36":"3","num2_37":"0","num2_38":"3","num2_39":"4","num2_4":"6","num2_40":"0","num2_41":"5","num2_42":"4","num2_43":"9","num2_44":"1","num2_45":"6","num2_46":"4","num2_47":"2","num2_48":"9","num2_49":"6","num2_5":"6","num2_50":"5","num2_51":"4","num2_52":"7","num2_53":"7","num2_54":"9","num2_55":"8","num2_56":"2","num2_57":"6","num2_58":"7","num2_59":"1","num2_6":"5","num2_60":"0","num2_61":"7","num2_62":"7","num2_63":"2","num2_64":"6","num2_65":"7","num2_66":"1","num2_67":"1","num2_68":"8","num2_69":"5","num2_7":"6","num2_70":"6","num2_71":"1","num2_72":"2","num2_73":"1","num2_74":"8","num2_75":"9","num2_76":"7","num2_77":"0","num2_78":"0","num2_8":"2","num2_9":"8"}}}
 #cat clump/crc8.json | ./bimorph - clump/crc8
@@ -29,12 +30,15 @@
 #mv clump/iris /tmp
 
 mv -f clump/iris/* /tmp/
+cat clump/iris.json | ./bimorph clump/iris -
+./bimorph clump/iris ds=495e7de50abef9a66166cc5ea4b6927e epoch=100 # ?cache=shared
 
-cat clump/iris_1.json | ./bimorph clump/iris -
-cat clump/iris_2.json | ./bimorph clump/iris -
-cat clump/iris_3.json | ./bimorph clump/iris -
+#cat clump/iris_1.json | ./bimorph clump/iris -
+#cat clump/iris_2.json | ./bimorph clump/iris -
+#cat clump/iris_3.json | ./bimorph clump/iris -
 
 #./bimorph clump/iris; echo "\n" # ?cache=shared
+#./bimorph clump/iris ds=fc8c9622e85a712e109eb6993bdfff95 epoch=100 # ?cache=shared
 
 #for loop in {1..3}; do
 #	for ds in {1..3}; do
@@ -44,7 +48,6 @@ cat clump/iris_3.json | ./bimorph clump/iris -
 #		done
 #	done
 #done
-./bimorph clump/iris ds=fc8c9622e85a712e109eb6993bdfff95 epoch=100 # ?cache=shared
 #./bimorph clump/iris ds=1 mem=:memory: itog=2 epoch=1 # ?cache=shared
 #./bimorph clump/iris ds=1 mem=:memory: itog=3 epoch=1 # ?cache=shared
 #./bimorph clump/iris ds=1 mem=:memory: itog=1 epoch=1 # ?cache=shared
