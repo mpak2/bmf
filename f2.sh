@@ -4,8 +4,6 @@
 
 clear
 echo "=== Сборка bmf ==="
-# g++ cparse/builtin-features.o cparse/shunting-yard.o bmf.cpp -lstdc++ -Wreturn-local-addr -lsqlite3 -Wwrite-strings -std=c++11 -lm -o bmf && ./bmf
-# json='{"dano":{"1":{"Один":"1","Два":"0","Три":"1"},"2":{"id":"2","name":"Проверка2"}},"itog":{"1":{"Один":"0","Два":"1"},"2":{"Один":"0","Два":"0"}}}';
 gcc bmf.cpp -O0 -lstdc++ -Wreturn-local-addr -lsqlite3 -std=c++17 -lstdc++fs -lm -lpthread -ldb_stl -lmariadb -o bimorph8 && bash bmf.sh
 #gcc inc/mariadb.cpp -O0 -lstdc++ -Wreturn-local-addr -std=c++17 -lstdc++fs -lm -lpthread -lmariadb -o inc/mariadb && ./inc/mariadb
 #for n in {1..10}; do echo "123"; done;
