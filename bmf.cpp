@@ -296,6 +296,7 @@ int main(int argc, char **argv){
 						}else if(_row.insert(make_pair(field, value)); _row.empty()){ err("Добавление значение в список");
 						}else{ //mpre("Поле значение " +field +" => " +value, __LINE__);
 						}}}return _row; }(); false){ err("Получение значений полей");
+					}else if(mysql_free_result(result); false){ err("Очистка ресурсов");
 					}else{ //mpre(_row, "Выборка " +sql, __LINE__);
 					}return _row; }(); false){ err("Значение поля");
 				}else{ //mpre(_row, "Результат", __LINE__); //mpre("ОШИБКА Выборка по условию " +sql, __LINE__);
@@ -367,6 +368,7 @@ int main(int argc, char **argv){
 				}else if(LIST.insert(make_pair(ROW.at("id"), ROW)); LIST.empty()){ err("Инкремент списка");
 				}else{ //mpre(ROW, "Элемент списка", __LINE__);
 				}}return false; }()){ err("ОШИБКА перебора значений");
+			}else if(mysql_free_result(result); false){ err("Очистка ресурсов");
 			}else{ //mpre("Запрос `" +table +"` списка:" +to_string(line) +" количество элементов:" +to_string(LIST.size()), __LINE__);
 			}return LIST; }; false){ err("ОШИБКА выборки из базы");
 		}else{
