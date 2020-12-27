@@ -142,7 +142,7 @@ namespace bmf{ // Глобальные переменные
 
 	std::function<Db*(string)> Open; // Список баз данных
 	std::function<bool(int)> Close; // Закрытие соединения с БД
-	std::function<int(TMs,string,int,string,string,string)> Vals; // Обучение
+	std::function<TMMs(TMs,string,int,string,string,string)> Vals; // Обучение
 	std::function<TMs(string,TMs,TMs,TMs,int)> Up; // Обучение
 	std::function<TMMs(string,TMs,int)> List; // Список выборки
 }
@@ -250,6 +250,19 @@ int main(int argc, char **argv){
 			}else if(mysql_query(bmf::mysql, std::string("SET NAMES utf8").c_str())){ err("Установка кодировки");
 			}else{
 			}return result; }()){ err("Подключение к БД");
+		}else if([&](){ // Очистка БД
+			if(bmf::ARGV.end() == bmf::ARGV.find("-c")){ //mpre("Не очищаем БД", __LINE__);
+			}else if(mysql_query(bmf::mysql, std::string("DROP TABLE IF EXISTS `index`;").c_str())){ err("ОШИБКА удаления таблицы");
+			}else if(mysql_query(bmf::mysql, std::string("DROP TABLE IF EXISTS `dataset`;").c_str())){ err("ОШИБКА удаления таблицы");
+			}else if(mysql_query(bmf::mysql, std::string("DROP TABLE IF EXISTS `dataset_map`;").c_str())){ err("ОШИБКА удаления таблицы");
+			}else if(mysql_query(bmf::mysql, std::string("DROP TABLE IF EXISTS `dano`;").c_str())){ err("ОШИБКА удаления таблицы");
+			}else if(mysql_query(bmf::mysql, std::string("DROP TABLE IF EXISTS `dano_values`;").c_str())){ err("ОШИБКА удаления таблицы");
+			}else if(mysql_query(bmf::mysql, std::string("DROP TABLE IF EXISTS `dano_titles`;").c_str())){ err("ОШИБКА удаления таблицы");
+			}else if(mysql_query(bmf::mysql, std::string("DROP TABLE IF EXISTS `itog`;").c_str())){ err("ОШИБКА удаления таблицы");
+			}else if(mysql_query(bmf::mysql, std::string("DROP TABLE IF EXISTS `itog_values`;").c_str())){ err("ОШИБКА удаления таблицы");
+			}else if(mysql_query(bmf::mysql, std::string("DROP TABLE IF EXISTS `itog_titles`;").c_str())){ err("ОШИБКА удаления таблицы");
+			}else{ mpre("Очистка базы данных", __LINE__);
+			}return false; }()){ err("ОШИБКА очистки БД");
 		}else if([&](){ // Создание таблиц 
 			//}else if(mysql_query(bmf::mysql, std::string("DROP TABLE `index`; DROP TABLE dataset; DROP TABLE dataset_map; DROP TABLE dano; DROP TABLE dano_values; DROP TABLE dano_titles; DROP TABLE itog; DROP TABLE itog_values; DROP TABLES itog_titles").c_str())){ err("Удаление таблиц");
 			if(mysql_query(bmf::mysql, std::string("CREATE TABLE IF NOT EXISTS `index` (`id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, `itog_values_id` VARCHAR(256), `dano_id` VARCHAR(256), `itog_id` VARCHAR(256), `index_id` VARCHAR(256), `bmf-index` VARCHAR(256), KEY `itog_id` (`itog_id`))").c_str())){ err("Список морфов"); 
@@ -579,7 +592,8 @@ int main(int argc, char **argv){
 			}else{ //mpre(stairs, "Ступень", __LINE__); //mpre(_BMF_DANO_EX.at(""), "Список", __LINE__); mpre(_DANO, "Выбор", __LINE__); mpre(_dano, "Результат", __LINE__); //mpre("ОШИБКА функции выбора исходного значения", __LINE__);
 			}return _dano; }); false){ mpre("ОШИБКА установки функции выбора Исходного значения", __LINE__);
 		}else if(bmf::Vals = ([&](TMs VALUE, string alias, int key, std::string BMF_VALS, std::string BMF_VALUES, std::string BMF_TITLES){ // Установка входных значений
-			if([&](TMMi VALS = {}){ // Расчет знаков
+			TMMs VALS = {};
+			if([&](){ // Расчет знаков
 				for(auto &val_itr:VALUE){ //mpre("VALUE ", __LINE__);
 					if(string value = val_itr.second; false){ mpre("ОШИБКА получения значения итератора", __LINE__);
 					}else if(TMs values = [&](TMs values = {}){ // Добавление значения
@@ -649,7 +663,7 @@ int main(int argc, char **argv){
 								}else if((vals = bmf::Up(BMF_VALS, {{"id", vals_id}}, _vals, {}, __LINE__)).empty()){ mpre(_vals, "Знак", __LINE__); mpre("ОШИБКА обновления знака", __LINE__);
 								}else{ //mpre("Добавление нового знака в базу " +vals_id, __LINE__); //mpre("ОШИБКА добавление глобального знака", __LINE__); //mpre(*BMF, __LINE__, "Список знаков"); mpre("Добавление глобального знака `"+ values["name"]+ "` ["+ vals.at("id")+ "] "+ to_string(nn), __LINE__); mpre(vals, __LINE__, "Знак"); //mpre("ОШИБКА добавления знака "+ alias+ " "+ vals.at("id"), __LINE__);
 								} return vals; }(); false){ mpre("ОШИБКА Добавления нового знака", __LINE__);
-							}else if([&](){ // Установка значения
+							/*}else if([&](){ // Установка значения
 								if(vals.empty()){ //mpre("Отрицательный знак", __LINE__);
 								}else if(vals.end() == vals.find("val")){ mpre("ОШИБКА поле значения val не найдено", __LINE__);
 								}else if(vals.at("val") == val){ //mpre("Знак не изменился", __LINE__);
@@ -657,7 +671,12 @@ int main(int argc, char **argv){
 								}else if(vals.end() == vals.find("id")){ mpre("ОШИБКА идентификатора знака не задан", __LINE__);
 								}else if(TMs _vals = bmf::Up(BMF_VALS, {{"id", vals.at("id")}}, vals, vals, __LINE__); _vals.empty()){ err("Сохранения значения знака");
 								}else{ //mpre("Изменение знака", __LINE__);
-								}return false; }()){ mpre("ОШИБКА установки знака", __LINE__);
+								}return false; }()){ mpre("ОШИБКА установки знака", __LINE__);*/
+							}else if([&](){ // Установка значения
+								if(vals.empty()){ //mpre("Отрицательный знак", __LINE__);
+								}else if(VALS[ values.at("id") ][ vals.at("id") ] = val; (1 != val.length())){ err("ОШИБКА установки значения знака");
+								}else{ //mpre("Установка значения values_id=" +values.at("id") +" vals_id=" +vals.at("id") +" val=" +val, __LINE__);
+								}return false; }()){ mpre("ОШИБКА установки значения", __LINE__);
 							}else{ //mpre("Установка знака `"+ values["name"]+ "` "+ to_string(nn), __LINE__); //mpre(_vals, __LINE__, "Добавление нового знака "+ to_string(i));
 							}
 						}return false; }()){ mpre("ОШИБКА добавления знаков значению", __LINE__);
@@ -665,7 +684,7 @@ int main(int argc, char **argv){
 					}
 				}return false; }()){ mpre("ОШИБКА расчета знаков", __LINE__);
 			}else{ //mpre("Vals окончен", __LINE__);
-			}return false; }); false){ mpre("ОШИБКА установки значений", __LINE__);
+			}return VALS; }); false){ mpre("ОШИБКА установки значений", __LINE__);
 		}else if(bmf::Learn = ([&](TMs bmf_index, string val = "", int key, TMs stair = {}){ //mpre("Обучение "+ bmf_index.at("id"), __LINE__);  //system("sleep 1"); // mpre(BMF_INDEX, __LINE__, "Список"); // if(remove){ mpre(row, __LINE__, "Ученик"); }
 			if(int rep = 2e9; 0 >= rep){ mpre("ОШИБКА установки предельного размера обучения для сети", __LINE__);
 			}else if(static TMMi STAIRS; false){ mpre("ОШИБКА лестница не пуста", __LINE__);
@@ -999,23 +1018,25 @@ int main(int argc, char **argv){
 			}else if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - microtime; false){ mpre("ОШИБКА расчета времени", __LINE__);
 			}else if(bmf::Progress("Расчет обучающих примеров " +to_string(key+1) +" (" + to_string(_microtime) +" сек.)", (float)(key+1)/in.size(), __LINE__); false){ mpre("Индикатор прогресса", __LINE__);
 			}else if(TMs dano = TMs(el["dano"]); dano.empty()){ mpre("ОШИБКА получения входных знаков", __LINE__);
-			}else if(bmf::Vals(dano, "dano", key, bmf::DANO, bmf::DANO_VALUES, bmf::DANO_TITLES); false){ mpre("ОШИБКА установки входящих значений", __LINE__);
+			}else if(TMMs _DANO_ = bmf::Vals(dano, "dano", key, bmf::DANO, bmf::DANO_VALUES, bmf::DANO_TITLES); false){ mpre("ОШИБКА установки входящих значений", __LINE__);
 			}else if([&](){ for(auto dano_itr:bmf::List(bmf::DANO, {}, __LINE__)){ // Сохранение результатов
 				if(dano_itr.second.end() == dano_itr.second.find("id")){ mpre("ОШИБКА поле идентификатора не найдено", __LINE__);
 				}else if(std::string id = dano_itr.second.at("id"); id.empty()){ mpre("ОШИБКА получения идентификатора итога", __LINE__);
-				}else if(dano_itr.second.end() == dano_itr.second.find("val")){ mpre("ОШИБКА поле значения не найдено", __LINE__);
-				}else if(std::string val = dano_itr.second.at("val"); val.empty()){ mpre("ОШИБКА выборки знака", __LINE__);
+				}else if(_DANO_.end() == _DANO_.find(dano_itr.second.at("dano_values_id"))){ err("Результаты значения не найдены");
+				}else if(_DANO_.at(dano_itr.second.at("dano_values_id")).end() == _DANO_.at(dano_itr.second.at("dano_values_id")).find(dano_itr.second.at("id"))){ //mpre("Результаты значения не найдены dano_values_id=" +dano_itr.second.at("dano_values_id") + " id=" +dano_itr.second.at("id"), __LINE__);
+				}else if(std::string val = _DANO_.at(dano_itr.second.at("dano_values_id")).at(dano_itr.second.at("id")); val.empty()){ mpre("ОШИБКА выборки знака", __LINE__);
 				}else if(DANO[key][id] = val; false){ mpre("ОШИБКА сохарнения значения расчета", __LINE__);
 				}else{ //mpre("Сохранения сигнала расчета", __LINE__);
 				}}return false; }()){ mpre("ОШИБКА сохранения результатов", __LINE__);
 			}else if(TMs itog = TMs(el["itog"]); itog.empty()){ mpre("ОШИБКА получения итоговых знаков", __LINE__);
-			}else if(bmf::Vals(itog, "itog", key, bmf::ITOG, bmf::ITOG_VALUES, bmf::ITOG_TITLES); false){ mpre("ОШИБКА установки входящих значений", __LINE__);
+			}else if(TMMs _ITOG_ = bmf::Vals(itog, "itog", key, bmf::ITOG, bmf::ITOG_VALUES, bmf::ITOG_TITLES); false){ mpre("ОШИБКА установки входящих значений", __LINE__);
 			//}else if(mpre("Расчет карты", __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
 			}else if([&](){ for(auto& itog_itr:bmf::List(bmf::ITOG, {}, __LINE__)){ // Сохранение результатов
 				if(itog_itr.second.end() == itog_itr.second.find("id")){ mpre("ОШИБКА поле идентификатора не найдено", __LINE__);
 				}else if(std::string id = itog_itr.second.at("id"); id.empty()){ mpre("ОШИБКА получения идентификатора итога", __LINE__);
-				}else if(itog_itr.second.end() == itog_itr.second.find("val")){ mpre("ОШИБКА поле значения не найдено", __LINE__);
-				}else if(std::string val = itog_itr.second.at("val"); val.empty()){ mpre("ОШИБКА выборки значения расчета", __LINE__);
+				}else if(_ITOG_.end() == _ITOG_.find(itog_itr.second.at("itog_values_id"))){ err("Результаты значения не найдены");
+				}else if(_ITOG_.at(itog_itr.second.at("itog_values_id")).end() == _ITOG_.at(itog_itr.second.at("itog_values_id")).find(itog_itr.second.at("id"))){ //mpre("Результаты значения не найдены", __LINE__);
+				}else if(std::string val = _ITOG_.at(itog_itr.second.at("itog_values_id")).at(itog_itr.second.at("id")); val.empty()){ mpre("ОШИБКА выборки знака", __LINE__);
 				}else if(ITOG[key][id] = val; false){ mpre("ОШИБКА сохарнения значения расчета", __LINE__);
 				}else{ //mpre("Сохранения сигнала расчета", __LINE__);
 				}}return false; }()){ mpre("ОШИБКА сохранения результатов", __LINE__);

@@ -30,7 +30,7 @@
 #mv clump/iris /tmp
 
 #mv -f clump/iris/* /tmp/
-cat clump/iris.json | ./bimorph iris - user=root password=password
+cat clump/iris.json | ./bimorph iris - -c user=root password=password
 ./bimorph iris ds=495e7de50abef9a66166cc5ea4b6927e epoch=100 user=root password=password # ?cache=shared
 
 #cat clump/iris_1.json | ./bimorph clump/iris -
