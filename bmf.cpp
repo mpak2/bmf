@@ -783,7 +783,8 @@ int main(int argc, char **argv){
 					}else{ //mpre("Выбор направления " +index.at("id") +" count_1=" +to_string(count_1) +" count_0=" +to_string(count_0) +" vd=" +to_string(vd) +" v1=" +to_string(v1) +" v0=" +to_string(v0) +" " +directions +"[" +to_string(pos) +"]=" +direction, __LINE__);
 					}return _stairs; }(); false){ mpre("ОШИБКА выбора направления развития", __LINE__);
 				}else if([&](){ // Проверка согласованности данных
-					if(_stairs.empty()){ //mpre("Только в прямом направлении", __LINE__);
+					if(true){ //mpre("Пропуск проверки. Многопоточный режим допускает несогласованности", __LINE__);
+					}else if(_stairs.empty()){ //mpre("Только в прямом направлении", __LINE__);
 					}else if(stairs.end() == stairs.find("parent")){ mpre("ОШИБКА поле родителя не задано", __LINE__);
 					}else if(boost::dynamic_bitset<> _maps1 = maps1; _maps1.empty()){ mpre("Создание копии старшей карты", __LINE__);
 					}else if(boost::dynamic_bitset<> _maps0 = maps0; _maps0.empty()){ mpre("Создание копии младшей карты", __LINE__);
@@ -936,7 +937,7 @@ int main(int argc, char **argv){
 				}else if(boost::dynamic_bitset<> _mp = [&](boost::dynamic_bitset<> _mp = {}){ // Карта исходного значения
 					if(false){ mpre("Пропуск", __LINE__);
 					//}else if(TMs dataset_map = bmf::fk("dataset_map", {{"dataset_id", dataset.at("id")}, {"alias", "dano"}, {"alias_id", index.at("dano_id")}}, {}, {}); false){ mpre("ОШИБКА выборки карты расчетов исходников", __LINE__);
-					}else if(std::string dataset_map_id = "dano," +index.at("dano_id") +"," +bmf::dataset.at("id"); dataset_map_id.empty()){ mpre("ОШИБКА составления идентификатора карты", __LINE__);
+					}else if(std::string dataset_map_id = "dano," +index.at("dano_id") +"," +dataset.at("id"); dataset_map_id.empty()){ mpre("ОШИБКА составления идентификатора карты", __LINE__);
 					}else if(TMs dataset_map = bmf::Up(bmf::DATASET_MAP, {{"id", dataset_map_id}}, {}, {}, __LINE__); false){ err("Выборка карты исходника");
 					}else if(_mp = boost::dynamic_bitset<>(dataset_map.end() == dataset_map.find("map") ? std::string(dataset_count, '0') : dataset_map.at("map")); (dataset_count != _mp.size())){ mpre("ОШИБКА расчета карты исходника", __LINE__);
 					}else{ //mpre("Расчет карты исодника", __LINE__);
@@ -945,7 +946,7 @@ int main(int argc, char **argv){
 					if(index.end() == index.find("index_id")){ mpre("ОШИБКА Поле старшего морфа не задано", __LINE__);
 					}else if(std::string index_id = index.at("index_id"); index_id.empty()){ //mpre("Идентификатор старшего морфа не установлен", __LINE__);
 					//}else if(TMs where = {{"dataset_id", dataset.at("id")}, {"alias", "index"}, {"alias_id", index_id}}; where.empty()){ mpre("ОШИБКА составления условий выборки", __LINE__);
-					}else if(std::string dataset_map_id = "index," +index_id +"," +bmf::dataset.at("id"); dataset_map_id.empty()){ mpre("ОШИБКА составления идентификатора карты", __LINE__);
+					}else if(std::string dataset_map_id = "index," +index_id +"," +dataset.at("id"); dataset_map_id.empty()){ mpre("ОШИБКА составления идентификатора карты", __LINE__);
 					//}else if(TMs dataset_map = bmf::fk("dataset_map", where, {}, {}); dataset_map.empty()){ mpre(where, "Условия выборки карты", __LINE__); mpre("ОШИБКА выборки карты расчетов", __LINE__);
 					}else if(TMs dataset_map = bmf::Up(bmf::DATASET_MAP, {{"id", dataset_map_id}}, {}, {}, __LINE__); false){ err("Выборка карты старшего потомка");
 					/*}else if(TMs dataset_map = [&](TMs dataset_map = {}){ // Выборка карты исходника
@@ -963,7 +964,7 @@ int main(int argc, char **argv){
 					if(index.end() == index.find("bmf-index")){ mpre("ОШИБКА Поле младшего морфа не задано", __LINE__);
 					}else if(std::string bmf_index = index.at("bmf-index"); bmf_index.empty()){ //mpre("Идентификатор младшего морфа не установлен", __LINE__);
 					//}else if(TMs where = {{"dataset_id", dataset.at("id")}, {"alias", "index"}, {"alias_id", bmf_index}}; where.empty()){ mpre("ОШИБКА составления условий выборки", __LINE__);
-					}else if(std::string dataset_map_id = "index," +bmf_index +"," +bmf::dataset.at("id"); dataset_map_id.empty()){ mpre("ОШИБКА составления идентификатора карты", __LINE__);
+					}else if(std::string dataset_map_id = "index," +bmf_index +"," +dataset.at("id"); dataset_map_id.empty()){ mpre("ОШИБКА составления идентификатора карты", __LINE__);
 					//}else if(TMs dataset_map = bmf::fk("dataset_map", where, {}, {}); dataset_map.empty()){ mpre(where, "Условия выборки карты", __LINE__); mpre("ОШИБКА выборки карты расчетов", __LINE__);
 					}else if(TMs dataset_map = bmf::Up(bmf::DATASET_MAP, {{"id", dataset_map_id}}, {}, {}, __LINE__); false){ err("Выборка карты младшего потомка");
 					/*}else if(TMs dataset_map = [&](TMs dataset_map = {}){ // Выборка карты исходника
@@ -983,7 +984,7 @@ int main(int argc, char **argv){
 				}else if(index.end() == index.find("itog_id")){ mpre("ОШИБКА поле итога не найдено у морфа", __LINE__);
 				}else if(std::string clump_id = (bmf::databases.end() == bmf::databases.find("file") ? bmf::clump_id : ":memory:"); clump_id.empty()){ mpre("ОШИБКА расчета базы", __LINE__);
 				}else if(TMs _dataset_map = {/*{"clump_id", clump_id},*/ {"itog_id", index.at("itog_id")}, {"map", _map}}; _dataset_map.empty()){ mpre("ОШИБКА устанвоки карты", __LINE__);
-				}else if(std::string dataset_map_id = "index," +index.at("id") +"," +bmf::dataset.at("id"); dataset_map_id.empty()){ mpre("ОШИБКА составления идентификатора карты", __LINE__);
+				}else if(std::string dataset_map_id = "index," +index.at("id") +"," +dataset.at("id"); dataset_map_id.empty()){ mpre("ОШИБКА составления идентификатора карты", __LINE__);
 				}else if(TMs dataset_map = bmf::Up(bmf::DATASET_MAP, {{"id", dataset_map_id}}, _dataset_map, _dataset_map, __LINE__); dataset_map.empty()){ err("Выборка карты младшего потомка");
 				//}else if(TMs dataset_map = bmf::fk("dataset_map", {{"dataset_id", dataset.at("id")}, {"alias", "index"}, {"alias_id", index.at("id")}}, _dataset_map, _dataset_map); dataset_map.empty()){ mpre("ОШИБКА установки карты расчетов", __LINE__);
 				}else if(bmf::dataset.at("id") != dataset.at("id")){ //mpre("Не возвращаем результатом " +bmf::dataset.at("id") +" " +dataset.at("id"), __LINE__);
@@ -1341,8 +1342,10 @@ int main(int argc, char **argv){
 					}else if(TMs dataset_map = bmf::Up(bmf::DATASET_MAP, {{"id", dataset_map_id}}, {}, {}, __LINE__); false){ mpre("Выборка карты корневого морфа", __LINE__);
 					}else if(map = (dataset_map.end() == dataset_map.find("map") ? std::string(dataset_count, '0') : dataset_map.at("map")); map.empty()){ mpre("ОШИБКА установки карты основного морфа", __LINE__);
 					}else if(!dataset_map.empty()){ //mpre("Уже найден в базе", __LINE__);
-					}else if(dataset_map.end() == dataset_map.find("map")){ mpre("ОШИБКА в карте нет поля битовой карты", __LINE__);
-					}else if(map = dataset_map.at("map"); map.empty()){ mpre("ОШИБКА выборки карты корневого морфа", __LINE__);
+					//}else if(dataset_map.end() == dataset_map.find("map")){ mpre("ОШИБКА в карте нет поля битовой карты", __LINE__);
+					//}else if(map = dataset_map.at("map"); map.empty()){ mpre("ОШИБКА выборки карты корневого морфа", __LINE__);
+					//}else if(TMs _dataset_map = {{"itog_id", index.at("itog_id")}, {"map", map}}; _dataset_map.empty()){ mpre("ОШИБКА устанвоки карты", __LINE__);
+					//}else if(TMs dataset_map = bmf::Up(bmf::DATASET_MAP, {{"id", dataset_map_id}}, _dataset_map, _dataset_map, __LINE__); false){ mpre("Выборка карты корневого морфа", __LINE__);
 					}else{ mpre("Добавление карты корневого морфа index_id=" +index.at("id") +" map=" +map, __LINE__);
 					}return map; }(); false){ mpre("ОШИБКА расчета карты корневого морфа", __LINE__);
 				}else if(boost::dynamic_bitset<> INDEX(map); (dataset_count != map.length())){ mpre("ОШИБКА не верный размер карты", __LINE__);

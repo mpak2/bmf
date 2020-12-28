@@ -29,26 +29,24 @@
 
 #mv clump/iris /tmp
 
-./bimorph mnist
 #mv -f clump/iris/* /tmp/
-#cat clump/iris.json | ./bimorph iris - -c user=root password=password
-#./bimorph iris ds=495e7de50abef9a66166cc5ea4b6927e epoch=100 user=root password=password # ?cache=shared
+#cat clump/iris.json | ./bimorph iris - -c
+#./bimorph iris ds=495e7de50abef9a66166cc5ea4b6927e epoch=100 # ?cache=shared
 
-#cat clump/iris_1.json | ./bimorph clump/iris -
-#cat clump/iris_2.json | ./bimorph clump/iris -
-#cat clump/iris_3.json | ./bimorph clump/iris -
+./bimorph iris -c
+cat clump/iris_1.json | ./bimorph iris -
+cat clump/iris_2.json | ./bimorph iris -
+cat clump/iris_3.json | ./bimorph iris -
 
-#./bimorph clump/iris; echo "\n" # ?cache=shared
+./bimorph iris; echo "\n" # ?cache=shared
 #./bimorph clump/iris ds=fc8c9622e85a712e109eb6993bdfff95 epoch=100 # ?cache=shared
 
-#for loop in {1..3}; do
-#	for ds in {1..3}; do
-#		echo "Поток $ds"
-#		for itog in {1..3}; do
-#			./bimorph clump/iris ds=$ds itog=$itog epoch=100; # ?cache=shareda
-#		done
-#	done
-#done
+for loop in {1..2}; do
+	echo "Поток $ds"
+	./bimorph iris ds=21e18b82ea50b431847639eeac729651 epoch=100 # ?cache=shared
+	./bimorph iris ds=fc8c9622e85a712e109eb6993bdfff95 epoch=100 # ?cache=shared
+#	./bimorph iris ds=425146b12b837f025e1f7ebdd78b8561 epoch=100 # ?cache=shared
+done
 #./bimorph clump/iris ds=1 mem=:memory: itog=2 epoch=1 # ?cache=shared
 #./bimorph clump/iris ds=1 mem=:memory: itog=3 epoch=1 # ?cache=shared
 #./bimorph clump/iris ds=1 mem=:memory: itog=1 epoch=1 # ?cache=shared
