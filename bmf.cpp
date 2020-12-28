@@ -1213,27 +1213,29 @@ int main(int argc, char **argv){
 	}else if(bmf::dataset = [&](){ // Выборка набора данных для расчета
 		if(false){ mpre("Пропуск определения набора данных", __LINE__);
 		}else if(bmf::ARGV.end() != bmf::ARGV.find("dano")){ //mpre("Расчетный пример", __LINE__);
-		}else if(std::string ds = (bmf::ARGV.end() == bmf::ARGV.find("ds") ? "" : bmf::ARGV.at("ds")); ds.empty()){ //mpre("ОШИБКА выборки идентификатора набора данных", __LINE__);
+		}else if(std::string ds = (bmf::ARGV.end() == bmf::ARGV.find("ds") ? "" : bmf::ARGV.at("ds")); false){ //mpre("ОШИБКА выборки идентификатора набора данных", __LINE__);
+		//}else if(mpre("Проверка", __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
 		}else if(!(bmf::dataset = bmf::Up(bmf::DATASET, {{"id", ds}}, {}, {}, __LINE__)).empty()){ //mpre({{"id", ds}}, "Условия выборки набора данных " +to_string((*bmf::DATASET).size()), __LINE__); mpre("ОШИБКА выборки набора данных", __LINE__);
 		}else if(bmf::ARGV.end() != bmf::ARGV.find("-")){ //mpre("Не выводим статистику на загузке набора данных", __LINE__);
 		}else if(!ds.empty()){ mpre("Набора данных не найден в базе "+ ds, __LINE__);
-		}else if(mpre("Проверка", __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
 		}else if(std::map<string, boost::dynamic_bitset<>> ITOG; false){ mpre("Справочник карт", __LINE__);
 		}else if(std::map<string, boost::dynamic_bitset<>> INDEX; false){ mpre("Справочник карт", __LINE__);
 		}else if([&](){ for(auto& dataset_itr:bmf::List(bmf::DATASET, {}, __LINE__)){ // Вывод списка набора данных
 			if(TMs dataset = dataset_itr.second; dataset.empty()){ mpre("ОШИБКА выборки набора данных", __LINE__);
 			}else if(dataset.end() == dataset.find("count")){ mpre("ОШИБКА поле количества примеров не установлено", __LINE__);
 			}else if(int dataset_count = atoi(dataset.at("count").c_str()); !dataset_count){ mpre("ОШИБКА расчета количества примеров в наборе данных", __LINE__);
-			}else if(float diff = [&](int ers = 0, int count = 0){ for(auto itog_itr:BMF_ITOG_EX.at("")){ // Расчет результата поитогово
+			}else if(TMMs _ITOG_ = bmf::List(bmf::ITOG, {}, __LINE__); _ITOG_.empty()){ err("Выборка списка итогов");
+			}else if(float diff = [&](int ers = 0, int count = 0){ for(auto itog_itr:_ITOG_){ // Расчет результата поитогово
 				if(TMs itog = itog_itr.second; itog.empty()){ mpre("ОШИБКА выборки итога", __LINE__);
 				//}else if(TMs itog_map = bmf::fk("dataset_map", {{"dataset_id", dataset.at("id")}, {"alias", "itog"}, {"alias_id", itog.at("id")}}, {}, {}); itog_map.empty()){ //mpre(TMs({{"dataset_id", dataset.at("id")}, {"alias", "itog"}, {"alias_id", itog.at("id")}}), "Условия", __LINE__); //mpre("ОШИБКА выборки расчета итога", __LINE__);
+				//}else if(mpre("Проверка", __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
 				}else if(std::string dataset_map_id = "itog," +itog.at("id") +"," +dataset.at("id"); dataset_map_id.empty()){ mpre("ОШИБКА составления идентификатора карты", __LINE__);
 				}else if(TMs itog_map = bmf::Up(bmf::DATASET_MAP, {{"id", dataset_map_id}}, {}, {}, __LINE__); itog_map.empty()){ mpre("ОШИБКА обнолвения карты исходника", __LINE__);
 				}else if(boost::dynamic_bitset<> gmap(itog_map.at("map")); gmap.empty()){ mpre("ОШИБКА установки карты итога", __LINE__);
 				}else if(ITOG[itog.at("id")] = gmap; ITOG.empty()){ mpre("ОШИБКА сохраенения карты итога", __LINE__);
 				//}else if(TMs index_map = bmf::fk("dataset_map", {{"dataset_id", dataset.at("id")}, {"alias", "index"}, {"alias_id", itog.at("index_id")}}, {}, {}); false){ mpre("ОШИБКА выборки расчета итога", __LINE__);
 				}else if(std::string dataset_map_id = "index," +itog.at("index_id") +"," +dataset.at("id"); dataset_map_id.empty()){ mpre("ОШИБКА составления идентификатора карты", __LINE__);
-				}else if(TMs index_map = bmf::Up(bmf::DATASET_MAP, {{"id", dataset_map_id}}, {}, {}, __LINE__); index_map.empty()){ mpre("ОШИБКА обнолвения карты исходника", __LINE__);
+				}else if(TMs index_map = bmf::Up(bmf::DATASET_MAP, {{"id", dataset_map_id}}, {}, {}, __LINE__); false){ mpre("ОШИБКА обнолвения карты исходника", __LINE__);
 				}else if(std::string map = (index_map.end() == index_map.find("map") ? std::string(dataset_count, '0') : index_map.at("map")); map.empty()){ mpre("ОШИБКА расчета карты", __LINE__);
 				}else if(boost::dynamic_bitset<> imap(map); imap.empty()){ mpre("ОШИБКА установки карты морфа", __LINE__);
 				}else if(INDEX[itog.at("id")] = imap; INDEX.empty()){ mpre("ОШИБКА сохраенения карты морфа", __LINE__);
@@ -1243,7 +1245,7 @@ int main(int argc, char **argv){
 				}else{ //mpre("Карта itog " +itog_map.at("map"), __LINE__); mpre("Карта index " +index_map.at("map"), __LINE__); mpre("Разница count=" +to_string(count) +" ers=" +to_string(ers), __LINE__);
 				}}return (!ers ? 1 : (float)(count-ers)/count); }(); (0 > diff)){ mpre("ОШИБКА расчета результата набора данных", __LINE__);
 			}else if(float perc = [&](int count = 0){ for(int i = 0; i < dataset_count; i++){ // Совпадение по значениям
-				if(int ers = [&](int ers = 0){ for( auto itog_itr:BMF_ITOG_EX.at("")){ // Проверка всех итогов
+				if(int ers = [&](int ers = 0){ for( auto itog_itr:_ITOG_){ // Проверка всех итогов
 					if(TMs itog = itog_itr.second; itog.empty()){ mpre("ОШИБКА выборки итога", __LINE__);
 					}else if(itog.end() == itog.find("id")){ mpre("ОШИБКА у итога не найдено поле идентификатора", __LINE__);
 					}else if(ITOG.end() == ITOG.find(itog.at("id"))){ mpre("ОШИБКА в справочнике карт итог не найден " +itog.at("id"), __LINE__);
@@ -1258,7 +1260,7 @@ int main(int argc, char **argv){
 				}else{ //mpre("Количество правильных ответов i=" +to_string(i) +" dataset_count=" +to_string(dataset_count) +" count=" +to_string(count) +" ers=" +to_string(ers), __LINE__);
 				}}return (float)(count*100)/dataset_count; }(); (0 > perc)){ mpre("ОШИБКА расчета процента полных совпадений по значениям", __LINE__);
 			}else if(string _perc = [&](string _perc = ""){ char chr[10]; sprintf(chr ,"%.2f" ,perc); return string(chr); }(); _perc.empty()){ mpre("ОШИБКА расчета строки процента ошибки", __LINE__);
-			}else{ mpre("Набор #" +dataset["id"] +" количество:"+ dataset["count"] +" точность:"+ to_string(diff) +" (" +_perc +"%)" +("0" == dataset["epoch"] ? "" : " эпох:" +dataset["epoch"]), __LINE__);
+			}else{ mpre("Набор " +dataset["id"] +" количество:"+ dataset["count"] +" точность:"+ to_string(diff) +" (" +_perc +"%)" +("" == dataset["epoch"] ? "" : " эпох:" +dataset["epoch"]), __LINE__);
 			}}return false; }()){ mpre("ОШИБКА отображения списка набора данных", __LINE__);
 		//}else if(bmf::Close(0)){ mpre("ОШИБКА закрытия БД", __LINE__);
 		}else{ //mpre("Выберете набор данных для расчета -ds и количество -epoch", __LINE__);
