@@ -54,6 +54,7 @@
 #include <unistd.h>
 
 #include <mariadb/mysql.h>
+#include <hiredis/hiredis.h>
 
 //#define CL_HPP_MINIMUM_OPENCL_VERSION 110
 //#define CL_HPP_TARGET_OPENCL_VERSION 210
@@ -109,9 +110,17 @@ namespace bmf{ // Глобальные переменные
 //	std::map<int, boost::dynamic_bitset<>> MAPS; // Список битовых результатов расчета для каждого морфа
 
 
-	MYSQL *mysql = NULL;
 	TMs databases; // Список баз данных
+	MYSQL *mysql = NULL; // БД mysql
+	redisContext *redis = NULL; // БД редис
+
+	string dbtype; //Тип БД
 	string dbname; //Имя БД
+	string dbuser = "root"; //Пользователь БД
+	string dbpassword = ""; //Пароль БД
+	string dbhost; //Хост БД
+	int dbport; //Порт БД
+
 	TMs ARGV; // Массив параметров консоли
 	int timestamp =  time(0); // Расчет выполнения участков кода
 	auto microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9;
@@ -144,10 +153,10 @@ namespace bmf{ // Глобальные переменные
 	std::function<bool(int)> Close; // Закрытие соединения с БД
 	std::function<TMMs(TMs,string,int,string,string,string)> Vals; // Обучение
 	std::function<TMs(string,TMs,TMs,TMs,int)> Up; // Обучение
+	std::function<TMs(string,TMs,TMs,TMs,int)> Up_mysql; // Обучение
+	std::function<TMs(string,TMs,TMs,TMs,int)> Up_redis; // Обучение
 	std::function<TMMs(string,TMs,int)> List; // Список выборки
 }
-
-  
 
 int main(int argc, char **argv){
 	if(setlocale(LC_ALL, "LC_ALL=C.UTF-8"); false){ mpre("ОШИБКА установки кирилицы", __LINE__);
@@ -228,30 +237,76 @@ int main(int argc, char **argv){
 		}else{
 		}return skip; }()){ exit(mpre("Остановка выполнения", __LINE__));
 	}else if([&](){ // Подключение БД
-		if([&](){ // Имя базы данных
+		if(std::string db = [&](std::string db = ""){ // Имя базы данных
 			if(bmf::ARGV.end() == bmf::ARGV.find("db")){ mpre("ОШИБКА БД для сохранения не задана -db", __LINE__);
 			}else if(0 >= bmf::ARGV.at("db").length()){ mpre("База данных для сохранения не указана", __LINE__);
-			}else if(bmf::dbname = bmf::ARGV.at("db"); (0 >= bmf::dbname.length())){ mpre("ОШИБКА имя файла для БД не задано", __LINE__);
+			}else if(db = bmf::ARGV.at("db"); db.empty()){ mpre("ОШИБКА имя файла для БД не задано", __LINE__);
 			}else{ //mpre("База данных "+ bmf::dbname, __LINE__);
-			}return false; }()){ mpre("ОШИБКА получения имени базы данных", __LINE__);
-		}else if([&](){ // Получение пути до файла БД
-			if(int npos = bmf::dbname.rfind("/"); false){ //mpre("Слешей в пути до скопления не найдено", __LINE__);
-			}else if(bmf::clump_id = (std::string::npos == npos ? bmf::dbname : bmf::dbname.substr(npos+1, bmf::dbname.length())); (0 >= bmf::clump_id.length())){ mpre("ОШИБКА сокращения пути до файла", __LINE__);
-			}else{ //mpre("Путь до БД сокращен "+ bmf::clump_id, __LINE__);
-			}return (0 >= bmf::clump_id.length()); }()){ mpre("ОШИБКА получения скопления", __LINE__);
-		}else if([&](int result = 0){ // Подключение к БД
-			if(bmf::mysql = mysql_init(NULL); (nullptr == bmf::mysql)){ err("ОШИБКА создания соединения");
-			}else if(std::string host = (bmf::ARGV.end() == bmf::ARGV.find("host") ? "localhost" : bmf::ARGV.at("host")); host.empty()){ err("Выбор хоста");
-			}else if(std::string user = (bmf::ARGV.end() == bmf::ARGV.find("user") ? "root" : bmf::ARGV.at("user")); user.empty()){ err("Выбор пользователя");
-			}else if(std::string password = (bmf::ARGV.end() == bmf::ARGV.find("password") ? "" : bmf::ARGV.at("password")); false){ err("Выбор пароля");
-			//}else if(std::string user = (bmf::ARGV.end() == bmf::ARGV.find("user") ? "root" : bmf::ARGV.at("user")); user.empty()){ err("Выбор пользователя");
-			//}else if(std::string database = (bmf::ARGV.end() == bmf::ARGV.find("database") ? "bimorph" : bmf::ARGV.at("database")); database.empty()){ err("Выбор пользователя");
-			}else if(bmf::mysql = mysql_real_connect(bmf::mysql, host.c_str(), user.c_str(), password.c_str(), bmf::dbname.c_str(), 0, NULL, 0); (nullptr == bmf::mysql)){ mpre("Параметры подключения host=" +host +" user=" +user +" password=" +password +" database=" +bmf::dbname, __LINE__); err("Подключение БД"); 
-			}else if(mysql_query(bmf::mysql, std::string("SET NAMES utf8").c_str())){ err("Установка кодировки");
-			}else{
-			}return result; }()){ err("Подключение к БД");
+			}return db; }(); db.empty()){ err("Строка подключения не установлена");
+		}else if(bmf::dbtype = [&](std::string type = ""){ // Получение БД
+			if(size_t npos = db.find_first_of("://"); (std::string::npos == npos)){ err("Тип БД не задан");
+			}else if(type = db.substr(0, npos); type.empty()){ err("Выборка типа БД");
+			}else if(db = db.substr(npos+3, db.length()); db.empty()){ err("Остаток атрибутов подключения");
+			}else{ //mpre("База данных type=" +type +" db=" +db +" npos=" +to_string(npos), __LINE__);
+			}return type; }(); bmf::dbtype.empty()){ err("Тип БД не задан");
+		}else if(std::string auth = [&](std::string auth = ""){ // Получение БД
+			if(size_t npos = db.find_first_of("@"); (std::string::npos == npos)){ //mpre("Аутентификация не задана", __LINE__);
+			}else if(auth = db.substr(0, npos); auth.empty()){ err("Выборка аутентификации БД");
+			}else if(db = db.substr(npos+1, db.length()); db.empty()){ err("Остаток атрибутов подключения");
+			}else{ //mpre("База данных auth=" +auth +" db=" +db +" npos=" +to_string(npos), __LINE__);
+			}return auth; }(); false){ err("Тип БД не задан");
+		}else if(bmf::dbuser = [&](std::string dbuser){ // Пользователь БД
+			if(auth.empty()){ //mpre("Аутентификация не задана", __LINE__);
+			}else if(size_t npos = auth.find_first_of(":"); (std::string::npos == npos)){ //mpre("Аутентификация не задана", __LINE__);
+			}else if(dbuser = auth.substr(0, npos); dbuser.empty()){ err("Остаток атрибутов подключения");
+			}else{ //mpre("База данных dbuser=" +dbuser +" auth=" +auth +" npos=" +to_string(npos), __LINE__);
+			}return dbuser; }(bmf::dbuser); false){ err("Получение пользователя БД");
+		}else if(bmf::dbpassword = [&](std::string dbpassword){ // Пользователь БД
+			if(auth.empty()){ //mpre("Аутентификация не задана", __LINE__);
+			}else if(size_t npos = auth.find_first_of(":"); (std::string::npos == npos)){ //mpre("Аутентификация не задана", __LINE__);
+			}else if(dbpassword = auth.substr(npos+1, auth.length()); false){ err("Остаток атрибутов подключения");
+			}else{ //mpre("База данных dbpassword=" +dbpassword +" auth=" +auth +" npos=" +to_string(npos), __LINE__);
+			}return dbpassword; }(bmf::dbpassword); false){ err("Получение пароля БД");
+		}else if(std::string host = [&](std::string host = ""){ // Получение БД
+			if(size_t npos = db.find_first_of("/"); (std::string::npos == npos)){ //mpre("Аутентификация не задана", __LINE__);
+			}else if(host = db.substr(0, npos); host.empty()){ err("Выборка аутентификации БД");
+			}else if(db = db.substr(npos+1, db.length()); db.empty()){ err("База данных не указана");
+			}else{ //mpre("База данных host=" +host +" db=" +db +" npos=" +to_string(npos), __LINE__);
+			}return host; }(); host.empty()){ err("Хост БД не задан");
+		}else if(bmf::dbhost = [&](std::string dbhost){ // Хост БД
+			if(size_t npos = host.find_first_of(":"); (std::string::npos == npos)){ //mpre("Порт не задан", __LINE__);
+			}else if(dbhost = host.substr(0, npos); dbhost.empty()){ err("Остаток атрибутов подключения");
+			}else{ //mpre("База данных dbhost=" +dbhost +" host=" +host +" npos=" +to_string(npos), __LINE__);
+			}return dbhost; }(host); bmf::dbhost.empty()){ err("Получение пользователя БД");
+		}else if(bmf::dbport = [&](int dbport = 0){ // Хост БД
+			if(size_t npos = host.find_first_of(":"); false){ //mpre("Порт не задан", __LINE__);
+			}else if([&](){ // Значение порта по умолчанию	
+				if(std::string::npos != npos){ pre("Порт задан настройками");
+				}else if("mysql" == bmf::dbtype){ dbport = 3306;
+				}else if("redis" == bmf::dbtype){ dbport = 6379;
+				}else{ mpre("Порт для типа " +bmf::dbtype +" данных не задан", __LINE__);
+				}return (std::string::npos == npos); }()){ //pre("Порт не задан. Устанавливаем по умолчанию");
+			}else if(std::string _dport = host.substr(npos+1, host.length()); _dport.empty()){ err("Выборка порта");
+			}else if(dbport = atoi(_dport.c_str()); !dbport){ mpre("host=" +host +" _dport=" +_dport, __LINE__); err("Остаток атрибутов подключения");
+			}else{ //mpre("База данных dbport=" +std::to_string(dbport) +" host=" +host +" npos=" +to_string(npos), __LINE__);
+			}return dbport; }(); !bmf::dbport){ err("Получение порта БД");
+		}else if(bmf::dbname = db; bmf::dbname.empty()){ err("Имя БД не задано");
+		}else if([&](){ // Подключение к БД mysql
+			if("mysql" != bmf::dbtype){ //mpre("Используем не mysql", __LINE__);
+			}else if(bmf::dbname.empty()){ err("Имя БД не задано");
+			}else if(bmf::mysql = mysql_init(NULL); (nullptr == bmf::mysql)){ err("ОШИБКА создания соединения");
+			}else if(bmf::mysql = mysql_real_connect(bmf::mysql, bmf::dbhost.c_str(), bmf::dbuser.c_str(), bmf::dbpassword.c_str(), bmf::dbname.c_str(), bmf::dbport, NULL, 0); !bmf::mysql){ mpre("Параметры подключения dbhost=" +bmf::dbhost +" dbport=" +to_string(bmf::dbport) +" dbuser=" +bmf::dbuser +" dbpassword=" +bmf::dbpassword +" database=" +bmf::dbname, __LINE__); err("Подключение БД"); 
+			}else if(mysql_query(bmf::mysql, std::string("SET NAMES utf8").c_str()); !bmf::mysql){ err("Установка кодировки");
+			}else{ //mpre("ОШИБКА: " +string(mysql_error(bmf::mysql)), __LINE__);
+			}return false; }()){ err("Подключение к БД mysql");
+		}else if([&](){ // Подключение к БД redis
+			if("redis" != bmf::dbtype){ //mpre("Используем не mysql", __LINE__);
+			}else if(bmf::redis = redisConnect(bmf::dbhost.c_str() ,bmf::dbport); (bmf::redis == NULL)){ err("Подключение к redis");
+			}else{ pre("Подключение к redis");
+			}return false; }()){ err("Подключение к БД redis");
 		}else if([&](){ // Очистка БД
 			if(bmf::ARGV.end() == bmf::ARGV.find("-c")){ //mpre("Не очищаем БД", __LINE__);
+			}else if("mysql" != bmf::dbtype){ //mpre("Используем не mysql", __LINE__);
 			}else if(mysql_query(bmf::mysql, std::string("DROP TABLE IF EXISTS `index`;").c_str())){ err("ОШИБКА удаления таблицы");
 			}else if(mysql_query(bmf::mysql, std::string("DROP TABLE IF EXISTS `dataset`;").c_str())){ err("ОШИБКА удаления таблицы");
 			}else if(mysql_query(bmf::mysql, std::string("DROP TABLE IF EXISTS `dataset_map`;").c_str())){ err("ОШИБКА удаления таблицы");
@@ -264,9 +319,9 @@ int main(int argc, char **argv){
 			}else{ mpre("Очистка базы данных", __LINE__);
 			}return false; }()){ err("ОШИБКА очистки БД");
 		}else if([&](){ // Создание таблиц 
-			//}else if(mysql_query(bmf::mysql, std::string("DROP TABLE `index`; DROP TABLE dataset; DROP TABLE dataset_map; DROP TABLE dano; DROP TABLE dano_values; DROP TABLE dano_titles; DROP TABLE itog; DROP TABLE itog_values; DROP TABLES itog_titles").c_str())){ err("Удаление таблиц");
-			if(mysql_query(bmf::mysql, std::string("CREATE TABLE IF NOT EXISTS `index` (`id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, `itog_values_id` VARCHAR(256), `dano_id` VARCHAR(256), `itog_id` VARCHAR(256), `index_id` VARCHAR(256), `bmf-index` VARCHAR(256), KEY `itog_id` (`itog_id`))").c_str())){ err("Список морфов"); 
-			}else if(mysql_query(bmf::mysql, std::string("CREATE TABLE IF NOT EXISTS `dataset` (`id` VARCHAR(256) NOT NULL UNIQUE, `name` VARCHAR(256), `count` int(11), `epoch` int(11))").c_str())){ err("Вставка данных"); 
+			if("mysql" != bmf::dbtype){ //mpre("Используем не mysql", __LINE__);
+			}else if(mysql_query(bmf::mysql, std::string("CREATE TABLE IF NOT EXISTS `index` (`id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY, `itog_values_id` VARCHAR(256), `dano_id` VARCHAR(256), `itog_id` VARCHAR(256), `index_id` VARCHAR(256), `bmf-index` VARCHAR(256), KEY `itog_id` (`itog_id`))").c_str())){ err("Список морфов"); 
+			}else if(mysql_query(bmf::mysql, std::string("CREATE TABLE IF NOT EXISTS `dataset` (`id` VARCHAR(256) NOT NULL UNIQUE, `name` VARCHAR(256), `count` int(11), `epoch` int(11) DEFAULT 0)").c_str())){ err("Вставка данных"); 
 			}else if(mysql_query(bmf::mysql, std::string("CREATE TABLE IF NOT EXISTS `dataset_map` (`id` VARCHAR(256) NOT NULL UNIQUE, `dataset_id` VARCHAR(256), `alias` VARCHAR(256), `alias_id` VARCHAR(256), `itog_id` VARCHAR(256), `map` TEXT)").c_str())){ err("Вставка данных"); 
 			}else if(mysql_query(bmf::mysql, std::string("CREATE TABLE IF NOT EXISTS `dano` (`id` VARCHAR(256) NOT NULL UNIQUE, `dano_values_id` VARCHAR(256), `name` VARCHAR(256), `val` VARCHAR(256))").c_str())){ err("Дано"); 
 			}else if(mysql_query(bmf::mysql, std::string("CREATE TABLE IF NOT EXISTS `dano_values` (`id` VARCHAR(256) NOT NULL UNIQUE, `name` TEXT)").c_str())){ err("Дано значения"); 
@@ -285,11 +340,55 @@ int main(int argc, char **argv){
 			if([&](){ // Проверка условия
 				if(update.empty()){ //mpre("Не задано обнолвение", __LINE__);
 				}else if(where.end() == where.find("id")){ mpre(where, "Условие", __LINE__); mpre("У поля не задан идентификатор", __LINE__);
+				}else if(where.at("id").empty()){ err("Пустой идентификатор");
 				}else if(1 != where.size()){ mpre("ОШИБКА условий выборки больше одного", __LINE__);
 				}else{ //mpre("Условие корректно", __LINE__);
 				}return false; }()){ err("Проверка условия выборки");
+			}else if("mysql" == bmf::dbtype){ _row = bmf::Up_mysql(ROWS, where, insert, update, line);
+			}else if("redis" == bmf::dbtype){ _row = bmf::Up_redis(ROWS, where, insert, update, line);
+			}else{
+			}return _row; }); false){ err("Функция обновления");
+		}else if(bmf::Up_redis = ([&](std::string ROWS, TMs where, TMs insert, TMs update, int line){
+			TMs _row; // Возвращаем обновленное значение
+			if(!bmf::redis){ err("Соединение БД");
 			}else if([&](){ // Выборка
 				if(where.empty()){ //mpre("Не заданы условия выборки", __LINE__);
+				//}else if(!update.empty()){ mpre("Обновление", __LINE__);
+				}else if(std::string id = ROWS +":" +where.at("id"); id.empty()){ err("Идентификатор записи");
+				//}else if(void *result = (void *)redisCommand(bmf::redis,"GET %s", id); (nullptr == result)){ err("Выборка");
+				}else if(redisReply *reply = (redisReply *)redisCommand(bmf::redis,"GET %s", id); (reply != REDIS_OK)){ mpre("Пустое значение "+ id, __LINE__);
+				//}else if(mpre(where, "Проверка line=" +to_string(line) +" id=" +id +" value=" +reply->str, __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
+				}else if(std::string value = string(reply->str); value.empty()){ err("Значение");
+				}else if(freeReplyObject(reply); false){ err("Освобождение ресурсов");
+				}else{ //mpre(_row, "Результат", __LINE__); //mpre("ОШИБКА Выборка по условию " +sql, __LINE__);
+				}return false; }()){ err("Выборка");
+			}else if([&](){ // Редактирование
+				if(update.empty()){ //mpre("Не обновляем значение", __LINE__);
+				}else if(_row.empty()){ //mpre("Элемент по условию не найден", __LINE__);
+				}else if(where.end() == where.find("id")){ err("Не заданы условия");
+				}else if(update["id"] = where.at("id"); false){ err("Установка идентификатора");
+				}else if(update == _row){ //mpre("При редактировании значения совпали", __LINE__);
+				}else if(_row = update; false){ mpre("ОШИБКА установки результата", __LINE__);
+				}else{ mpre(where, "Условие", __LINE__); mpre(update, "Обновление", __LINE__);
+				}return false; }()){ err("Редактирование строка " +line);
+			}else if([&](){ // Добавление
+				if(insert.empty()){ //mpre("Не добавляем в базу", __LINE__);
+				}else if(!_row.empty()){ //mpre("Элемент по условию найден", __LINE__);
+				}else if([&](){
+					if(where.end() == where.find("id")){ //mpre("Не заданы условия", __LINE__);
+					}else if(insert["id"] = where.at("id"); false){ err("Установка идентификатора");
+					}else{ //mpre("Проверка на совпадения", __LINE__);
+					}return (insert == _row); }()){ mpre("Значения при обновлении совпали", __LINE__);
+				}else{ mpre(insert, "Добавление значения в базу", __LINE__);
+				}return false; }()){ err("Обновление");
+			}else{ //mpre(where, "Условие", __LINE__); mpre(insert, "Вставка", __LINE__); mpre(update, "Обновление", __LINE__); mpre("Запрос `" +ROWS +"` строка:" +std::to_string(line), __LINE__); //mpre("Добавление заголовока в базу `" +row.at("id") +"` ", __LINE__);
+			}return _row; }); false){ err("Функция обновления");
+		}else if(bmf::Up_mysql = ([&](std::string ROWS, TMs where, TMs insert, TMs update, int line){
+			TMs _row; // Возвращаем обновленное значение
+			if(!bmf::mysql){ err("Соединение БД");
+			}else if([&](){ // Выборка
+				if(where.empty()){ //mpre("Не заданы условия выборки", __LINE__);
+				//}else if(!update.empty()){ mpre("Обновление", __LINE__);
 				}else if(std::string _where = [&](std::string _where = ""){ // Условия выборки
 					if([&](){ for(auto where_itr:where){ // Строка условий
 						_where += string(_where.empty() ? "" : " AND ") +"`" +where_itr.first +"`='" +where_itr.second +"'";
@@ -298,8 +397,8 @@ int main(int argc, char **argv){
 					}return _where; }(); false){ err("Составления условий выборки");
 				}else if(std::string sql = "SELECT * FROM `" + ROWS+"` WHERE " +_where; sql.empty()){ err("Запрос к БД");
 				}else if(_row = [&](TMs _row = {}){ // Получение значения
-					if(mysql_query(bmf::mysql, sql.c_str())){ mpre("Выбор данных из таблицы " +sql, __LINE__);
-					}else if(MYSQL_RES *result = mysql_store_result(bmf::mysql); false){ err("ОШИБКА выполнения запроса");
+					if(mysql_query(bmf::mysql, sql.c_str()); !bmf::mysql){ mpre("Выбор данных из таблицы " +sql, __LINE__);
+					}else if(MYSQL_RES *result = mysql_store_result(bmf::mysql); !result){ err("ОШИБКА выполнения запроса");
 					}else if(int count = mysql_num_fields(result); !count){ err("Получение количества полей");
 					}else if(std::string FIELDS[count]; false){ err("Массив списка полей");
 					}else if([&](int i = 0){ while(MYSQL_FIELD *field = mysql_fetch_field(result)){ FIELDS[i++] = field->name; }return false; }()){ mpre("ОШИБКА получения полей", __LINE__);
@@ -314,7 +413,6 @@ int main(int argc, char **argv){
 					}return _row; }(); false){ err("Значение поля");
 				}else{ //mpre(_row, "Результат", __LINE__); //mpre("ОШИБКА Выборка по условию " +sql, __LINE__);
 				}return false; }()){ err("Выборка");
-			//}else if(mpre("Проверка", __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
 			}else if([&](){ // Редактирование
 				if(update.empty()){ //mpre("Не обновляем значение", __LINE__);
 				}else if(_row.empty()){ //mpre("Элемент по условию не найден", __LINE__);
@@ -1065,9 +1163,8 @@ int main(int argc, char **argv){
 				}else{ //mpre(_dano, "Дано " +val, __LINE__);
 				}}return false; }()){ mpre("ОШИБКА сохранения обучающих примеров", __LINE__);
 			}else if(std::string map = [&](std::string map = ""){ boost::to_string(bit, map); return map; }(); map.empty()){ mpre("ОШИБКА установки карты исходника", __LINE__);
-			}else if(std::string clump_id = (bmf::databases.end() == bmf::databases.find("file") ? bmf::clump_id : ":memory:"); clump_id.empty()){ mpre("ОШИБКА расчета базы", __LINE__);
 			}else if(std::string dataset_map_id = "dano," +dano.at("id") +"," +bmf::dataset.at("id"); dataset_map_id.empty()){ mpre("ОШИБКА составления идентификатора карты", __LINE__);
-			}else if(TMs _dataset_map = {{"id", dataset_map_id}, /*{"clump_id", clump_id},*/ {"map", map}}; _dataset_map.empty()){ mpre("ОШИБКА создания карты набора данных", __LINE__);
+			}else if(TMs _dataset_map = {{"id", dataset_map_id}, {"map", map}}; _dataset_map.empty()){ mpre("ОШИБКА создания карты набора данных", __LINE__);
 			}else if(TMs dataset_map = bmf::Up(bmf::DATASET_MAP, {{"id", dataset_map_id}}, _dataset_map, _dataset_map, __LINE__); dataset_map.empty()){ mpre("ОШИБКА обнолвения карты исходника", __LINE__);
 			}else{ //mpre("Установка карты морфа "+ dataset_map_id, __LINE__);//mpre("Исходник " +dano_itr.second.at("id") +" " +dano_itr.second.at("map"), __LINE__);
 			}} std::cerr << endl; return false; }()){ mpre("ОШИБКА составления двоичной карты", __LINE__);
@@ -1097,9 +1194,8 @@ int main(int argc, char **argv){
 				}else{ //mpre(_dano, "Дано " +val, __LINE__);
 				}}return false; }()){ mpre("ОШИБКА сохранения обучающих примеров", __LINE__);
 			}else if(std::string map = [&](std::string map = ""){ boost::to_string(bit, map); return map; }(); map.empty()){ mpre("ОШИБКА установки карты итога", __LINE__);
-			}else if(std::string clump_id = (bmf::databases.end() == bmf::databases.find("file") ? bmf::clump_id : ":memory:"); clump_id.empty()){ mpre("ОШИБКА расчета базы", __LINE__);
 			}else if(std::string dataset_map_id = "itog," +itog.at("id") +"," +bmf::dataset.at("id"); dataset_map_id.empty()){ mpre("ОШИБКА составления идентификатора карты", __LINE__);
-			}else if(TMs _dataset_map = {/*{"clump_id", clump_id},*/ {"itog_id", itog.at("id")}, {"map", map}}; _dataset_map.empty()){ mpre("ОШИБКА создания карты набора данных", __LINE__);
+			}else if(TMs _dataset_map = {{"itog_id", itog.at("id")}, {"map", map}}; _dataset_map.empty()){ mpre("ОШИБКА создания карты набора данных", __LINE__);
 			}else if(bmf::Up(bmf::DATASET_MAP, {{"id", dataset_map_id}}, _dataset_map, _dataset_map, __LINE__).empty()){ mpre("ОШИБКА обновления набора данных", __LINE__);
 			}else{ //mpre("Итог " +itog_itr.second.at("id") +" " +itog_itr.second.at("map"), __LINE__); //mpre(dano_itr.second, "Исходник", __LINE__);
 			}} std::cerr << endl; return false; }()){ mpre("ОШИБКА составления двоичной карты", __LINE__);
@@ -1221,6 +1317,7 @@ int main(int argc, char **argv){
 		}else if(!ds.empty()){ mpre("Набора данных не найден в базе "+ ds, __LINE__);
 		}else if(std::map<string, boost::dynamic_bitset<>> ITOG; false){ mpre("Справочник карт", __LINE__);
 		}else if(std::map<string, boost::dynamic_bitset<>> INDEX; false){ mpre("Справочник карт", __LINE__);
+		//}else if(mpre("Проверка", __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
 		}else if([&](){ for(auto& dataset_itr:bmf::List(bmf::DATASET, {}, __LINE__)){ // Вывод списка набора данных
 			if(TMs dataset = dataset_itr.second; dataset.empty()){ mpre("ОШИБКА выборки набора данных", __LINE__);
 			}else if(dataset.end() == dataset.find("count")){ mpre("ОШИБКА поле количества примеров не установлено", __LINE__);
@@ -1261,10 +1358,9 @@ int main(int argc, char **argv){
 				}else{ //mpre("Количество правильных ответов i=" +to_string(i) +" dataset_count=" +to_string(dataset_count) +" count=" +to_string(count) +" ers=" +to_string(ers), __LINE__);
 				}}return (float)(count*100)/dataset_count; }(); (0 > perc)){ mpre("ОШИБКА расчета процента полных совпадений по значениям", __LINE__);
 			}else if(string _perc = [&](string _perc = ""){ char chr[10]; sprintf(chr ,"%.2f" ,perc); return string(chr); }(); _perc.empty()){ mpre("ОШИБКА расчета строки процента ошибки", __LINE__);
-			}else{ mpre("Набор " +dataset["id"] +" количество:"+ dataset["count"] +" точность:"+ to_string(diff) +" (" +_perc +"%)" +("" == dataset["epoch"] ? "" : " эпох:" +dataset["epoch"]), __LINE__);
+			}else{ mpre("Набор " +dataset["id"] +" количество:"+ dataset["count"] +" точность:"+ to_string(diff) +" (" +_perc +"%)" +("0" == dataset["epoch"] ? "" : " эпох:" +dataset["epoch"]), __LINE__);
 			}}return false; }()){ mpre("ОШИБКА отображения списка набора данных", __LINE__);
-		//}else if(bmf::Close(0)){ mpre("ОШИБКА закрытия БД", __LINE__);
-		}else{ //mpre("Выберете набор данных для расчета -ds и количество -epoch", __LINE__);
+		}else{ //mpre("Размер модели ", __LINE__);
 		}return bmf::dataset; }(); bmf::dataset.empty()){ //mpre("ОШИБКА набор данных не установлен", __LINE__);
 	}else if(int loop = [&](int loop = 0){ // Количетсво повторений
 		if(int epoch = (bmf::ARGV.end() == bmf::ARGV.find("epoch") ? 0 : atoi(bmf::ARGV.at("epoch").c_str())); (0 > epoch)){ mpre("ОШИБКА расчета количества эпох", __LINE__);
@@ -1364,6 +1460,13 @@ int main(int argc, char **argv){
 			}else{
 			}}while(!(rep = !rep)); return err; }(); (0 > err)){ mpre("ОШИБКА проверки списка итогов", __LINE__);
 		//}else if(bmf::Close(err)){ mpre("ОШИБКА закрытия БД", __LINE__);
+		}else if([&](){ // Прибавление эпохи
+			if(!err){ //mpre("Не увеличиваем эпохи без обучения", __LINE__);
+			}else if(bmf::dataset = bmf::Up(bmf::DATASET, {{"id", bmf::dataset.at("id")}}, {}, {}, __LINE__); bmf::dataset.empty()){ err("Выборка набора данных");
+			}else if(bmf::dataset["epoch"] = to_string(atoi(bmf::dataset["epoch"].c_str())+1); bmf::dataset.at("epoch").empty()){ err("Инкремента эпох");
+			}else if(bmf::dataset = bmf::Up(bmf::DATASET, {{"id", bmf::dataset.at("id")}}, bmf::dataset, bmf::dataset, __LINE__); bmf::dataset.empty()){ err("Выборка набора данных");
+			}else{ //mpre("Инкремент эпох", __LINE__);
+			}return bmf::dataset; }(); bmf::dataset.empty()){ err("Инкремент эпох");
 		}else if([&](){ // Расчет процента бит
 			if(1 == bmf::loop){ bmf::pips_first = (err ? (float)(dataset_count-err)/dataset_count : 1); //mpre("Расчет процента первой эпохи err=" +to_string(err) +" count=" +to_string(count), __LINE__);
 			}else{ bmf::pips_last = (err ? (float)(dataset_count-err)/dataset_count : 1); //mpre("Расчет процента последней эпохи", __LINE__);
