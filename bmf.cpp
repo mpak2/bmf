@@ -346,9 +346,8 @@ int main(int argc, char **argv){
 		if(bmf::Up = ([&](std::string ROWS, TMs where, TMs insert, TMs update, int line){
 			TMs _row; // Возвращаем обновленное значение
 			if([&](){ // Проверка условия
-				if(update.empty()){ //mpre("Не задано обнолвение", __LINE__);
-				}else if(where.end() == where.find("id")){ mpre(where, "Условие", __LINE__); mpre("У поля не задан идентификатор", __LINE__);
-				}else if(where.at("id").empty()){ err("Пустой идентификатор");
+				if(where.end() == where.find("id")){ mpre(where, "Условие", __LINE__); mpre("ОШИБКА У поля не задан идентификатор", __LINE__);
+				}else if(where.at("id").empty()){ mpre("ОШИБКА Пустой идентификатор line=" +to_string(line), __LINE__);
 				}else if(1 != where.size()){ mpre("ОШИБКА условий выборки больше одного", __LINE__);
 				}else{ //mpre("Условие корректно", __LINE__);
 				}return false; }()){ err("Проверка условия выборки");
@@ -373,6 +372,7 @@ int main(int argc, char **argv){
 				}else if(_row = [&](TMs _row = {}){ for(int i =0; i <reply->elements; i =i +2){
 					if(std::string first = reply->element[i]->str; first.empty()){ err("Ключ");
 					}else if(std::string second = reply->element[i+1]->str; false){ err("Значение");
+					}else if(second = ("\"\"" == second ? "" : second); false){ err("Пустое значение");
 					}else if(_row.insert(make_pair(first, second)); _row.empty()){ err("Добавление поля/значение");
 					}else{
 					}}return _row; }(); false){ err("Выборка значения");
@@ -390,8 +390,8 @@ int main(int argc, char **argv){
 					//}else if(update == _row){
 					}else if(std::string values = [&](std::string values = ""){ for(auto update_itr:update){ // Строка значений
 						if(std::string key = update_itr.first; key.empty()){ err("Ключ не найден");
-						}else if(std::string val = update_itr.second; val.empty()){ //pre("Пустое значение");
-						}else if(values += string(values.empty() ? "" : " ") +key +" " +val +""; values.empty()){ err("Добавление значения");
+						}else if(std::string val = update_itr.second; false){ //pre("Пустое значение");
+						}else if(values += string(values.empty() ? "" : " ") +key +" " +(val.empty() ? "\"\"" : val) +""; values.empty()){ err("Добавление значения");
 						}else{
 						}}return values; }(); values.empty()){ err("Значения списка");
 					}else if(std::string cmd = "HMSET " +id +" " +values; cmd.empty()){ err("Запрос на выборку");
@@ -410,11 +410,9 @@ int main(int argc, char **argv){
 					}else if(insert["id"] = where.at("id"); false){ err("Установка идентификатора");
 					}else if(std::string values = [&](std::string values = ""){ for(auto insert_itr:insert){ // Строка значений
 						if(std::string key = insert_itr.first; key.empty()){ err("Ключ не найден");
-						}else if(std::string val = insert_itr.second; val.empty()){ //pre("Пустое значение");
-						}else if(values += string(values.empty() ? "" : " ") +key +" " +val +""; values.empty()){ err("Добавление значения");
-						}else{
+						}else if(std::string val = insert_itr.second; false){ //pre("Пустое значение");
+						}else if(values += string(values.empty() ? "" : " ") +key +" " +(val.empty() ? "\"\"" : val) +""; values.empty()){ err("Добавление значения");
 						}}return values; }(); values.empty()){ err("Значения списка");
-					//}else if(mpre("Проверка", __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
 					}else if(std::string cmd = "HMSET " +id +" " +values; cmd.empty()){ err("Запрос на выборку");
 					}else if(redisReply *reply = (redisReply *)redisCommand(bmf::redis ,cmd.c_str()); ("OK" != string(reply->str))){ mpre("ОШИБКА добавления line=" +to_string(line) +" HMSET " +id +" " +values +" " +reply->str, __LINE__);
 					}else if(_row = insert; _row.empty()){ err("Возвращаемое значение");
@@ -873,7 +871,9 @@ int main(int argc, char **argv){
 				}else if(TMs stairs = stairs_itr->second; stairs.empty()){ mpre(STAIRS, __LINE__, "Лестница"); mpre("ОШИБКА получения ступени", __LINE__);
 				//}else if(mpre(bmf_index, "Морф", __LINE__); false){ err("Уведомление");
 				//}else if(TMs index = bmf::fk("index", {{"id", stairs.at("index_id")}}, {}, {}); index.empty()){ mpre("ОШИБКА обновления морфа", __LINE__);
-				}else if(TMs index = bmf::Up(bmf::INDEX, {{"id", stairs.at("index_id")}}, {}, {}, __LINE__); index.empty()){ mpre("ОШИБКА выборки морфа", __LINE__);
+				}else if(TMs index = bmf::Up(bmf::INDEX, {{"id", stairs.at("index_id")}}, {}, {}, __LINE__); index.empty()){ mpre(stairs, "Ступень", __LINE__); mpre(bmf::List(bmf::INDEX, {}, __LINE__), "Список", __LINE__); mpre("ОШИБКА выборки морфа", __LINE__);
+				//}else if(mpre(stairs, "Ступень", __LINE__); false){ err("Уведомление");
+				//}else if(mpre(index, "Морф", __LINE__); false){ err("Уведомление");
 				}else if(TMs dano = bmf::Up(bmf::DANO, {{"id", index.at("dano_id")}}, {}, {}, __LINE__); dano.empty()){ mpre("ОШИБКА выборки исходного значения", __LINE__);
 				}else if(boost::dynamic_bitset<> map = [&](boost::dynamic_bitset<> map = {}){ // Карта морфа
 					//if(TMs dataset_map = bmf::fk("dataset_map", {{"dataset_id", bmf::dataset.at("id")}, {"alias", "dano"}, {"alias_id", dano.at("id")}}, {}, {}); false){ mpre("ОШИБКА выборки карты исходника", __LINE__);
@@ -885,7 +885,7 @@ int main(int argc, char **argv){
 					}else{ //mpre("Карта морфа " +dataset_map.at("map"), __LINE__);
 					}return map; }(); map.empty()){ mpre("ОШИБКА выборки карты морфа", __LINE__);
 				//}else if(TMs index_1 = bmf::fk("index", {{"id", index.at("index_id")}}, {}, {}); false){ mpre("ОШИБКА выборки старшего потомка", __LINE__);
-				}else if(TMs index_1 = bmf::Up(bmf::INDEX, {{"id", index.at("index_id")}}, {}, {}, __LINE__); false){ err("Выборка старшего потомка");
+				}else if(TMs index_1 = (index.at("index_id").empty() ? index_1 : bmf::Up(bmf::INDEX, {{"id", index.at("index_id")}}, {}, {}, __LINE__)); false){ err("Выборка старшего потомка");
 				}else if(boost::dynamic_bitset<> maps1 = [&](boost::dynamic_bitset<> maps1){ // Карта морфа
 					if(index_1.empty()){ //mpre("Старшего морфа нет берем карту исходника", __LINE__);
 					}else if(std::string dataset_map_id = "index," +index_1.at("id") +"," +bmf::dataset.at("id"); dataset_map_id.empty()){ mpre("ОШИБКА составления идентификатора карты", __LINE__);
@@ -903,7 +903,7 @@ int main(int argc, char **argv){
 					}else{ //mpre("Карта морфа " +dataset_map.at("map"), __LINE__);
 					}return maps1; }(map); maps1.empty()){ mpre("ОШИБКА выборки карты морфа", __LINE__);
 				//}else if(TMs index_0 = bmf::fk("index", {{"id", index.at("bmf-index")}}, {}, {}); false){ mpre("ОШИБКА выборки младшего потомка", __LINE__);
-				}else if(TMs index_0 = bmf::Up(bmf::INDEX, {{"id", index.at("bmf-index")}}, {}, {}, __LINE__); false){ err("Выборка младшего потомка");
+				}else if(TMs index_0 = (index.at("bmf-index").empty() ? index_0 : bmf::Up(bmf::INDEX, {{"id", index.at("bmf-index")}}, {}, {}, __LINE__)); false){ err("Выборка младшего потомка");
 				}else if(boost::dynamic_bitset<> maps0 = [&](boost::dynamic_bitset<> maps0){ // Карта морфа
 					if(index_0.empty()){ //mpre("Старшего морфа нет берем карту исходника", __LINE__);
 					//}else if(TMs where = {{"dataset_id", bmf::dataset.at("id")}, {"alias", "index"}, {"alias_id", index_0.at("id")}}; where.empty()){ mpre("ОШИБКА формирования условий на выборку карты", __LINE__);
@@ -983,14 +983,15 @@ int main(int argc, char **argv){
 						}else if(_dano = bmf::Up(bmf::DANO, {{"id", index.at("dano_id")}}, {}, {}, __LINE__); _dano.empty()){ mpre("ОШИБКА выборки исходника смежного морфа", __LINE__);
 						}else{ //mpre(_dano, "Выборка исходника смежного морфа", __LINE__);
 						} return _dano; }(); _dano.empty()){ mpre("ОШИБКА выборки нового морфа", __LINE__);
-					}else if(std::string clump_id = (bmf::databases.end() == bmf::databases.find("file") ? bmf::clump_id : ":memory:"); clump_id.empty()){ mpre("ОШИБКА расчета базы", __LINE__);
+					//}else if(std::string clump_id = (bmf::databases.end() == bmf::databases.find("file") ? bmf::clump_id : ":memory:"); clump_id.empty()){ mpre("ОШИБКА расчета базы", __LINE__);
 					//}else if(mpre(bmf::databases, "clump_id=" +clump_id, __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
-					}else if(TMs _index = {/*{"clump_id", clump_id},*/ {"itog_values_id", index.at("itog_values_id")}, {"dano_id", _dano.at("id")}, {"itog_id", index.at("itog_id")}, {"index_id", ""}, {"bmf-index", ""}}; _index.empty()){ mpre("ОШИБКА создания нового морфа "+ index.at("id"), __LINE__);
+					}else if(TMs _index = {{"itog_values_id", index.at("itog_values_id")}, {"dano_id", _dano.at("id")}, {"itog_id", index.at("itog_id")}, {"index_id", ""}, {"bmf-index", ""}}; _index.empty()){ mpre("ОШИБКА создания нового морфа "+ index.at("id"), __LINE__);
 					}else if(index.end() == index.find(_stairs.at("parent"))){ mpre("ОШИБКА у морфа поле родителя не найдено", __LINE__);
 					}else if(_stairs.end() == _stairs.find("parent")){ mpre("ОШИБКА поле родителя не указано", __LINE__);
 					//}else if(bmf::exec("BEGIN TRANSACTION"); false){ mpre("ОШИБКА начала сессии к БД", __LINE__);
 					//}else if(_index = bmf::fk("index", {}, _index, {}); _index.empty()){ mpre("ОШИБКА добавления нового морфа в БД", __LINE__);
-					}else if(_index = bmf::Up(bmf::INDEX, {}, _index, {}, __LINE__); _index.empty()){ mpre("ОШИБКА добавления нового морфа", __LINE__);
+					}else if(std::string _id = md5(index.at("id") +_stairs.at("parent")); _id.empty()){ err("Расчет идентификатора морфа");
+					}else if(_index = bmf::Up(bmf::INDEX, {{"id", _id}}, _index, {}, __LINE__); _index.empty()){ mpre("ОШИБКА добавления нового морфа", __LINE__);
 					}else if(index_1 = ("index_id" == _stairs.at("parent") ? _index : index_1); false){ mpre("ОШИБКА обновления старшего морфа", __LINE__);
 					}else if(index_0 = ("bmf-index" == _stairs.at("parent") ? _index : index_0); false){ mpre("ОШИБКА обновления младшего морфа", __LINE__);
 					}else if(TMs dataset_map = bmf::Maps(_index, _stairs.at("parent")); dataset_map.empty()){ mpre("ОШИБКА установки карт нового морфа", __LINE__);
@@ -1282,6 +1283,7 @@ int main(int argc, char **argv){
 				}else if(itog_itr.second.end() == itog_itr.second.find("index_id")){ mpre("ОШИБКА поле корневого морфа у итога не найдено", __LINE__);
 				//}else if(TMs bmf_index = (*bmf::INDEX)[itog_itr.second.at("index_id")]; bmf_index.empty()){ mpre("ОШИБКА выборки корневого морфа", __LINE__);
 				}else if(TMs bmf_index = bmf::Up(bmf::INDEX, {{"id", itog_itr.second.at("index_id")}}, {}, {}, __LINE__); bmf_index.empty()){ //mpre("Корневой морф не установлен", __LINE__);
+				//}else if(mpre(bmf_index, "Корневой морф", __LINE__); false){ err("Уведомление");
 				}else if(static TMMi STAIRS; !STAIRS.empty()){ mpre("Создание статической лестницы", __LINE__);
 				}else if([&](){ // Заполнение лестницы первоначальным значением
 					if(false){ pre("Пропуск первоначального заполнения лестницы");
@@ -1296,7 +1298,7 @@ int main(int argc, char **argv){
 					}else if(auto stairs_itr = STAIRS.rbegin(); (STAIRS.rend() == stairs_itr)){ err("Выборка итаратора ступени");
 					}else if(TMs stairs = stairs_itr->second; stairs.empty()){ err("Выборка ступени");
 					}else if(stairs.end() == stairs.find("index_id")){ err("ОШИБКА У ступени не найдено поле идентификатора морфа");
-					}else if(TMs index = bmf::Up(bmf::INDEX, {{"id", stairs.at("index_id")}}, {}, {}, __LINE__); index.empty()){ mpre("ОШИБКА морф не найден", __LINE__);
+					}else if(TMs index = bmf::Up(bmf::INDEX, {{"id", stairs.at("index_id")}}, {}, {}, __LINE__); index.empty()){ mpre(stairs, "Ступень", __LINE__); mpre("ОШИБКА морф не найден", __LINE__);
 					}else if(std::string map = [&](std::string map = {}){ // Выборка карты морфа
 						if(index.empty()){ mpre("ОШИБКА морф не найден", __LINE__);
 						}else if(index.end() == index.find("dano_id")){ mpre("ОШИБКА не установлен идентификатор исходника", __LINE__);
@@ -1306,8 +1308,8 @@ int main(int argc, char **argv){
 						}else if(map = dataset_map.at("map"); map.empty()){ mpre("ОШИБКА пустая карта исходника", __LINE__);
 						}else{ //mpre("Карта исходника " +index.at("dano_id") +" " +map, __LINE__);
 						}return map; }(); map.empty()){ mpre("ОШИБКА выборки карты морфа", __LINE__);
-					}else if(TMs index_1 = bmf::Up(bmf::INDEX, {{"id", index.at("index_id")}}, {}, {}, __LINE__); false){ mpre("ОШИБКА морф не найден", __LINE__);
-					}else if(TMs index_0 = bmf::Up(bmf::INDEX, {{"id", index.at("bmf-index")}}, {}, {}, __LINE__); false){ mpre("ОШИБКА морф не найден", __LINE__);
+					}else if(TMs index_1 = (index.at("index_id").empty() ? index_1 : bmf::Up(bmf::INDEX, {{"id", index.at("index_id")}}, {}, {}, __LINE__)); false){ mpre("ОШИБКА морф не найден", __LINE__);
+					}else if(TMs index_0 = (index.at("bmf-index").empty() ? index_0 : bmf::Up(bmf::INDEX, {{"id", index.at("bmf-index")}}, {}, {}, __LINE__)); false){ mpre("ОШИБКА морф не найден", __LINE__);
 					}else if(std::string field = [&](std::string field = ""){ // Направление расчета
 						if(std::string _field = (stairs.end() == stairs.find("field") ? "" : stairs.at("field")); false){ pre("Определение старого направления");
 						}else if(TMs fields = {{"", "index_id"}, {"index_id", "bmf-index"}, {"bmf-index", ""}}; fields.empty()){ err("Установка списка переходов");
@@ -1347,8 +1349,8 @@ int main(int argc, char **argv){
 						}else if(boost::dynamic_bitset<> maps = ("index_id" == parent ? maps1&maps0 : maps1|maps0); maps.empty()){ err("Расчет результата");
 						}else if(TMs _index = index; _index.empty()){ mpre("ОШИБКА клонирования морфа", __LINE__);
 						}else if(std::string map = [&](std::string map = ""){ boost::to_string(maps, map); return map; }(); map.empty()){ mpre("ОШИБКА установки карты морфа", __LINE__);
-						}else if(std::string clump_id = (bmf::databases.end() == bmf::databases.find("file") ? bmf::clump_id : ":memory:"); clump_id.empty()){ mpre("ОШИБКА расчета базы", __LINE__);
-						}else if(TMs _dataset_map = {/*{"clump_id", clump_id},*/ {"itog_id", itog_itr.second.at("id")}, {"map", map}}; _dataset_map.empty()){ mpre("ОШИБКА устанвоки карты", __LINE__);
+						//}else if(std::string clump_id = (bmf::databases.end() == bmf::databases.find("file") ? bmf::clump_id : ":memory:"); clump_id.empty()){ mpre("ОШИБКА расчета базы", __LINE__);
+						}else if(TMs _dataset_map = {{"itog_id", itog_itr.second.at("id")}, {"map", map}}; _dataset_map.empty()){ mpre("ОШИБКА устанвоки карты", __LINE__);
 						}else if(std::string dataset_map_id = "index," +index.at("id") +"," +bmf::dataset.at("id"); dataset_map_id.empty()){ mpre("ОШИБКА составления идентификатора карты", __LINE__);
 						}else if(TMs dataset_map = bmf::Up(bmf::DATASET_MAP, {{"id", dataset_map_id}}, _dataset_map, _dataset_map, __LINE__); dataset_map.empty()){ mpre("ОШИБКА обнолвения карты исходника", __LINE__);
 						}else if([&](){ // Расчет размера веток
@@ -1492,9 +1494,8 @@ int main(int argc, char **argv){
 						}else if((index = bmf::Up(bmf::INDEX, {{"id", itog.at("index_id")}}, {}, {}, __LINE__)).empty()){ mpre("ОШИБКА добавления корневого морфа в базу", __LINE__);
 						}else{ //mpre(index, "Морф найден в базе", __LINE__);
 						}return !index.empty(); }()){ //mpre("Морф уже в базе", __LINE__);
-					}else if(TMs _index = {/*{"clump_id", bmf::clump_id},*/ {"itog_values_id", itog.at("itog_values_id")}, {"dano_id", dano.at("id")}, {"itog_id", itog.at("id")}, {"index_id", ""}, {"bmf-index", ""}}; _index.empty()){ mpre("ОШИБКА формирования свойст нового морфа", __LINE__);
+					}else if(TMs _index = {{"itog_values_id", itog.at("itog_values_id")}, {"dano_id", dano.at("id")}, {"itog_id", itog.at("id")}, {"index_id", ""}, {"bmf-index", ""}}; _index.empty()){ mpre("ОШИБКА формирования свойст нового морфа", __LINE__);
 					}else if(std::string id = md5(itog.at("id")); id.empty()){ err("Нахождение идентификатора корневого морфа");
-					//}else if(mpre("Проверка", __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
 					}else if((index = bmf::Up(bmf::INDEX, {{"id", id}}, _index, {}, __LINE__)).empty()){ mpre("ОШИБКА добавления корневого морфа в базу", __LINE__);
 					}else if(TMs dataset_map = bmf::Maps(index, "bmf-index"); dataset_map.empty()){ mpre("Установка карт", __LINE__);
 					}else if(itog["index_id"] = index.at("id"); itog.empty()){ mpre("ОШИБКА установки свойства связи итога с морфом", __LINE__);

@@ -35,13 +35,13 @@
 #cat clump/iris.json | ./bimorph iris - -c
 #./bimorph iris ds=495e7de50abef9a66166cc5ea4b6927e epoch=100 # ?cache=shared
 
-./bimorph redis://localhost/iris -c
+#./bimorph redis://localhost/iris -c
 #./bimorph redis://localhost/iris
 cat clump/iris_1.json | ./bimorph redis://localhost/iris -
 cat clump/iris_2.json | ./bimorph redis://localhost/iris -
 cat clump/iris_3.json | ./bimorph redis://localhost/iris -
 
-#./bimorph redis://localhost/iris ds=fc8c9622e85a712e109eb6993bdfff95 epoch=100 # ?cache=shared
+./bimorph redis://localhost/iris ds=fc8c9622e85a712e109eb6993bdfff95 epoch=100 # ?cache=shared
 
 #for loop in {1..10}; do
 #	echo "Поток $loop"
