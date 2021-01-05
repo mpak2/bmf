@@ -35,7 +35,7 @@
 #cat clump/iris.json | ./bimorph iris - -c
 #./bimorph iris ds=495e7de50abef9a66166cc5ea4b6927e epoch=100 # ?cache=shared
 
-#./bimorph redis://localhost:6379/iris -c
+./bimorph redis://localhost/iris -c
 #./bimorph redis://localhost/iris
 cat clump/iris_1.json | ./bimorph redis://localhost/iris -
 cat clump/iris_2.json | ./bimorph redis://localhost/iris -

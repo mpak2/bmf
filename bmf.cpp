@@ -308,6 +308,12 @@ int main(int argc, char **argv){
 			}return false; }()){ err("Подключение к БД redis");
 		}else if([&](){ // Очистка БД
 			if(bmf::ARGV.end() == bmf::ARGV.find("-c")){ //mpre("Не очищаем БД", __LINE__);
+			}else if("redis" != bmf::dbtype){ //mpre("Используем не редис", __LINE__);
+			}else if(redisReply *reply = (redisReply *)redisCommand(bmf::redis ,"FLUSHDB"); ("OK" != string(reply->str))){ err("Очистка FLUSHDB БД redis");
+			}else{ mpre("Очистка FLUSHDB базы данных redis", __LINE__);
+			}return false; }()){ err("ОШИБКА очистки БД");
+		}else if([&](){ // Очистка БД
+			if(bmf::ARGV.end() == bmf::ARGV.find("-c")){ //mpre("Не очищаем БД", __LINE__);
 			}else if("mysql" != bmf::dbtype){ //mpre("Используем не mysql", __LINE__);
 			}else if(mysql_query(bmf::mysql, std::string("DROP TABLE IF EXISTS `index`;").c_str())){ err("ОШИБКА удаления таблицы");
 			}else if(mysql_query(bmf::mysql, std::string("DROP TABLE IF EXISTS `dataset`;").c_str())){ err("ОШИБКА удаления таблицы");
@@ -318,7 +324,7 @@ int main(int argc, char **argv){
 			}else if(mysql_query(bmf::mysql, std::string("DROP TABLE IF EXISTS `itog`;").c_str())){ err("ОШИБКА удаления таблицы");
 			}else if(mysql_query(bmf::mysql, std::string("DROP TABLE IF EXISTS `itog_values`;").c_str())){ err("ОШИБКА удаления таблицы");
 			}else if(mysql_query(bmf::mysql, std::string("DROP TABLE IF EXISTS `itog_titles`;").c_str())){ err("ОШИБКА удаления таблицы");
-			}else{ mpre("Очистка базы данных", __LINE__);
+			}else{ mpre("Очистка базы данных mysql", __LINE__);
 			}return false; }()){ err("ОШИБКА очистки БД");
 		}else if([&](){ // Создание таблиц 
 			if("mysql" != bmf::dbtype){ //mpre("Используем не mysql", __LINE__);
@@ -373,14 +379,27 @@ int main(int argc, char **argv){
 				}else if(freeReplyObject(reply); false){ err("Освобождение ресурсов");
 				}else{ //mpre(_row, "Выборка "+cmd + " (" +to_string(reply->elements) +")", __LINE__); //mpre("ОШИБКА Выборка по условию " +sql, __LINE__);
 				}return false; }()){ err("Выборка");
-			}else if([&](){ // Редактирование
+			}else if([&](){ // Обновление
 				if(update.empty()){ //mpre("Не обновляем значение", __LINE__);
 				}else if(_row.empty()){ //mpre("Элемент по условию не найден", __LINE__);
 				}else if(where.end() == where.find("id")){ err("Не заданы условия");
-				}else if(update["id"] = where.at("id"); false){ err("Установка идентификатора");
-				}else if(update == _row){ //mpre("При редактировании значения совпали", __LINE__);
-				}else if(_row = update; false){ mpre("ОШИБКА установки результата", __LINE__);
-				}else{ mpre(where, "Условие", __LINE__); mpre(update, "Обновление", __LINE__);
+				}else if(std::string id = bmf::dbname +":" +ROWS +":" +where.at("id"); id.empty()){ err("Идентификатор записи");
+				}else if([&](){
+					if(where.end() == where.find("id")){ //mpre("Не заданы условия", __LINE__);
+					}else if(update["id"] = where.at("id"); false){ err("Установка идентификатора");
+					//}else if(update == _row){
+					}else if(std::string values = [&](std::string values = ""){ for(auto update_itr:update){ // Строка значений
+						if(std::string key = update_itr.first; key.empty()){ err("Ключ не найден");
+						}else if(std::string val = update_itr.second; val.empty()){ //pre("Пустое значение");
+						}else if(values += string(values.empty() ? "" : " ") +key +" " +val +""; values.empty()){ err("Добавление значения");
+						}else{
+						}}return values; }(); values.empty()){ err("Значения списка");
+					}else if(std::string cmd = "HMSET " +id +" " +values; cmd.empty()){ err("Запрос на выборку");
+					}else if(redisReply *reply = (redisReply *)redisCommand(bmf::redis ,cmd.c_str()); ("OK" != string(reply->str))){ mpre("ОШИБКА добавления line=" +to_string(line) +" HMSET " +id +" " +values +" " +reply->str, __LINE__);
+					}else if(_row = update; _row.empty()){ err("Возвращаемое значение");
+					}else{ //mpre(update, "Обновляем значения в базе " +cmd, __LINE__); //mpre("Проверка на совпадения", __LINE__);
+					}return _row.empty(); }()){ err("Добавление");
+				}else{ //mpre(where, "Условие", __LINE__); mpre(update, "Обновление", __LINE__);
 				}return false; }()){ err("Редактирование строка " +line);
 			}else if([&](){ // Добавление
 				if(insert.empty()){ //mpre("Не добавляем в базу", __LINE__);
@@ -406,9 +425,8 @@ int main(int argc, char **argv){
 					}else if(std::transform(table.begin() ,table.end() ,table.begin(), ::toupper); table.empty()){ err("ОШИБКА получения первого заглавного символа");
 					}else if(std::string list_id = bmf::dbname +":" +table; list_id.empty()){ err("Идентификатор записи");
 					}else if(std::string cmd = "SADD " +list_id +" " +where.at("id") +""; cmd.empty()){ err("Составление запроса");
-					}else if(mpre("Запрос "+ cmd, __LINE__); false){ err("Уведомление");
 					}else if(redisReply *reply = (redisReply *)redisCommand(bmf::redis ,cmd.c_str()); (0 != reply->str)){ mpre("ОШИБКА добавления line=" +to_string(line) +" " +cmd +" " +reply->str, __LINE__);
-					}else{ mpre("Добавление нового значения в список " +cmd, __LINE__);
+					}else{ //mpre("Добавление нового значения в список " +cmd, __LINE__);
 					}return false; }(ROWS)){ err("Список значения");
 				}else{ //mpre("Добавление значения HMSET " +id +" " +values, __LINE__);
 				}return false; }()){ err("Обновление");
@@ -1381,9 +1399,9 @@ int main(int argc, char **argv){
 				}else if(std::string dataset_map_id = "itog," +itog.at("id") +"," +dataset.at("id"); dataset_map_id.empty()){ mpre("ОШИБКА составления идентификатора карты", __LINE__);
 				}else if(TMs itog_map = bmf::Up(bmf::DATASET_MAP, {{"id", dataset_map_id}}, {}, {}, __LINE__); itog_map.empty()){ mpre("ОШИБКА обнолвения карты исходника", __LINE__);
 				}else if(boost::dynamic_bitset<> gmap(itog_map.at("map")); gmap.empty()){ mpre("ОШИБКА установки карты итога", __LINE__);
-				}else if(ITOG[itog.at("id")] = gmap; ITOG.empty()){ mpre("ОШИБКА сохраенения карты итога", __LINE__);
+				}else if(ITOG[itog.at("id")] = gmap; ITOG.empty()){ mpre("ОШИБКА сохранения карты итога", __LINE__);
 				}else if(dataset.end() == dataset.find("id")){ err("Не найден идентификатор набора данных");
-				}else if(std::string index_id = (itog.end() == itog.find("index_id") ? "0" : itog.at("index_id")); index_id.empty()){ err("ОШИБКА расчета идентификатора морфа");
+				}else if(std::string index_id = (itog.end() == itog.find("index_id") ? "0" : itog.at("index_id")); false){ err("ОШИБКА расчета идентификатора морфа");
 				}else if(std::string dataset_map_id = "index," +index_id +"," +dataset.at("id"); dataset_map_id.empty()){ mpre("ОШИБКА составления идентификатора карты", __LINE__);
 				}else if(TMs index_map = bmf::Up(bmf::DATASET_MAP, {{"id", dataset_map_id}}, {}, {}, __LINE__); false){ mpre("ОШИБКА обнолвения карты исходника", __LINE__);
 				}else if(std::string map = (index_map.end() == index_map.find("map") ? std::string(dataset_count, '0') : index_map.at("map")); map.empty()){ mpre("ОШИБКА расчета карты", __LINE__);
