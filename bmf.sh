@@ -36,20 +36,20 @@
 #./bimorph iris ds=495e7de50abef9a66166cc5ea4b6927e epoch=100 # ?cache=shared
 
 #./bimorph redis://localhost:6379/iris -c
-./bimorph mysql://localhost/mnist
-#cat clump/iris_1.json | ./bimorph redis://localhost:6379/iris -
-#cat clump/iris_2.json | ./bimorph redis://localhost:6379/iris -
-#cat clump/iris_3.json | ./bimorph redis://localhost:6379/iris -
+#./bimorph redis://localhost/iris
+cat clump/iris_1.json | ./bimorph redis://localhost/iris -
+cat clump/iris_2.json | ./bimorph redis://localhost/iris -
+cat clump/iris_3.json | ./bimorph redis://localhost/iris -
 
-#./bimorph clump/iris ds=fc8c9622e85a712e109eb6993bdfff95 epoch=100 # ?cache=shared
+#./bimorph redis://localhost/iris ds=fc8c9622e85a712e109eb6993bdfff95 epoch=100 # ?cache=shared
 
 #for loop in {1..10}; do
 #	echo "Поток $loop"
-#	./bimorph iris ds=21e18b82ea50b431847639eeac729651 epoch=100 # ?cache=shared
-#	./bimorph iris ds=fc8c9622e85a712e109eb6993bdfff95 epoch=100 # ?cache=shared
-#	./bimorph iris ds=425146b12b837f025e1f7ebdd78b8561 epoch=100 # ?cache=shared
+#	./bimorph redis://localhost/iris ds=21e18b82ea50b431847639eeac729651 epoch=100 # ?cache=shared
+#	./bimorph redis://localhost/iris ds=fc8c9622e85a712e109eb6993bdfff95 epoch=100 # ?cache=shared
+#	./bimorph redis://localhost/iris ds=425146b12b837f025e1f7ebdd78b8561 epoch=100 # ?cache=shared
 #done
-#./bimorph iris; echo "\n" # ?cache=shared
+./bimorph redis://localhost/iris; echo "\n" # ?cache=shared
 
 #./bimorph clump/iris ds=1 mem=:memory: itog=2 epoch=1 # ?cache=shared
 #./bimorph clump/iris ds=1 mem=:memory: itog=3 epoch=1 # ?cache=shared
