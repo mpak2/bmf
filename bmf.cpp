@@ -969,7 +969,12 @@ int main(int argc, char **argv){
 					}else if(TMs _index = {{"itog_values_id", index.at("itog_values_id")}, {"dano_id", _dano.at("id")}, {"itog_id", index.at("itog_id")}, {"index_id", ""}, {"bmf-index", ""}}; _index.empty()){ mpre("ОШИБКА создания нового морфа "+ index.at("id"), __LINE__);
 					}else if(index.end() == index.find(_stairs.at("parent"))){ mpre("ОШИБКА у морфа поле родителя не найдено", __LINE__);
 					}else if(_stairs.end() == _stairs.find("parent")){ mpre("ОШИБКА поле родителя не указано", __LINE__);
-					}else if(std::string _id = md5(index.at("id") +_stairs.at("parent")); _id.empty()){ err("Расчет идентификатора морфа");
+					//}else if(std::string _id = md5(index.at("id") +_stairs.at("parent")); _id.empty()){ err("Расчет идентификатора морфа");
+					}else if(std::string _id = [&](std::string _id){ // Идентификатор морфа
+						if(std::string step = ("index_id" == _stairs.at("parent") ? "1" : "0"); step.empty()){ err("ОШИБКА получения признака шага");
+						}else if(_id = "1" +step +_id.substr(1, _id.length()); _id.empty()){ err("Составление нового идентификатора");
+						}else{ //mpre("Идентификатор морфа " +index.at("id") +" > " +_id, __LINE__);
+						}return _id; }(index.at("id")); _id.empty()){ err("Составление идентификатора морфа");
 					}else if(_index = bmf::Up(bmf::INDEX, {{"id", _id}}, _index, {}, __LINE__); _index.empty()){ mpre("ОШИБКА добавления нового морфа", __LINE__);
 					}else if(index_1 = ("index_id" == _stairs.at("parent") ? _index : index_1); false){ mpre("ОШИБКА обновления старшего морфа", __LINE__);
 					}else if(index_0 = ("bmf-index" == _stairs.at("parent") ? _index : index_0); false){ mpre("ОШИБКА обновления младшего морфа", __LINE__);
@@ -1466,7 +1471,8 @@ int main(int argc, char **argv){
 						}else{ //mpre(index, "Морф найден в базе", __LINE__);
 						}return !index.empty(); }()){ //mpre("Морф уже в базе", __LINE__);
 					}else if(TMs _index = {{"itog_values_id", itog.at("itog_values_id")}, {"dano_id", dano.at("id")}, {"itog_id", itog.at("id")}, {"index_id", ""}, {"bmf-index", ""}}; _index.empty()){ mpre("ОШИБКА формирования свойст нового морфа", __LINE__);
-					}else if(std::string id = md5(itog.at("id")); id.empty()){ err("Нахождение идентификатора корневого морфа");
+					//}else if(std::string id = md5(itog.at("id")); id.empty()){ err("Нахождение идентификатора корневого морфа");
+					}else if(std::string id = "1-" +itog.at("id"); id.empty()){ err("Идентификатор первоначального морфа");
 					}else if((index = bmf::Up(bmf::INDEX, {{"id", id}}, _index, {}, __LINE__)).empty()){ mpre("ОШИБКА добавления корневого морфа в базу", __LINE__);
 					}else if(TMs dataset_map = bmf::Maps(index, "bmf-index", -1); dataset_map.empty()){ mpre("Установка карт", __LINE__);
 					}else if(itog["index_id"] = index.at("id"); itog.empty()){ mpre("ОШИБКА установки свойства связи итога с морфом", __LINE__);
