@@ -911,7 +911,7 @@ int main(int argc, char **argv){
 				}else if(bmf::COUNT[index.at("id")] = to_string(count_1 +count_0 +1); (bmf::COUNT.end() == bmf::COUNT.find(index.at("id")))){ mpre("ОШИБКА обновления счетчиков морфа", __LINE__);
 				}else if(TMs _stairs = [&](TMs _stairs = {}){ // Выбор направления развития
 					if(stairs.end() != stairs.find("val")){ //mpre("Пропуск выбора направления расчета", __LINE__);
-					}else if(std::string directions = "11123322"; directions.empty()){ mpre("ОШИБКА установки маски перехода", __LINE__);
+					}else if(std::string directions = "11122122"; directions.empty()){ mpre("ОШИБКА установки маски перехода", __LINE__);
 					}else if(int vd = (map.test(key) ? 1 : 0); (0 > vd)){ mpre("ОШИБКА расчета собственного значения", __LINE__);
 					}else if(int v1 = (maps1.test(key) ? 1 : 0); (0 > v1)){ mpre("ОШИБКА расчета значения старшей связи", __LINE__);
 					}else if(int v0 = (maps0.test(key) ? 1 : 0); (0 > v0)){ mpre("ОШИБКА расчета значения младшей связи", __LINE__);
