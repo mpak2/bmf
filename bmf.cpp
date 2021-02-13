@@ -72,7 +72,7 @@ namespace fs = std::experimental::filesystem;
 
 struct comp{ bool operator()(const std::string& lhs, const std::string& rhs) const{ size_t ls = lhs.size(); size_t rs = rhs.size(); return std::tie(ls, lhs) > std::tie(rs, rhs); }};
 
-typedef std::map<string, string> TMs;
+typedef std::map<string, string, comp> TMs;
 typedef std::map<string, TMs, comp> TMMs;
 typedef std::map<int, TMs> TMMi;
 typedef std::map<string, TMMi> TM3i;
@@ -90,9 +90,6 @@ TMMi BMF_CLUMP, DATABASES;//, BMF_INDEX, BMF_DANO, _BMF_DANO, _BMF_ITOG, BMF_ITO
 TM3i BMF_DANO_VALUES_EX, BMF_ITOG_VALUES_EX; // Значения позиций морфов
 TM3i BMF_DANO_TITLES_EX, BMF_ITOG_TITLES_EX; // Списки справочников
 TM3i BMF_DATASET_EX; // Список наборов данных
-
-TMMs BMF_INDEX;
-
 
 namespace bmf{ // Глобальные переменные
 	int loop = 0; // Количество итераций скрипта
@@ -116,6 +113,7 @@ namespace bmf{ // Глобальные переменные
 
 
 	TMs databases; // Список баз данных
+	int group_level = 10; // Уровень групп кешей
 	MYSQL *mysql = NULL; // БД mysql
 	redisContext *redis = NULL; // БД редис
 
@@ -134,6 +132,8 @@ namespace bmf{ // Глобальные переменные
 	TMMt *TEST; // Справочнк морфов
 
 	std::string INDEX = "index"; // Справочнк морфов
+	std::string INDEX_GROUP = "index_group"; // Промежуточные значения
+	std::string INDEX_SHIFT = "index_shift"; // Количество изменений
 	std::string DATASET = "dataset"; // Наборы данных
 	std::string DATASET_MAP = "dataset_map"; // Карты
 	std::string DANO = "dano"; // Исходники
@@ -163,7 +163,16 @@ namespace bmf{ // Глобальные переменные
 	std::function<TMMs(string,TMs,int)> List; // Список выборки
 	std::function<TMMs(string,TMs,int)> List_mysql; // Список выборки
 	std::function<TMMs(string,TMs,int)> List_redis; // Список выборки
+	std::function<TMMs(string,TMMs&,int)> Scan; // Список выборки
+	std::function<TMMs(string,TMMs&,int)> Scan_mysql; // Список выборки
+	std::function<TMMs(string,TMMs&,int)> Scan_redis; // Список выборки
 	std::function<string(string)> Id; // Закрытие соединения с БД
+	std::function<TMMs(TMs,int)> Shift; // Список изменений
+	std::function<TMMs(TMs,TMMs&,int)> Shift_mysql; // Список изменений
+	std::function<TMMs(TMs,TMMs&,int)> Shift_redis; // Список изменений
+	std::function<TMMs(TMs,int)> Group; // Список групп
+	std::function<TMMs(TMs,TMMs&,int)> Group_mysql; // Список групп
+	std::function<TMMs(TMs,TMMs&,int)> Group_redis; // Список групп
 }
 
 int main(int argc, char **argv){
@@ -204,11 +213,11 @@ int main(int argc, char **argv){
 			if(bmf::ARGV.end() == bmf::ARGV.find("-v")){ //mpre("Пропускаем отображение версии", __LINE__);
 			}else if(skip = !skip; false){ mpre("Условия выхода", __LINE__);
 			}else{ std::cout << endl;
-				std::cout << "bimorph v8.0" << endl;
+				std::cout << "bimorph v10.1" << endl;
 				std::cout << "Copyright (C) 2021 биморф.рф" << endl;
 				std::cout << "Нет НИКАКИХ ГАРАНТИЙ до степени, разрешённой законом." << endl << endl;
 				std::cout << "Лицензия freemium https://ru.wikipedia.org/wiki/Freemium" << endl;
-				std::cout << "Данная версия является условной бесплатной с граничением сети в "+ to_string(bmf::size_max)+ " морфов" << endl;
+				std::cout << "Данная версия является условной бесплатной с граничением сети в "+ to_string(bmf::size_max)+ " связей" << endl;
 				std::cout << "Морф — наименьшая осмысленная единица языка (логики)" << endl << endl;
 
 				std::cout << "Авторы программы -- Кривошлыков Евгений Павлович +79618063797" << endl << endl;
@@ -316,7 +325,6 @@ int main(int argc, char **argv){
 		}else if([&](){ // Очистка БД
 			if(bmf::ARGV.end() == bmf::ARGV.find("-c")){ //mpre("Не очищаем БД", __LINE__);
 			}else if("redis" != bmf::dbtype){ //mpre("Используем не редис", __LINE__);
-			}else if(redisReply *reply = (redisReply *)redisCommand(bmf::redis ,string("SELECT " +bmf::dbname).c_str()); ("OK" != string(reply->str))){ mpre("ОШИБКА Выбор БД " +bmf::dbname +" (В redis доступны базы от 0 до 15)", __LINE__);
 			}else if(redisReply *reply = (redisReply *)redisCommand(bmf::redis ,"FLUSHDB"); ("OK" != string(reply->str))){ err("Очистка FLUSHDB БД redis");
 			}else{ mpre("Очистка FLUSHDB базы данных " +bmf::dbname, __LINE__);
 			}return false; }()){ err("ОШИБКА очистки БД");
@@ -324,6 +332,8 @@ int main(int argc, char **argv){
 			if(bmf::ARGV.end() == bmf::ARGV.find("-c")){ //mpre("Не очищаем БД", __LINE__);
 			}else if("mysql" != bmf::dbtype){ //mpre("Используем не mysql", __LINE__);
 			}else if(mysql_query(bmf::mysql, std::string("DROP TABLE IF EXISTS `index`;").c_str())){ err("ОШИБКА удаления таблицы");
+			}else if(mysql_query(bmf::mysql, std::string("DROP TABLE IF EXISTS `index_group`;").c_str())){ err("ОШИБКА удаления таблицы");
+			}else if(mysql_query(bmf::mysql, std::string("DROP TABLE IF EXISTS `index_shift`;").c_str())){ err("ОШИБКА удаления таблицы");
 			}else if(mysql_query(bmf::mysql, std::string("DROP TABLE IF EXISTS `dataset`;").c_str())){ err("ОШИБКА удаления таблицы");
 			}else if(mysql_query(bmf::mysql, std::string("DROP TABLE IF EXISTS `dataset_map`;").c_str())){ err("ОШИБКА удаления таблицы");
 			}else if(mysql_query(bmf::mysql, std::string("DROP TABLE IF EXISTS `dano`;").c_str())){ err("ОШИБКА удаления таблицы");
@@ -336,7 +346,12 @@ int main(int argc, char **argv){
 			}return false; }()){ err("ОШИБКА очистки БД");
 		}else if([&](){ // Создание таблиц 
 			if("mysql" != bmf::dbtype){ //mpre("Используем не mysql", __LINE__);
-			}else if(mysql_query(bmf::mysql, std::string("CREATE TABLE IF NOT EXISTS `index` (`id` VARCHAR(750) NOT NULL UNIQUE, `itog_values_id` VARCHAR(750), `dano_id` VARCHAR(750), `itog_id` VARCHAR(750), `index_id` VARCHAR(750), `bmf-index` VARCHAR(750), KEY `itog_id` (`itog_id`))").c_str())){ err("Список морфов"); 
+			}else if(mysql_query(bmf::mysql, std::string("CREATE TABLE IF NOT EXISTS `index` (`id` VARCHAR(750) NOT NULL UNIQUE, `timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, `group` VARCHAR(750), `itog_values_id` VARCHAR(750), `dano_id` VARCHAR(750), `itog_id` VARCHAR(750), `index_id` VARCHAR(750), `bmf-index` VARCHAR(750), KEY `itog_id`(`itog_id`))").c_str())){ err("Список морфов"); 
+			}else if(mysql_query(bmf::mysql, std::string("CREATE TABLE IF NOT EXISTS `index_group` (`id` VARCHAR(750) NOT NULL UNIQUE, `group` VARCHAR(750), `key` int(11), `shift` int(11), `grp` ENUM('00','01','10','11') DEFAULT NULL, KEY `group`(`group`, `shift`), KEY `key`(`key`))").c_str())){ err("Вставка данных"); 
+			//}else if(mysql_query(bmf::mysql, std::string("ALTER TABLE `index_group` ADD INDEX (`group`, `shift`);").c_str())){ err("Вставка данных"); 
+			//}else if(mysql_query(bmf::mysql, std::string("ALTER TABLE `index_group` ADD INDEX (`key`);").c_str())){ err("Вставка данных"); 
+			}else if(mysql_query(bmf::mysql, std::string("CREATE TABLE IF NOT EXISTS `index_shift` (`id` VARCHAR(750) NOT NULL UNIQUE, `group` VARCHAR(750), `shift` int(11), KEY `shift`(`group`, `shift`))").c_str())){ err("Вставка данных"); 
+			//}else if(mysql_query(bmf::mysql, std::string("ALTER TABLE `index_shift` ADD INDEX (`group`, `shift`);").c_str())){ err("Вставка данных"); 
 			}else if(mysql_query(bmf::mysql, std::string("CREATE TABLE IF NOT EXISTS `dataset` (`id` VARCHAR(750) NOT NULL UNIQUE, `name` VARCHAR(750), `count` int(11), `key` int(11) DEFAULT 0, `epoch` int(11) DEFAULT 0)").c_str())){ err("Вставка данных"); 
 			}else if(mysql_query(bmf::mysql, std::string("CREATE TABLE IF NOT EXISTS `dataset_map` (`id` VARCHAR(750) NOT NULL UNIQUE, `dataset_id` VARCHAR(750), `alias` VARCHAR(750), `alias_id` VARCHAR(750), `itog_id` VARCHAR(750), `map` TEXT)").c_str())){ err("Вставка данных"); 
 			}else if(mysql_query(bmf::mysql, std::string("CREATE TABLE IF NOT EXISTS `dano` (`id` VARCHAR(750) NOT NULL UNIQUE, `dano_values_id` VARCHAR(750), `name` VARCHAR(750), `val` VARCHAR(750))").c_str())){ err("Дано"); 
@@ -544,7 +559,14 @@ int main(int argc, char **argv){
 		}else if(bmf::List_mysql = [&](std::string table, TMs where, int line){ // Список значений из базы
 			TMMs LIST = {};
 			if(false){ err("Выборка");
-			}else if(mysql_query(bmf::mysql, string("SELECT * FROM `" +table +"`").c_str())){ err("Выбор данных из таблицы");
+			}else if(string _where = [&](string _where = "1"){ // Условия выборки
+				if(where.empty()){ //mpre("Нет условий на выборку", __LINE__);
+				}else if([&](){ for(auto where_itr:where){ // Список условий
+					_where += string(_where.empty() ? "" : " AND ") +"`" +where_itr.first +"`='" +where_itr.second +"'";
+					}return false; }()){ err("Список условий");
+				}else{ //mpre("Условия выборки " +_where, __LINE__);
+				}return _where; }(); false){ err("Условия выборки");
+			}else if(mysql_query(bmf::mysql, string("SELECT * FROM `" +table +"` WHERE " +_where).c_str())){ err("Выбор данных из таблицы");
 			}else if(MYSQL_RES *result = mysql_store_result(bmf::mysql); false){ err("ОШИБКА выполнения запроса");
 			}else if([&](TMs titles = {}){ while(MYSQL_ROW row = mysql_fetch_row(result)){
 				if(TMs ROW = [&](TMs ROW = {}){ for(int i = 0; i < mysql_num_fields(result); i++){
@@ -566,7 +588,145 @@ int main(int argc, char **argv){
 			}else if(mysql_free_result(result); false){ err("Очистка ресурсов");
 			}else{ //mpre("Запрос `" +table +"` списка:" +to_string(line) +" количество элементов:" +to_string(LIST.size()), __LINE__);
 			}return LIST; }; false){ err("ОШИБКА выборки из базы");
-		}else{
+		}else if(bmf::Scan = [&](std::string table, TMMs LIST, int line){ // Список значений из базы
+			if(false){ err("Выборка");
+			}else if("mysql" == bmf::dbtype){ LIST = bmf::Scan_mysql(table, LIST, line);
+			}else if("redis" == bmf::dbtype){ LIST = bmf::Scan_redis(table, LIST, line);
+			}else{ err("Тип БД не установлен");
+			}return LIST; }; false){ err("ОШИБКА выборки из базы");
+		}else if(bmf::Scan_mysql = [&](std::string table, TMMs LIST, int line){ // Список значений из базы
+			TMMs _LIST;
+			if(static std::string timestamp = ""; false){ err("Уведомление");
+			}else if(mysql_query(bmf::mysql, string("SELECT * FROM `" +table +"` WHERE timestamp >= '" +timestamp +"'").c_str())){ err("Выбор данных из таблицы");
+			}else if(MYSQL_RES *result = mysql_store_result(bmf::mysql); false){ err("ОШИБКА выполнения запроса");
+			}else if([&](TMs titles = {}){ while(MYSQL_ROW row = mysql_fetch_row(result)){
+				if(TMs ROW = [&](TMs ROW = {}){ for(int i = 0; i < mysql_num_fields(result); i++){
+					if([&](){ // Список заголовоков полей
+						if(0 < i){ //mpre("Получаем заголовки только на нулевой итерации", __LINE__);
+						}else{ while(MYSQL_FIELD *field = mysql_fetch_field(result)){
+							titles.insert(make_pair(to_string(titles.size()), field->name));
+						}}return titles.empty(); }()){ err("Получения заголвоков");
+					}else if(titles.end() == titles.find(to_string(i))){ mpre("ОШИБКА заголовок не найден " +to_string(i), __LINE__);
+					}else if(std::string key = titles.at(to_string(i)); key.empty()){ err("Выборки заголовока");
+					}else if(std::string val = (row[i] ? string(row[i]) : ""); false){ err("Получения значения");
+					}else if(ROW.insert(make_pair(key, val)); ROW.empty()){ err("Заполнение списка");
+					}else{
+					}}return ROW; }(); ROW.empty()){ err("Получение полей записи");
+				}else if(ROW.end() == ROW.find("id")){ err("Поле идентификатора");
+				}else if(_LIST.insert(make_pair(ROW.at("id"), ROW)); _LIST.empty()){ err("Инкремент списка");
+				}else if(ROW.end() == ROW.find("timestamp")){ err("Поле с временем создания");
+				}else if(timestamp = (ROW.at("timestamp") > timestamp ? ROW.at("timestamp") : timestamp); timestamp.empty()){ err("Расчет максимальной даты обновления");
+				}else{ //mpre("Обновленный элемент списка " +ROW.at("id"), __LINE__);
+				}}return false; }()){ err("ОШИБКА перебора значений");
+			}else if(mysql_free_result(result); false){ err("Очистка ресурсов");
+			}else{ //mpre("Обновление в БД для mysql timestamp=" +timestamp, __LINE__);
+			}return _LIST; }; false){ err("ОШИБКА выборки из базы");
+		}else if(bmf::Scan_redis = [&](std::string table, TMMs LIST, int line){ // Список значений из базы
+			TMMs _LIST;
+			if(std::string _table = table; _table.empty()){ err("Копитя таблицы для списка");
+			}else if(std::transform(_table.begin() ,_table.end() ,_table.begin(), ::toupper); table.empty()){ err("ОШИБКА получения первого заглавного символа");
+			}else if(std::string id = bmf::dbname +":" +_table; id.empty()){ err("Идентификатор записи");
+			}else if(redisReply *reply = (redisReply *)redisCommand(bmf::redis,"SSCAN %s 0 count 1000000000", id.c_str()); (NULL == reply)){ err("Выборка списка");
+			}else if(reply->type != REDIS_REPLY_ARRAY){ err("Тип данных");
+			}else if(reply->element[1]->type != REDIS_REPLY_ARRAY){ err("Тип данных списока");
+			}else if([&](){ for(int i =0; i <reply->element[1]->elements; i++){ // Проверка в списке новых элементов
+				if(std::string key = reply->element[1]->element[i]->str; false){ err("Значение");
+				}else if(LIST.end() != LIST.find(key)){ //mpre("Элемент уже в списоке", __LINE__);
+				}else if(TMs index = bmf::Up(table, {{"id", key}}, {}, {}, __LINE__); index.empty()){ err("Выборка элемента");
+				}else if(_LIST.insert(make_pair(key, index)); LIST.empty()){ err("Добалвение нового элемента в список");
+				}else{ //mpre("Новый элемент i=" +to_string(i) +" key=" +key, __LINE__);
+				}}return false; }()){ err("Выборка значения");
+			}else{ //mpre("Проверка обновлений " +to_string(reply->elements), __LINE__);
+			}return _LIST; }; false){ err("ОШИБКА выборки из базы");
+		}else if(bmf::Shift = [&](TMs where, int line){ // Список значений из базы
+			TMMs LIST;
+			if(false){ err("Выборка");
+			}else if("mysql" == bmf::dbtype){ LIST = bmf::Shift_mysql(where, LIST, line);
+			}else if("redis" == bmf::dbtype){ LIST = bmf::Shift_redis(where, LIST, line);
+			}else{ err("Тип БД не установлен");
+			}return LIST; }; false){ err("ОШИБКА выборки из базы");
+		}else if(bmf::Shift_mysql = [&](TMs where, TMMs LIST, int line){ // Список значений из базы
+			if([&](){ // Список
+				if(!where.empty()){ //mpre("Список изменений не формируем", __LINE__);
+				}else if(LIST = bmf::List(bmf::INDEX_SHIFT, {}, __LINE__); false){ err("Выборка изменений");
+				}else{ //mpre("Выборка списка", __LINE__);
+				}return false; }()){ err("Список изменений");
+			}else if([&](){ // Изменения
+				if(where.empty()){ //mpre("Изменения не устанавливаем", __LINE__);
+				}else if(where.end() == where.find("group")){ err("Поле групы не установлено");
+				}else if(std::string group = where.at("group"); group.empty()){ err("Значение группы");
+				}else if(std::string sql = "INSERT INTO `index_shift` SET `id`='" +group +"', `group`='" +group +"', `shift`=1 ON DUPLICATE KEY UPDATE `shift`=`shift`+1;"; sql.empty()){ err("Запрос на изменение");
+				}else if(mysql_query(bmf::mysql, sql.c_str())){ mpre("Установка изменений " +sql +"\n" +mysql_error(bmf::mysql), __LINE__);
+				}else{ //mpre(where, "Установка изменения " +sql, __LINE__);
+				}return false; }()){ err("Изменения");
+			}else{ //mpre("Изменения");
+			}return LIST; }; false){ err("ОШИБКА выборки из базы");
+		}else if(bmf::Shift_redis = [&](TMs where, TMMs LIST, int line){ // Список значений из базы
+			err("Изменения redis");
+			return LIST; }; false){ err("ОШИБКА выборки из базы");
+		}else if(bmf::Group = [&](TMs where, int line){ // Список значений из базы
+			TMMs LIST;
+			if(false){ err("Выборка");
+			}else if("mysql" == bmf::dbtype){ LIST = bmf::Group_mysql(where, LIST, line);
+			}else if("redis" == bmf::dbtype){ LIST = bmf::Group_redis(where, LIST, line);
+			}else{ err("Тип БД не установлен");
+			}return LIST; }; false){ err("ОШИБКА выборки из базы");
+		}else if(bmf::Group_mysql = [&](TMs where, TMMs LIST, int line){ // Список значений из базы
+			if([&](){ // Список
+				if(1 != where.size()){ //mpre("Список изменений не формируем", __LINE__);
+				}else if(where.end() == where.find("key")){ err("Ключ не найден");
+				}else if(std::string key = where.at("key"); key.empty()){ err("Значение ключа");
+				}else if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени", __LINE__);
+				}else if(string sql = "SELECT grp.* FROM `index_group` AS `grp` LEFT JOIN `index_shift` as `shift` ON grp.`shift`=`shift`.`shift` AND grp.`group`=`shift`.`group` WHERE `shift`.`shift` IS NOT NULL AND grp.`key`='" +key +"'"; sql.empty()){ err("Запрос на выборку актуальных групп");
+				}else if(mysql_query(bmf::mysql, sql.c_str())){ err("Выбор данных из таблицы");
+				}else if(MYSQL_RES *result = mysql_store_result(bmf::mysql); false){ err("ОШИБКА выполнения запроса");
+				}else if([&](TMs titles = {}){ while(MYSQL_ROW row = mysql_fetch_row(result)){
+					if(TMs ROW = [&](TMs ROW = {}){ for(int i = 0; i < mysql_num_fields(result); i++){
+						if([&](){ // Список заголовоков полей
+							if(0 < i){ //mpre("Получаем заголовки только на нулевой итерации", __LINE__);
+							}else{ while(MYSQL_FIELD *field = mysql_fetch_field(result)){
+								titles.insert(make_pair(to_string(titles.size()), field->name));
+							}}return titles.empty(); }()){ err("Получения заголвоков");
+						}else if(titles.end() == titles.find(to_string(i))){ mpre("ОШИБКА заголовок не найден " +to_string(i), __LINE__);
+						}else if(std::string key = titles.at(to_string(i)); key.empty()){ err("Выборки заголовока");
+						}else if(std::string val = (row[i] ? string(row[i]) : ""); false){ err("Получения значения");
+						}else if(ROW.insert(make_pair(key, val)); ROW.empty()){ err("Заполнение списка");
+						}else{
+						}}return ROW; }(); ROW.empty()){ err("Получение полей записи");
+					}else if(ROW.end() == ROW.find("id")){ err("Поле идентификатора");
+					}else if(LIST.insert(make_pair(ROW.at("id"), ROW)); LIST.empty()){ err("Инкремент списка");
+					}else{ //mpre("Обновленный элемент списка " +ROW.at("id"), __LINE__);
+					}}return false; }()){ err("ОШИБКА перебора значений");
+				}else if([&](){ // Информация о запроса
+					if(bmf::ARGV.end() == bmf::ARGV.find("-microtime")){ //mpre("Не отображаем время обучения", __LINE__);
+					}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Выборка значений групп size=" +to_string(LIST.size()) +" " +sql, __LINE__);
+					}return false; }()){ err("Вывод инморфации о запросе");
+				}else if(mysql_free_result(result); false){ err("Очистка ресурсов");
+				//}else if(LIST.empty()){ //mpre("Не выводим уведомление", __LINE__);
+				//}else if(TMMs INDEX_SHIFT = bmf::List(bmf::INDEX_SHIFT, {}, __LINE__); false){ err("Список изменений");
+				}else{ //mpre(INDEX_SHIFT, "Изменения", __LINE__); mpre(LIST, "Выборка списка групп key=" +key +" " +sql, __LINE__);
+				}return false; }()){ err("Список изменений");
+			}else if([&](){ // Изменения
+				if(1 == where.size()){ //mpre("Изменения не устанавливаем", __LINE__);
+				}else if(where.end() == where.find("group")){ err("Поле групы не установлено");
+				}else if(std::string group = where.at("group"); group.empty()){ err("Значение группы");
+				}else if(where.end() == where.find("shift")){ err("Поле изменения не задано");
+				}else if(std::string shift = where.at("shift"); shift.empty()){ err("Значение изменения");
+				}else if(where.end() == where.find("grp")){ err("Поле значения группы");
+				}else if(std::string grp = where.at("grp"); grp.empty()){ err("Значение группы");
+				}else if(where.end() == where.find("key")){ err("Поле ключа");
+				}else if(std::string key = where.at("key"); key.empty()){ err("Значение ключа");
+				}else if(std::string index_group_id = group +"," +key; index_group_id.empty()){ err("Идентификатор записи");
+				}else if(std::string sql = "INSERT INTO `index_group` SET `id`='" +index_group_id +"', `group`='" +group +"', `key`='" +key +"', `shift`='" +shift +"', `grp`='" +grp +"' ON DUPLICATE KEY UPDATE `shift`='" +shift +"', `grp`='" +grp +"';"; sql.empty()){ err("Запрос на изменение");
+				}else if(mysql_query(bmf::mysql, sql.c_str())){ mpre("Установка изменений " +sql +"\n" +mysql_error(bmf::mysql), __LINE__);
+				}else{ //mpre(where, "Установка значения группы " +sql, __LINE__);
+				}return false; }()){ err("Изменения");
+			}else{ //mpre("Изменения");
+			}return LIST; }; false){ err("ОШИБКА выборки из базы");
+		}else if(bmf::Group_redis = [&](TMs where, TMMs LIST, int line){ // Список значений из базы
+			err("Группа redis");
+			return LIST; }; false){ err("ОШИБКА выборки из базы");
+		}else{ //mpre("Загрузка функций БД", __LINE__);
 		}return false; }()){ mpre("ОШИБКА функции БД", __LINE__);
 	}else if([&](bool skip = true){ // Подключение базы
 		if(bmf::Dec2bin = ([&](double decimal, string binary = ""){ // Получаем число возвращаем двойное число
@@ -1320,7 +1480,7 @@ int main(int argc, char **argv){
 				}else{ //mpre("Количество правильных ответов i=" +to_string(i) +" dataset_count=" +to_string(dataset_count) +" count=" +to_string(count) +" ers=" +to_string(ers), __LINE__);
 				}}return (float)(count*100)/dataset_count; }(); (0 > perc)){ mpre("ОШИБКА расчета процента полных совпадений по значениям", __LINE__);
 			}else if(string _perc = [&](string _perc = ""){ char chr[10]; sprintf(chr ,"%.2f" ,perc); return string(chr); }(); _perc.empty()){ mpre("ОШИБКА расчета строки процента ошибки", __LINE__);
-			}else{ mpre("Набор " +dataset["id"] +" количество:"+ dataset["count"] +" точность:"+ to_string(diff) +" (" +_perc +"%)" +("0" == dataset["epoch"] ? "" : " эпох:" +dataset["epoch"]), __LINE__);
+			}else{ mpre("Набор " +dataset["id"] +" количество:"+ dataset["count"] +" точность:"+ to_string(diff) +" (" +_perc +"%)" +(0 == atoi(dataset["epoch"].c_str()) ? "" : " эпох:" +dataset["epoch"]), __LINE__);
 			}}return false; }()){ mpre("ОШИБКА отображения списка набора данных", __LINE__);
 		}else{ //mpre("Размер модели ", __LINE__);
 		}return bmf::dataset; }(); bmf::dataset.empty()){ //mpre("ОШИБКА набор данных не установлен", __LINE__);
@@ -1331,6 +1491,27 @@ int main(int argc, char **argv){
 		}else if(loop = epoch){ //mpre("Набор данных -ds " +bmf::dataset.at("id")+ " количество эпох -epoch " +to_string(loop), __LINE__);
 		}else{ mpre("ОШИБКА расчтеа количества повторений", __LINE__);
 		}return loop; }(); false){ mpre("ОШИБКА расчета колчиества повторений", __LINE__);
+	}else if(TMMs BMF_INDEX = [&](TMMs BMF_INDEX = {}){ // Выборка данных
+		if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени", __LINE__);
+		}else if(BMF_INDEX = bmf::List(bmf::INDEX, {}, __LINE__); false){ err("ОШИБКА выборки списка морфов");
+		}else if(bmf::ARGV.end() == bmf::ARGV.find("-microtime")){ //mpre("Не отображаем время обучения", __LINE__);
+		}else{ mpre("Выборка модели " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +"сек. Размер модели " +to_string(BMF_INDEX.size()), __LINE__);
+		}return BMF_INDEX; }(); false){ err("Выборка данных");
+	}else if(TMMs GROUP = [&](TMMs GROUP = {}){ for(auto index_itr:BMF_INDEX){ // Групповые значения
+		if(TMs index = index_itr.second; index.empty()){ err("Выборка морфа");
+		}else if(index.end() == index.find("id")){ err("Идентификатор не указан");
+		}else if([&](){ // Установка группы ранее не установленной
+			if(index.end() != index.find("group")){ //mpre("Группа уже установлена", __LINE__);
+			}else if(std::string index_id = index.at("id"); index_id.empty()){ err("Идентификаторa");
+			}else if(size_t npos = index_id.find_first_of("-"); std::string::npos == npos){ err("Позиция делителя в идентификаторе");
+			}else if(int level = npos -1 -((npos -1) %bmf::group_level); false){ err("Уровень группы");
+			}else if(index["group"] = "1" +index_id.substr(npos -level, index_id.length()); false){ err("Расчет пути до группы");
+			}else if(index = bmf::Up(bmf::INDEX, {{"id", index_id}}, {}, index, __LINE__); index.empty()){ err("Обновление группы морфа");
+			}else{ mpre("Установка группы " +index_id +" > " +index.at("group"), __LINE__);
+			}return false; }()){ err("Установка группы");
+		}else if(GROUP[index.at("group")][index.at("id")]; GROUP.empty()){ err("Установка значения");
+		}else{ //mpre("Создание структуры групп", __LINE__);
+		}}return GROUP; }(); false){ err("Расчет групповых значений");
 	}else if(int errors = [&](int errors = 0, bool pass = false){ do{ // Итерации обучения
 		if(bmf::loop++ >= loop){ //mpre("Остановка по максимальному количеству эпох", __LINE__);
 		}else if(bmf::dataset.empty()){ mpre("ОШИБКА набор данных не установлен", __LINE__);
@@ -1357,55 +1538,148 @@ int main(int argc, char **argv){
 			}else if(key = atoi(bmf::dataset.at("key").c_str()); 0 > key){ err("Расчет значения последнего ключа");
 			}else{ //mpre("Текущее состояние ключа key=" +to_string(key), __LINE__);
 			}return key; }(); false){ err("Расчет позиции обучения");
-		}else if(int err = [&](int err = 0, bool rep = false){ do{ // Повторение эпох расчета
-			if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - microtime; false){ mpre("ОШИБКА расчета времени эпохи", __LINE__);
-			}else if(std::string epoch = [&](std::string epoch = "1"){ // Расчет эпохи
+		}else if(int err = [&](int err = 0, bool rep = false){ do{ // Повторение расчетов эпохи
+			if(std::string epoch = [&](std::string epoch = "1"){ // Расчет эпохи
 				if(bmf::dataset.end() == bmf::dataset.find("epoch")){ // mpre("Поле эпохи не задано", __LINE__);
 				}else if(epoch = bmf::dataset.at("epoch"); false){ err("Выборка значения эпохи");
 				}else if(epoch = to_string(atoi(epoch.c_str()) + 1); epoch.empty()){ err("Инкремент эпохи");
 				}else{ //mpre("Увеличение значения эпохи " +epoch, __LINE__);
 				}return epoch; }(); epoch.empty()){ mpre("ОШИБКА расчета эпохи", __LINE__);
 			}else if(std::string itog_str = (bmf::ARGV.end() == bmf::ARGV.find("itog") ? "" : "." +bmf::ARGV.at("itog")); false){ mpre("ОШИБКА формирования итога в консоли", __LINE__);
-			}else if(BMF_INDEX = bmf::List(bmf::INDEX, {}, __LINE__); false){ err("ОШИБКА выборки списка морфов")
-			}else if(TMs vals = [&](TMs vals = {}){ for(auto index_itr:BMF_INDEX){
-				if(TMs index = index_itr.second; index.empty()){ err("Выборка морфа");
-				//}else if(index.end() == index.find("index_id")){ err("Поле старшего потомка не найдено");
-				//}else if(index.end() == index.find("bmf-index")){ err("Поле старшего потомка не найдено");
-				}else if(std::string dano_val = [&](std::string dano_val = ""){ // Значение исходника
-					if(index.end() == index.find("dano_id")){ err("Поле исходника ненайдено");
-					}else if(std::string dano_id = index.at("dano_id"); dano_id.empty()){ err("Идентификатор исходника не установлен");
-					}else if(DANO_BITMAP.end() == DANO_BITMAP.find(dano_id)){ err("Карта исходника не найдена");
-					}else if(boost::dynamic_bitset<> dano_map = DANO_BITMAP[dano_id]; dano_map.empty()){ err("Выборка карты исходника");
-					}else if(dano_val = (dano_map.test(key) ? "1" : "0"); dano_val.empty()){ err("Выборка значения исходника");
-					}else{ //mpre("Выборка исходного значения dano_val=" +dano_val, __LINE__);
-					}return dano_val; }(); false){ err("Значение исходника");
-				}else if(std::string field = [&](std::string field = ""){ // Связь с родителем
-					if(size_t npos = index.at("id").find_first_of("-"); (std::string::npos == npos)){ err("Позиция разделителя идентификаторм морфа");
-					}else if(std::string sign = (1 == npos ? "0" : index.at("id").substr(1, 1)); (1 != sign.length())){ mpre(index, "ОШИБКА Нахождение связи sign=" +sign+ " ", __LINE__);
-					}else if(field = ("1" == sign ? "index_id" : field); false){ mpre("Нахождение старшего поля", __LINE__);
-					}else if(field = ("0" == sign ? "bmf-index" : field); field.empty()){ err("Нахождение поля связи");
-					}else{ //mpre("Поле связи field=" +field, __LINE__);
-					}return field; }(); field.empty()){ err("Связь с родителем");
-				}else if(std::string v1 = [&](std::string v1, std::string _field = "index_id"){ // Старшее значение
-					if(std::string _id1 = "11" +index.at("id").substr(1, index.at("id").length()); _id1.empty()){ err("Идентификатор старшего морфа");
-					}else if(vals.end() == vals.find(_id1)){ //mpre("Значение дочернего морфа не найдено среди расчетных", __LINE__);
-					}else if(v1 = ("01" == vals.at(_id1) ? "1" : "0"); v1.empty()){ err("Выборка значения потомка из расчетных");
-					}else{ //mpre("Значение старшего потомка " +_id1 +" v1=" +v1, __LINE__);
-					}return v1; }(dano_val); (1 != v1.length())){ err("Старшее значение");
-				}else if(std::string v0 = [&](std::string v0, std::string _field = "bmf-index"){ // Младшее значение
-					if(std::string _id0 = "10" +index.at("id").substr(1, index.at("id").length()); _id0.empty()){ err("Идентификатор старшего морфа");
-					}else if(vals.end() == vals.find(_id0)){ //mpre("Значение дочернего морфа не найдено среди расчетных", __LINE__);
-					}else if(v0 = ("01" == vals.at(_id0) ? "0" : "1"); v0.empty()){ err("Выборка значения потомка из расчетных");
-					}else{ //mpre("Значение младшего потомка " +_id0 +" v0=" +v0, __LINE__);
-					}return v0; }(dano_val); (1 != v0.length())){ err("Младшее значение");
-				}else if(std::string grp = v1 +v0; (2 != grp.length())){ err("Значение группы");
-				}else if(vals[index.at("id")] = grp; vals.empty()){ err("Сохранение значения");
-				}else{ //mpre("Группа расчетов " +index.at("id") +" " +field +" grp=" +grp, __LINE__);
-				}}return vals; }(); false){ err("Расчет значений");
-			//}else if(!++progress){ err("Автоинкремент счетчика");
+			}else if([&](){ // Выборка данных
+				if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени", __LINE__);
+				}else if(TMMs _BMF_INDEX = bmf::Scan(bmf::INDEX, BMF_INDEX, __LINE__); _BMF_INDEX.empty()){ // Выборка и обновление модели
+				}else if([&](){ for(auto index_itr:_BMF_INDEX){ // Обнолвение структуры расчетов групп
+					if(TMs index = index_itr.second; index.empty()){ err("Выборка обновленного морфа");
+					}else if(index.end() == index.find("id")){ err("Идентификатор не указан");
+					}else if(index.end() == index.find("group")){ err("Группа не установлена");
+					}else if(GROUP[index.at("group")][index.at("id")]; GROUP.empty()){ err("Добавление значения в группу");
+					}else if(BMF_INDEX.insert(make_pair(index.at("id"), index)); BMF_INDEX.empty()){ err("Обновление справочника");
+					}else{ //mpre("Обновление струкруты групп", __LINE__);
+					}}return false; }()){ err("Обновление структуры групп и списка морфов");
+				}else if(bmf::ARGV.end() == bmf::ARGV.find("-microtime")){ //mpre("Не отображаем время обучения", __LINE__);
+				}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +"сек. Обновление модели size=" +to_string(BMF_INDEX.size()), __LINE__);
+				}return false; }()){ err("Обновление модели");
+			}else if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени", __LINE__);
+			}else if(TMMs INDEX_SHIFT = bmf::Shift({}, __LINE__); false){ err("Выборка изменений модели");
+			//}else if(mpre(INDEX_SHIFT, "Изменения", __LINE__); false){ err("Уведмоление");
+			}else if(TMMs INDEX_GROUP = bmf::Group({{"key", to_string(key)}}, __LINE__); false){ err("Выборка списка значений");
+			//}else if(mpre(INDEX_GROUP, "Значения key=" +to_string(key), __LINE__); false){ err("Уведмоление");
+			}else if(TMMs UPDATE = [&](TMMs UPDATE = {}){ for(auto &group_itr:GROUP){ // Расчет значений
+				if(std::string group = group_itr.first; group.empty()){ err("Выборка группы");
+				}else if(std::string grp = [&](std::string grp = ""){ // Применение кешированых данных
+					if(TMs index_group = [&](TMs index_group = {}){ //Значение группы
+						if(std::string index_group_id = group +"," +to_string(key); index_group_id.empty()){ err("Идентификатор группы");
+						}else if(INDEX_GROUP.end() == INDEX_GROUP.find(index_group_id)){ //mpre("Значения не найдены index_group_id=" +index_group_id, __LINE__);
+						}else if(index_group = INDEX_GROUP.at(index_group_id); index_group.empty()){ err("Выборка группы");
+						}else if(index_group.end() == index_group.find("shift")){ err("Поле изменений не найдено");
+						}else if(index_group.end() == index_group.find("grp")){ err("Поле группы не найдено");
+						}else if(index_group.end() == index_group.find("key")){ err("Поле группы не найдено");
+						}else{ //mpre(index_group, "Значение группы", __LINE__);
+						}return index_group; }(); index_group.empty()){ //mpre("Значение не задано", __LINE__);
+					}else if(TMs index_shift = [&](TMs index_shift = {}){ // Изменения
+						if(INDEX_SHIFT.end() == INDEX_SHIFT.find(group)){ err("Изменения не найдены");
+						}else if(index_shift = INDEX_SHIFT.at(group); index_shift.empty()){ err("Выборка изменений");
+						}else if(index_shift.end() == index_shift.find("shift")){ err("Поле изменений не найдено");
+						}else{ //mpre(index_shift, "Изменения", __LINE__);
+						}return index_shift; }(); index_shift.empty()){ err("Выборка изменений");
+					}else if(index_group.at("shift") != index_shift.at("shift")){ err("Устаревшее значение кеша");
+					}else if(index_group.at("key") != to_string(key)){ err("Не правильный ключ группы");
+					}else if(grp = index_group.at("grp"); (2 != grp.length())){ err("Значение группы");
+					}else if(GROUP[group][group] = grp; false){ err("Установка значения из кеша");
+					}else{ //mpre("Значение из кеша group=" +group +" key=" +to_string(key) +" grp=" +grp, __LINE__);
+					}return grp; }(); (2 == grp.length())){ //mpre("Применяем кеш " +group, __LINE__);
+				}else if([&](){ for(auto &index_itr:group_itr.second){ // Расчет группы
+					if(std::string index_id = index_itr.first; index_id.empty()){ err("Выборка идентификатора морфа");
+					}else if(BMF_INDEX.end() == BMF_INDEX.find(index_id)){ err("Морф с идентификатором не найден в справочнике");
+					}else if(TMs index = BMF_INDEX.at(index_id); index.empty()){ err("Выборка морфа");
+					}else if(std::string way = index_id.substr(1, index_id.length()); false){ err("Путь до текущего морфа");
+					}else if(std::string id1 = "11" +way; id1.empty()){ err("Идентификатор старшего морфа");
+					}else if(std::string id0 = "10" +way; id0.empty()){ err("Идентификатор старшего морфа");
+					}else if(std::string dano_val = [&](std::string dano_val = ""){ // Значение исходника
+						if(index.end() == index.find("dano_id")){ err("Поле исходника ненайдено");
+						}else if(std::string dano_id = index.at("dano_id"); dano_id.empty()){ err("Идентификатор исходника не установлен");
+						}else if(DANO_BITMAP.end() == DANO_BITMAP.find(dano_id)){ err("Карта исходника не найдена");
+						}else if(dano_val = (DANO_BITMAP[dano_id].test(key) ? "1" : "0"); dano_val.empty()){ err("Выборка значения исходника");
+						}else{ //mpre("Выборка исходного значения dano_val=" +dano_val, __LINE__);
+						}return dano_val; }(); false){ err("Значение исходника");
+					}else if(std::string v1 = [&](std::string v1){ //Группа старшего морфа
+						if(BMF_INDEX.end() == BMF_INDEX.find(id1)){ //mpre("Морф с идентификатором не найден в справочнике", __LINE__);
+						}else if(BMF_INDEX.at(id1).end() == BMF_INDEX.at(id1).find("group")){ err("Поля группы не найдено");
+						}else if(std::string group1 = BMF_INDEX.at(id1).at("group"); group1.empty()){ err("Поле группы");
+						}else if(GROUP.end() == GROUP.find(group1)){ err("Группа в расчетах не найдена");
+						}else if(GROUP.at(group1).end() == GROUP.at(group1).find(id1)){ err("Идентификатор в группе расчетов не найдена");
+						}else if(std::string grp = GROUP.at(group1).at(id1); (2 != grp.length())){ mpre("Выборка значения GROUP[" +group1 +"][" +id1 +"]", __LINE__); err("Выборка группы");
+						}else if(v1 = ("01" == grp ? "1" : "0"); v1.empty()){ err("Выборка значения потомка из расчетных");
+						}else{ //mpre("Группа старшего потомка", __LINE__);
+						}return v1; }(dano_val); v1.empty()){ err("Группа старшего морфа");
+					}else if(std::string v0 = [&](std::string v0){ //Группа старшего морфа
+						if(BMF_INDEX.end() == BMF_INDEX.find(id0)){ //mpre("Морф с идентификатором не найден в справочнике", __LINE__);
+						}else if(BMF_INDEX.at(id0).end() == BMF_INDEX.at(id0).find("group")){ err("Поля группы не найдено");
+						}else if(std::string group0 = BMF_INDEX.at(id0).at("group"); group0.empty()){ err("Поле группы");
+						}else if(GROUP.end() == GROUP.find(group0)){ err("Группа в расчетах не найдена");
+						}else if(GROUP.at(group0).end() == GROUP.at(group0).find(id0)){ err("Идентификатор в группе расчетов не найдена");
+						}else if(std::string grp = GROUP.at(group0).at(id0); (2 != grp.length())){ err("Выборка группы");
+						}else if(v0 = ("01" == grp ? "0" : "1"); v0.empty()){ err("Выборка значения потомка из расчетных");
+						}else{ //mpre("Группа старшего потомка", __LINE__);
+						}return v0; }(dano_val); v0.empty()){ err("Группа старшего морфа");
+					}else if(index_itr.second = v1 +v0; 2 != index_itr.second.length()){ err("Значение группы");
+					}else{ //mpre("Установка значения GROUP[" +group +"][" +index_id +"]=" +GROUP[group][index_id], __LINE__);
+					}}return false; }()){ err("Расчет группы");
+				}else if([&](){ // Сохраняем значение
+					if(GROUP.end() == GROUP.find(group)){ err("Группа в расчетах не найдена");
+					}else if(GROUP.at(group).end() == GROUP.at(group).find(group)){ mpre("Идентификатор в группе расчетов не найден grpoup=" +group, __LINE__);
+					}else if(std::string grp = GROUP.at(group).at(group); (2 != grp.length())){ err("Выборка группы");
+					}else if(std::string shift = [&](string shift = "0"){ // Изменения
+						if(TMs index_shift = (INDEX_SHIFT.end() == INDEX_SHIFT.find(group) ? index_shift : INDEX_SHIFT.at(group)); false){ err("Выборка изменений");
+						}else if(shift = (index_shift.end() == index_shift.find("shift") ? "1" : index_shift.at("shift")); shift.empty()){ err("Расчет изменений");
+						}else if(!index_shift.empty()){ //mpre("Изменения уже установлены", __LINE__);
+						}else if(bmf::Shift({{"group", group}}, __LINE__); false){ err("Установка изменения");
+						}else{ //mpre("Установка модели group=" +group, __LINE__); //mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Установка изменений group=" +group, __LINE__);
+						}return shift; }(); shift.empty()){ err("Расчет изменений");
+					}else if(TMs update = {{"group", group}, {"key", to_string(key)}, {"grp", grp}, {"shift", shift}}; update.empty()){ err("Значение обновления");
+					}else if(bmf::Group(update, __LINE__); false){ err("Сохранение результата");
+					}else if(UPDATE.insert(make_pair(to_string(UPDATE.size()), update)); UPDATE.empty()){ err("Сохранение обновления");
+					//}else if(bmf::ARGV.end() == bmf::ARGV.find("-microtime")){ //mpre("Не отображаем время обновления группы", __LINE__);
+					}else{ //mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Изменение группы group=" +group +" key=" +to_string(key) +" grp=" +grp, __LINE__); //mpre("Сохрание значения INDEX_GROUP[" +group +"][" +to_string(key) +"]=" +GROUP.at(group).at(group), __LINE__);
+					}return false; }()){ err("Сохраняем значение");
+				}else{ //mpre("Расчет группы " +group +" size=" +to_string(group_itr.second.size()), __LINE__);
+				}}return UPDATE; }(); false){ err("Расчет значений");
+			//}else if(mpre(UPDATE, "Обновления", __LINE__); false){ err("Уведомление");
+			/*}else if([&](){ // Сохранение изменений
+				if(UPDATE.empty()){ //mpre("Пустой список обновлений", __LINE__);
+				}else if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени эпохи", __LINE__);
+				}else if(TMs one = UPDATE.begin()->second; one.empty()){ err("Одна строка для заголовка");
+				}else if(string titles = [&](string titles = "`id`"){ for(auto one_itr:one){
+					if(titles += ", `" +one_itr.first +"`"; titles.empty()){ err("Формирования строки полей");
+					}else{ //mpre("Поле " +one_itr.first, __LINE__);
+					}}return titles; }(); titles.empty()){ err("Строка заголовков");
+				}else if(string VALUES = [&](string VALUES = ""){ for(auto update_itr:UPDATE){
+					if(TMs update = update_itr.second; update.empty()){ err("Выбор записи");
+					}else if(update.end() == update.find("group")){ err("Поле группы не найдено");
+					}else if(update.end() == update.find("key")){ err("Поле ключа не найдено");
+					}else if(string group = update.at("group"); group.empty()){ err("Значение группы");
+					}else if(string key = update.at("key"); key.empty()){ err("Значение ключа");
+					}else if(string update_id = group +"," +key; update_id.empty()){ err("Идентификатор записи");
+					}else if(string values = [&](string values){ for(auto update_itr:update){
+						if(values += ",'" +update_itr.second +"'"; values.empty()){ err("Формирования строки значений");
+						}else{ //mpre("Поле " +update_itr.second, __LINE__);
+						}}return values; }("'" +update_id +"'"); values.empty()){ err("Строка заголовков");
+					}else if(VALUES += string(VALUES.empty() ? "" : ",\n") +"(" +values + ")"; VALUES.empty()){ err("Добавление строки запросу");
+					}else{ //mpre("Новая строка в обновлении values=" +values, __LINE__);
+					}}return VALUES; }(); VALUES.empty()){ err("Список строк");
+				}else if(std::string sql = "INSERT INTO `index_group` (" +titles +") VALUES\n" +VALUES +" ON DUPLICATE KEY UPDATE `shift`=VALUES(`shift`), `grp`=VALUES(`grp`);"; sql.empty()){ err("Строка запроса");
+				}else if(mysql_query(bmf::mysql, sql.c_str())){ mpre("Установка изменений " +sql +"\n" +mysql_error(bmf::mysql), __LINE__);
+				}else if(bmf::ARGV.end() == bmf::ARGV.find("-microtime")){ //mpre("Не отображаем время обновления группы", __LINE__);
+				}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Изменение групп " +sql, __LINE__); //mpre("Сохрание значения INDEX_GROUP[" +group +"][" +to_string(key) +"]=" +GROUP.at(group).at(group), __LINE__); //mpre("Обновление " +sql, __LINE__);
+				}return false; }()){ err("Сохранение изменений");*/
+			}else if([&](){ // Время обучения
+				if(bmf::ARGV.end() == bmf::ARGV.find("-microtime")){ //mpre("Не отображаем время обучения", __LINE__);
+				}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Расчет модели size=" +to_string(BMF_INDEX.size()), __LINE__);
+				}return false; }()){ err("Время на обучение");
 			}else if([&](){ for(auto &itog_itr:bmf::List(bmf::ITOG, {}, __LINE__)){ // Проверка списка итогов
-				if(false){ mpre("Пропуск расчета", __LINE__);
-				}else if(bmf::Progress("Набор:" +bmf::dataset.at("id") + itog_str+" Эпоха:" +epoch +" Примеров:" +to_string(key) +" Изменений:"+ to_string(err)+ " (" +to_string(_microtime) +" сек.)", (float)key/dataset_count, __LINE__); false){ mpre("Индикатор прогресса", __LINE__);
+				if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - microtime; false){ mpre("ОШИБКА расчета времени эпохи", __LINE__);
+				}else if(bmf::Progress("Набор:" +bmf::dataset.at("id") + itog_str+" Эпоха:" +epoch +" Примеров:" +to_string(key+1) +" Изменений:"+ to_string(err)+ " (" +to_string(_microtime) +" сек.)", (float)(key+1)/dataset_count, __LINE__); false){ mpre("Индикатор прогресса", __LINE__);
 				}else if(TMs itog = itog_itr.second; itog.empty()){ //mpre("ОШИБКА выборки итога", __LINE__);
 				}else if(itog.end() == itog.find("id")){ mpre("ОШИБКА не найден идентификатор итога", __LINE__);
 				}else if(TMs index = [&](TMs index = {}){ // Добавление первоначального морфа
@@ -1417,13 +1691,13 @@ int main(int argc, char **argv){
 						}else if((index = bmf::Up(bmf::INDEX, {{"id", itog.at("index_id")}}, {}, {}, __LINE__)).empty()){ mpre("ОШИБКА добавления корневого морфа в базу", __LINE__);
 						}else{ //mpre(index, "Морф найден в базе", __LINE__);
 						}return !index.empty(); }()){ //mpre("Морф уже в базе", __LINE__);
-					}else if(TMs _index = {{"itog_values_id", itog.at("itog_values_id")}, {"dano_id", dano.at("id")}, {"itog_id", itog.at("id")}, {"index_id", ""}, {"bmf-index", ""}}; _index.empty()){ mpre("ОШИБКА формирования свойст нового морфа", __LINE__);
 					}else if(std::string id = "1-" +itog.at("id"); id.empty()){ err("Идентификатор первоначального морфа");
+					}else if(TMs _index = {{"group", id}, {"itog_values_id", itog.at("itog_values_id")}, {"dano_id", dano.at("id")}, {"itog_id", itog.at("id")}, {"index_id", ""}, {"bmf-index", ""}}; _index.empty()){ mpre("ОШИБКА формирования свойст нового морфа", __LINE__);
 					}else if((index = bmf::Up(bmf::INDEX, {{"id", id}}, _index, {}, __LINE__)).empty()){ mpre("ОШИБКА добавления корневого морфа в базу", __LINE__);
-					}else if(itog["index_id"] = index.at("id"); itog.empty()){ mpre("ОШИБКА установки свойства связи итога с морфом", __LINE__);
+					}else if(itog["index_id"] = id; itog.empty()){ mpre("ОШИБКА установки свойства связи итога с морфом", __LINE__);
 					}else if(TMs _itog = bmf::Up(bmf::ITOG, {{"id", itog.at("id")}}, {}, itog, __LINE__); _itog.empty()){ err("Обновление поля корневого морфа у итога");
-					}else if(BMF_INDEX[index.at("id")] = index; BMF_INDEX.empty()){ err("Добавление нового морфа в список");
-					}else if(vals[index.at("id")] = "00"; vals.empty()){ err("Значение корневого морфа");
+					}else if(BMF_INDEX[id] = index; BMF_INDEX.empty()){ err("Добавление нового морфа в список");
+					}else if(GROUP[id][id] = "00"; GROUP.empty()){ err("Значение корневого морфа");
 					}else{ //mpre(index, "Добавление первоначального морфа " +index.at("id"), __LINE__);
 					}return index; }(); index.empty()){ mpre("ОШИБКА морф связи не найден", __LINE__);
 				}else if(std::string learn = [&](std::string learn = ""){ // Обучающее значение
@@ -1432,8 +1706,9 @@ int main(int argc, char **argv){
 					}else{ //mpre("Выборка обучающего значения learn=" +learn, __LINE__);
 					}return learn; }(); (1 != learn.length())){ err("Выборка обучающего значения");
 				}else if(std::string calc = [&](std::string calc = ""){ // Результат модели
-					if(vals.end() == vals.find(index.at("id"))){ err("Значение корневого морфа");
-					}else if(std::string grp = vals.at(index.at("id")); grp.empty()){ err("Выборка значения корневого морфа");
+					if(GROUP.end() == GROUP.find(index.at("group"))){ mpre(index, "Морф", __LINE__); err("Значение корневого морфа");
+					}else if(GROUP.at(index.at("group")).end() == GROUP.at(index.at("group")).find(index.at("id"))){ err("Значение корневого морфа");
+					}else if(std::string grp = GROUP.at(index.at("group")).at(index.at("id")); grp.empty()){ err("Выборка значения корневого морфа");
 					}else if(calc = ("01" == grp ? "0" : "1"); calc.empty()){ err("Значение");
 					}else{ //mpre(vals, "Расчет результата дерева", __LINE__);
 					}return calc; }(); (1 != calc.length())){ err("Результат модели");
@@ -1450,13 +1725,18 @@ int main(int argc, char **argv){
 					}else{ //mpre("Сохранение обновленной карты морфа map=" +map, __LINE__);
 					}return false; }()){ err("Сохранение результата в индекс")
 				}else if(TMs index = [&](TMs index = {}, std::string list = ""){ // Обучение
-					if(learn == calc){ //mpre("Сравнение key=" +to_string(key) +" " +learn +"=" +calc, __LINE__);
+					if(bmf::ARGV.end() == bmf::ARGV.find("learn")){ //mpre("Пропускаем обучение", __LINE__);
+					}else if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени эпохи", __LINE__);
+					}else if(learn == calc){ //mpre("Сравнение key=" +to_string(key) +" " +learn +"=" +calc, __LINE__);
+					}else if(TMMs UPDATE = {}; false){ err("Список изменений");
 					}else if(std::string learn_id = [&](std::string next_id, std::string learn_id = "", int count = 750){ do{ // Поиск изменений
 						if(TMs index = [&](TMs index = {}){ // Выборка расчетного морфа
 							if(BMF_INDEX.end() == BMF_INDEX.find(next_id)){ err("Выборка морфа");
 							}else if(index = BMF_INDEX.at(next_id); index.empty()){ err("Выборка морфа");
+							}else if(index.end() == index.find("group")){ err("Поле группы");
 							}else{ //mpre(index, "Расчетный морф", __LINE__);
 							}return index; }(); index.empty()){ err("Выборка морфа");
+						}else if(std::string group = index.at("group"); group.empty()){ err("Группа");
 						}else if(std::string dano_val = [&](std::string dano_val = ""){ // Значение исходника
 							if(index.end() == index.find("dano_id")){ err("Поле исходника ненайдено");
 							}else if(std::string dano_id = index.at("dano_id"); dano_id.empty()){ err("Идентификатор исходника не установлен");
@@ -1465,8 +1745,12 @@ int main(int argc, char **argv){
 							}else if(dano_val = (dano_map.test(key) ? "1" : "0"); dano_val.empty()){ err("Выборка значения исходника");
 							}else{ //mpre("Выборка исходного значения dano_val=" +dano_val, __LINE__);
 							}return dano_val; }(); false){ err("Значение исходника");
-						}else if(vals.end() == vals.find(next_id)){ err("Группа не найдена");
-						}else if(std::string grp = vals.at(next_id); (2 != grp.length())){ mpre("ОШИБКА Выборка группы grp=" +grp, __LINE__);
+						}else if(std::string grp = [&](std::string grp = ""){ //Группа
+							if(GROUP.end() == GROUP.find(group)){ err("Значение корневого морфа");
+							}else if(GROUP.at(group).end() == GROUP.at(group).find(index.at("id"))){ err("Значение корневого морфа");
+							}else if(grp = GROUP.at(group).at(index.at("id")); grp.empty()){ mpre("ОШИБКА Выборка значения группы group=" +group +" id=" +index.at("id"), __LINE__);
+							}else{ //mpre("Выборка группы морфа grp=" +grp, __LINE__) ;
+							}return grp; }(); 2 != grp.length()){ err("Группа");
 						}else if([&](){ // Выбор нижестоящего
 							if(int pos = atoi(dano_val.c_str()); 0 > pos){ err("Позиция");
 							}else if(std::string addr = grp.substr(pos, 1); (1 != addr.length())){ err("Расчет перехода");
@@ -1484,23 +1768,61 @@ int main(int argc, char **argv){
 							}else if(list +=cur; list.empty()){ mpre("ОШИБКА сохранения истории родителю", __LINE__);
 							}else{ //mpre("Список исходников итоговый "+ list, __LINE__);
 							}return list.empty(); }()){ mpre("ОШИБКА получения списка использованных исходников", __LINE__);
+						}else if([&](){ // Удаление кеша
+							if(index.at("id") != group){ //mpre("Морф не является гурппой", __LINE__);
+							}else if(TMs update = {{"group", group}}; update.empty()){ err("Изменение");
+							}else if(bmf::Shift(update, __LINE__); false){ err("Инкремент изменений");
+							}else if(UPDATE.insert(make_pair(group, update)); UPDATE.empty()){ err("Список изменений");
+							}else{ //mpre("Удаление кеша " +index.at("id"), __LINE__);
+							}return false; }()){ err("Удаление кеша");
 						}else if(learn_id = [&](){ // Получение обучающего морфа
 							if(BMF_INDEX.end() != BMF_INDEX.find(next_id)){ //mpre("Морф уже создан", __LINE__);
 							}else if(learn_id = next_id; learn_id.empty()){ err("Установка обучающего морфа");
 							}else{ //mpre("Обучающий морф " +learn_id, __LINE__);
 							}return learn_id; }(); false){ err("Расчет обучающего морфа");
 						}else if(0 > --count){ err("Ограничение глубины расчета дерева");
-						}else{ //mpre("Поиск изменений count=" +to_string(count) +" next_id=" +next_id +" learn_id=" +learn_id +" dano_val=" +dano_val +" [" +v1 +v0 +"]", __LINE__);
+						}else{ //mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Обучение " +itog.at("id"), __LINE__);
 						}}while(learn_id.empty()); return learn_id; }(itog.at("index_id")); learn_id.empty()){ mpre("ОШИБКА Поиск изменений learn_id=" +learn_id, __LINE__);
+					/*}else if([&](){ // Сохранение изменений
+						if(UPDATE.empty()){ //mpre("Пустой список обновлений", __LINE__);
+						}else if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени эпохи", __LINE__);
+						}else if(TMs one = UPDATE.begin()->second; one.empty()){ err("Одна строка для заголовка");
+						}else if(string titles = [&](string titles = "`id`, `shift`"){ for(auto one_itr:one){
+							if(titles += ", `" +one_itr.first +"`"; titles.empty()){ err("Формирования строки полей");
+							}else{ //mpre("Поле " +one_itr.first, __LINE__);
+							}}return titles; }(); titles.empty()){ err("Строка заголовков");
+						}else if(string VALUES = [&](string VALUES = ""){ for(auto update_itr:UPDATE){
+							if(TMs update = update_itr.second; update.empty()){ err("Выбор записи");
+							}else if(update.end() == update.find("group")){ err("Поле группы не найдено");
+							}else if(string group = update.at("group"); group.empty()){ err("Значение группы");
+							}else if(string values = [&](string values){ for(auto update_itr:update){
+								if(values += " ,'" +update_itr.second +"'"; values.empty()){ err("Формирования строки значений");
+								}else{ //mpre("Поле " +update_itr.second, __LINE__);
+								}}return values; }("'" +group +"' ,'1'"); values.empty()){ err("Строка заголовков");
+							}else if(VALUES += string(VALUES.empty() ? "" : ",\n") +"(" +values + ")"; VALUES.empty()){ err("Добавление строки запросу");
+							}else{ //mpre("Новая строка в обновлении values=" +values, __LINE__);
+							}}return VALUES; }(); VALUES.empty()){ err("Список строк");
+						}else if(std::string sql = "INSERT INTO `index_shift` (" +titles +") VALUES\n" +VALUES +" ON DUPLICATE KEY UPDATE `shift`=`shift`+1;"; sql.empty()){ err("Строка запроса");
+						}else if(mysql_query(bmf::mysql, sql.c_str())){ mpre("Установка изменений " +sql +"\n" +mysql_error(bmf::mysql), __LINE__);
+						}else if(bmf::ARGV.end() == bmf::ARGV.find("-microtime")){ //mpre("Не отображаем время обновления группы", __LINE__);
+						}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Сохранение изменений " +sql, __LINE__); //mpre("Сохрание значения INDEX_GROUP[" +group +"][" +to_string(key) +"]=" +GROUP.at(group).at(group), __LINE__); //mpre("Обновление " +sql, __LINE__);
+						}return false; }()){ err("Сохранение изменений");*/
 					}else if(index = [&](TMs index = {}){ // Добавление нового морфа
 						if(TMs _dano = bmf::Choice(list, key); _dano.empty()){ err("Уведомление");
 						}else if(700 <= learn_id.length()){ err("Длинна идентификатора");
-						}else if(TMs _index = {{"itog_values_id", itog.at("itog_values_id")}, {"dano_id", _dano.at("id")}, {"itog_id", itog.at("id")}, {"index_id", ""}, {"bmf-index", ""}}; _index.empty()){ mpre("ОШИБКА формирования свойст нового морфа", __LINE__);
+						}else if(std::string group = [&](std::string group = ""){ // Расчет группы
+							if(size_t npos = learn_id.find_first_of("-"); std::string::npos == npos){ err("Позиция делителя в идентификаторе");
+							}else if(int level = npos -1 -((npos -1) %bmf::group_level); false){ err("Уровень группы");
+							}else if(group = "1" +learn_id.substr(npos -level, learn_id.length()); false){ err("Расчет пути до группы");
+							}else{ //mpre("Расчет группы learn_id=" +learn_id +" npos=" +to_string(npos) +" level=" +to_string(level) +" group=" +group, __LINE__);
+							}return group; }(); false){ err("Расчет группы");
+						}else if(TMs _index = {{"group", group}, {"itog_values_id", itog.at("itog_values_id")}, {"dano_id", _dano.at("id")}, {"itog_id", itog.at("id")}, {"index_id", ""}, {"bmf-index", ""}}; _index.empty()){ mpre("ОШИБКА формирования свойст нового морфа", __LINE__);
 						}else if(index = bmf::Up(bmf::INDEX, {{"id", learn_id}}, _index, {}, __LINE__); _index.empty()){ err("Добавления корневого морфа в базу");
 						}else{ //mpre(index, "Добавление нового морфа", __LINE__);
 						}return index; }(); index.empty()){ err("Добавление нового морфа");
 					}else if(err+=1; !err){ mpre("Инкремент ошибок", __LINE__);
-					}else{ //mpre("Обучение " +index.at("id") +" calc=" +calc +" learn=" +learn, __LINE__);
+					}else if(bmf::ARGV.end() == bmf::ARGV.find("-microtime")){ //mpre("Не отображаем время обновления группы", __LINE__);
+					}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Обучение " +itog.at("id"), __LINE__); //mpre("Обучение " +index.at("id") +" calc=" +calc +" learn=" +learn, __LINE__);
 					}return index; }(); false){ mpre("ОШИБКА обучения", __LINE__);
 				}else{ //mpre("Обучение сигнала " +to_string(key) +" itog[" +itog.at("id") +"]", __LINE__);
 				}} return false; }()){ mpre("ОШИБКА сравнения результата расчета", __LINE__);

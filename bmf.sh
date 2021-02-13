@@ -39,15 +39,15 @@
 #cat clump/iris_2.json | ./bimorph redis://localhost/iris -
 #cat clump/iris_3.json | ./bimorph redis://localhost/iris -
 
-./bimorph redis://localhost/0 -c
-cat clump/iris.json | ./bimorph redis://localhost/0 - # ?cache=shared
-./bimorph redis://localhost/0 ds=495e7de50abef9a66166cc5ea4b6927e epoch=100 # ?cache=shared
-./bimorph redis://localhost/0; echo "\n" # ?cache=shared
+#./bimorph redis://localhost/0 -c
+#cat clump/iris.json | ./bimorph redis://localhost/0 - # ?cache=shared
+#./bimorph redis://localhost/0 ds=495e7de50abef9a66166cc5ea4b6927e epoch=100 learn # ?cache=shared
+#./bimorph redis://localhost/0; echo "\n" # ?cache=shared
 
-#./bimorph mysql://localhost/iris -c
-#cat clump/iris.json | ./bimorph mysql://localhost/iris - # ?cache=shared
-#./bimorph mysql://localhost/iris ds=495e7de50abef9a66166cc5ea4b6927e epoch=100 # ?cache=shared
-#./bimorph mysql://localhost/iris; echo "\n" # ?cache=shared
+./bimorph mysql://localhost/iris -c
+cat clump/iris.json | ./bimorph mysql://localhost/iris - # ?cache=shared
+./bimorph mysql://localhost/iris ds=495e7de50abef9a66166cc5ea4b6927e epoch=100 learn #-microtime # ?cache=shared
+./bimorph mysql://localhost/iris; echo "\n" # ?cache=shared
 
 #for loop in {1..10}; do
 #	echo "Поток $loop"
