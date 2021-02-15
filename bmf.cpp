@@ -349,10 +349,10 @@ int main(int argc, char **argv){
 		}else if([&](string sql = ""){ // Создание таблиц 
 			if("mysql" != bmf::dbtype){ //mpre("Используем не mysql", __LINE__);
 			}else if(mysql_query(bmf::mysql, std::string("CREATE TABLE IF NOT EXISTS `index` (`id` VARCHAR(750) NOT NULL UNIQUE, `timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, `group` VARCHAR(750), `itog_values_id` VARCHAR(750), `dano_id` VARCHAR(750), `itog_id` VARCHAR(750), `index_id` VARCHAR(750), `bmf-index` VARCHAR(750), KEY `itog_id`(`itog_id`))").c_str())){ err("Список морфов"); 
-			}else if(mysql_query(bmf::mysql, std::string(sql = "CREATE TABLE IF NOT EXISTS `index_group` (`id` VARCHAR(750) NOT NULL UNIQUE, `group` VARCHAR(750), `dataset_id` VARCHAR(750), `key` int(11), `shift` int(11), `grp` ENUM('00','01','10','11') DEFAULT NULL, KEY `group`(`group`, `shift`), KEY `key`(`dataset_id`, `key`)) ENGINE=HEAP ROW_FORMAT=DYNAMIC;").c_str())){ mpre("Вставка данных " +sql +"\n" +string(mysql_error(bmf::mysql)), __LINE__); 
+			}else if(mysql_query(bmf::mysql, std::string(sql = "CREATE TABLE IF NOT EXISTS `index_group` (`id` VARCHAR(750) NOT NULL UNIQUE, `group` VARCHAR(750), `dataset_id` VARCHAR(750), `key` int(11), `shift` int(11), `grp` ENUM('00','01','10','11') DEFAULT NULL, KEY `group`(`group`, `shift`), KEY `key`(`dataset_id`, `key`)) -- ENGINE=MEMORY ROW_FORMAT=DYNAMIC;").c_str())){ mpre("Вставка данных " +sql +"\n" +string(mysql_error(bmf::mysql)), __LINE__); 
 			//}else if(mysql_query(bmf::mysql, std::string("ALTER TABLE `index_group` ADD INDEX (`dataset_id`, `group`, `shift`);").c_str())){ err("Вставка данных"); 
 			//}else if(mysql_query(bmf::mysql, std::string("ALTER TABLE `index_group` ADD INDEX (`key`);").c_str())){ err("Вставка данных"); 
-			}else if(mysql_query(bmf::mysql, std::string(sql = "CREATE TABLE IF NOT EXISTS `index_shift` (`id` VARCHAR(750) NOT NULL UNIQUE, `group` VARCHAR(750), `dataset_id` VARCHAR(750), `key` int(11), `shift` int(11), KEY `shift`(`group`, `shift`)) ENGINE=HEAP ROW_FORMAT=DYNAMIC;").c_str())){ mpre("Вставка данных " +sql +"\n" +string(mysql_error(bmf::mysql)), __LINE__); //err("Вставка данных"); 
+			}else if(mysql_query(bmf::mysql, std::string(sql = "CREATE TABLE IF NOT EXISTS `index_shift` (`id` VARCHAR(750) NOT NULL UNIQUE, `group` VARCHAR(750), `dataset_id` VARCHAR(750), `key` int(11), `shift` int(11), KEY `shift`(`group`, `shift`)) ENGINE=MEMORY ROW_FORMAT=DYNAMIC;").c_str())){ mpre("Вставка данных " +sql +"\n" +string(mysql_error(bmf::mysql)), __LINE__); //err("Вставка данных"); 
 			//}else if(mysql_query(bmf::mysql, std::string("ALTER TABLE `index_shift` ADD INDEX (`group`, `shift`);").c_str())){ err("Вставка данных"); 
 			}else if(mysql_query(bmf::mysql, std::string("CREATE TABLE IF NOT EXISTS `dataset` (`id` VARCHAR(750) NOT NULL UNIQUE, `name` VARCHAR(750), `count` int(11), `key` int(11) DEFAULT 0, `epoch` int(11) DEFAULT 0)").c_str())){ err("Вставка данных"); 
 			}else if(mysql_query(bmf::mysql, std::string("CREATE TABLE IF NOT EXISTS `dataset_map` (`id` VARCHAR(750) NOT NULL UNIQUE, `dataset_id` VARCHAR(750), `alias` VARCHAR(750), `alias_id` VARCHAR(750), `itog_id` VARCHAR(750), `map` TEXT, KEY `dataset_id`(`dataset_id`), KEY `alias`(`alias`))").c_str())){ err("Вставка данных"); 
@@ -672,6 +672,8 @@ int main(int argc, char **argv){
 				//}else if(mysql_query(bmf::mysql, sql.c_str())){ mpre("Установка изменений " +sql +"\n" +mysql_error(bmf::mysql), __LINE__);
 				}else if(TMs _index_shift = {{"group", group}, {"dataset_id", dataset_id}, {"key", key}, {"shift", "0"}}; _index_shift.empty()){ err("Первоначальные изменения");
 				}else if(TMs index_shift = bmf::Up(bmf::INDEX_SHIFT, {{"id", index_shift_id}}, _index_shift, {}, __LINE__); index_shift.empty()){ err("Добавление нового изменения");
+				//}else if(std::string sql = "INSERT INTO `index_shift` SET `id`=MD5('" +index_shift_id +"'), `group`=MD5('" +group +"'), `dataset_id`='" +dataset_id +"', `key`='" +key +"', `shift`='0';"; sql.empty()){ err("Запрос на изменение");
+				//}else if(mysql_query(bmf::mysql, sql.c_str())){ mpre("Установка изменений " +sql +"\n" +mysql_error(bmf::mysql), __LINE__);
 				}else{ //mpre(where, "Установка изменения " +sql, __LINE__);
 				}return false; }()){ err("Изменения");
 			}else{ //mpre("Изменения");
@@ -693,7 +695,7 @@ int main(int argc, char **argv){
 				}else if(std::string key = where.at("key"); key.empty()){ err("Значение ключа");
 				}else if(where.end() == where.find("dataset_id")){ err("Ключ не найден");
 				}else if(std::string dataset_id = where.at("dataset_id"); dataset_id.empty()){ err("Значение ключа");
-				//}else if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени", __LINE__);
+				}else if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени", __LINE__);
 				}else if(string sql = "SELECT grp.* FROM `index_group` AS `grp` LEFT JOIN `index_shift` as `shift` ON grp.`group`=`shift`.`group` AND grp.`shift`=`shift`.`shift` WHERE `shift`.`id` IS NOT NULL AND grp.`key`='" +key +"' AND grp.`dataset_id`='" +dataset_id +"'"; sql.empty()){ err("Запрос на выборку актуальных групп");
 				}else if(mysql_query(bmf::mysql, sql.c_str())){ err("Выбор данных из таблицы");
 				}else if(MYSQL_RES *result = mysql_store_result(bmf::mysql); false){ err("ОШИБКА выполнения запроса");
@@ -714,10 +716,10 @@ int main(int argc, char **argv){
 					}else if(LIST.insert(make_pair(ROW.at("id"), ROW)); LIST.empty()){ err("Инкремент списка");
 					}else{ //mpre("Обновленный элемент списка " +ROW.at("id"), __LINE__);
 					}}return false; }()){ err("ОШИБКА перебора значений");
-				/*}else if([&](){ // Информация о запроса
+				}else if([&](){ // Информация о запроса
 					if(bmf::ARGV.end() == bmf::ARGV.find("-microtime")){ //mpre("Не отображаем время обучения", __LINE__);
-					}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Выборка значений групп size=" +to_string(LIST.size()) +" " +sql, __LINE__);
-					}return false; }()){ err("Вывод инморфации о запросе");*/
+					}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Выборка значений групп size=" +to_string(LIST.size()), __LINE__);
+					}return false; }()){ err("Вывод инморфации о запросе");
 				}else if(mysql_free_result(result); false){ err("Очистка ресурсов");
 				}else{ //mpre(LIST, "Выборка списка групп key=" +key +" " +sql, __LINE__);
 				}return false; }()){ err("Список изменений");
@@ -734,7 +736,7 @@ int main(int argc, char **argv){
 				}else if(where.end() == where.find("dataset_id")){ err("Поле набора данных");
 				}else if(std::string dataset_id = where.at("dataset_id"); dataset_id.empty()){ err("Значение набора данных");
 				}else if(std::string index_group_id = group +"," +dataset_id +"," +key; index_group_id.empty()){ err("Идентификатор записи");
-				}else if(std::string sql = "INSERT INTO `index_group` SET `id`='" +index_group_id +"', `group`='" +group +"', `dataset_id`='" +dataset_id +"', `key`='" +key +"', `shift`='" +shift +"', `grp`='" +grp +"' ON DUPLICATE KEY UPDATE `shift`='" +shift +"', `grp`='" +grp +"';"; sql.empty()){ err("Запрос на изменение");
+				}else if(std::string sql = "INSERT INTO `index_group` SET `id`=" +index_group_id +", `group`=" +group +"', `dataset_id`='" +dataset_id +"', `key`='" +key +"', `shift`='" +shift +"', `grp`='" +grp +"' ON DUPLICATE KEY UPDATE `shift`='" +shift +"', `grp`='" +grp +"';"; sql.empty()){ err("Запрос на изменение");
 				}else if(mysql_query(bmf::mysql, sql.c_str())){ mpre("Установка изменений " +sql +"\n" +mysql_error(bmf::mysql), __LINE__);
 				}else{ //mpre(where, "Установка значения группы " +sql, __LINE__);
 				}return false; }()){ err("Изменения");
@@ -945,8 +947,8 @@ int main(int argc, char **argv){
 				}else if(_dano = dano_itr->second; _dano.empty()){ mpre("ОШИБКА выборки оставшегося значения", __LINE__);
 				}else{ //mpre(_dano, "Оставшееся значение", __LINE__);
 				}return _dano; }(); _dano.empty()){ mpre("ОШИБКА выборки оставшегося значения", __LINE__);
-			}else if(bmf::ARGV.end() == bmf::ARGV.find("-microtime")){ //mpre("Не отображаем время обновления группы", __LINE__);
-			}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Выбор подходящей связи size=" +to_string(_DANO.size()) +" list.length()=" +to_string(list.length()) +" ", __LINE__); //mpre("Сохрание значения INDEX_GROUP[" +group +"][" +to_string(key) +"]=" +GROUP.at(group).at(group), __LINE__); //mpre("Обновление " +sql, __LINE__);
+			//}else if(bmf::ARGV.end() == bmf::ARGV.find("-microtime")){ //mpre("Не отображаем время обновления группы", __LINE__);
+			//}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Выбор подходящей связи size=" +to_string(_DANO.size()) +" list.length()=" +to_string(list.length()) +" ", __LINE__); //mpre("Сохрание значения INDEX_GROUP[" +group +"][" +to_string(key) +"]=" +GROUP.at(group).at(group), __LINE__); //mpre("Обновление " +sql, __LINE__);
 			//}else{ //mpre(stairs, "Ступень", __LINE__); //mpre(_BMF_DANO_EX.at(""), "Список", __LINE__); mpre(_DANO, "Выбор", __LINE__); mpre(_dano, "Результат", __LINE__); //mpre("ОШИБКА функции выбора исходного значения", __LINE__);
 			}return _dano; }); false){ mpre("ОШИБКА установки функции выбора Исходного значения", __LINE__);
 		}else if(bmf::Vals = ([&](TMs VALUE, string alias, int key, std::string BMF_VALS, std::string BMF_VALUES, std::string BMF_TITLES){ // Установка входных значений
@@ -1494,7 +1496,7 @@ int main(int argc, char **argv){
 					}else{ //mpre("Обновление струкруты групп", __LINE__);
 					}}return false; }()){ err("Обновление структуры групп и списка морфов");
 				}else if(bmf::ARGV.end() == bmf::ARGV.find("-microtime")){ //mpre("Не отображаем время обучения", __LINE__);
-				}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Обновление модели size=" +to_string(BMF_INDEX.size()) +" ", __LINE__);
+				}else{ mpre("==========", __LINE__); mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Обновление модели size=" +to_string(BMF_INDEX.size()) +" ", __LINE__);
 				}return false; }()){ err("Обновление модели");
 			}else if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени", __LINE__);
 			}else if(TMMs INDEX_SHIFT = [&](TMMs INDEX_SHIFT = {}){ // Выборка изменений
@@ -1508,8 +1510,8 @@ int main(int argc, char **argv){
 				if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени", __LINE__);
 				}else if(INDEX_GROUP = bmf::Group({{"dataset_id", bmf::dataset.at("id")}, {"key", to_string(key)}}, __LINE__); false){ err("Выборка списка значений");
 				//}else if(mpre(INDEX_GROUP, "Значения dataset_id=" +bmf::dataset.at("id") +" key=" +to_string(key), __LINE__); false){ err("Уведмоление");
-				}else if(bmf::ARGV.end() == bmf::ARGV.find("-microtime")){ //mpre("Не отображаем время обучения", __LINE__);
-				}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Список значений групп size=" +to_string(INDEX_GROUP.size()) +" ", __LINE__);
+				//}else if(bmf::ARGV.end() == bmf::ARGV.find("-microtime")){ //mpre("Не отображаем время обучения", __LINE__);
+				//}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Список значений групп size=" +to_string(INDEX_GROUP.size()) +" ", __LINE__);
 				}return INDEX_GROUP; }(); false){ err("Значения групп");
 			}else if(TMMs UPDATE = [&](TMMs UPDATE = {}){ for(auto &group_itr:GROUP){ // Расчет значений
 				if(std::string group = group_itr.first; group.empty()){ err("Выборка группы");
@@ -1599,12 +1601,12 @@ int main(int argc, char **argv){
 			//}else if(mpre(UPDATE, "Обновления", __LINE__); false){ err("Уведомление");
 			}else if([&](){ // Время расчета
 				if(bmf::ARGV.end() == bmf::ARGV.find("-microtime")){ //mpre("Не отображаем время обучения", __LINE__);
-				}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Расчет модели size=" +to_string(BMF_INDEX.size()), __LINE__);
+				}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Расчет модели GROUP.size=" +to_string(GROUP.size()), __LINE__);
 				}return false; }()){ err("Время расчета");
 			}else if([&](){ // Сохранение изменений
 				if(UPDATE.empty()){ //mpre("Пустой список обновлений", __LINE__);
 				//}else if(mpre(INDEX_SHIFT, "Изменения", __LINE__); false){ err("Уведомление");
-				}else if(bmf::ARGV.end() == bmf::ARGV.find("learn")){ mpre("Не сохраняем", __LINE__);
+				}else if(bmf::ARGV.end() == bmf::ARGV.find("learn")){ //mpre("Не сохраняем", __LINE__);
 				}else if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени эпохи", __LINE__);
 				}else if(TMs one = UPDATE.begin()->second; one.empty()){ err("Одна строка для заголовка");
 				}else if(string titles = [&](string titles = "`id`, `dataset_id`"){ for(auto one_itr:one){
@@ -1625,10 +1627,10 @@ int main(int argc, char **argv){
 					}else if(VALUES += string(VALUES.empty() ? "" : ",\n") +"(" +values + ")"; VALUES.empty()){ err("Добавление строки запросу");
 					}else{ //mpre("Новая строка в обновлении values=" +values, __LINE__);
 					}}return VALUES; }(); VALUES.empty()){ err("Список строк");
-				}else if(std::string sql = "INSERT INTO `index_group` (" +titles +") VALUES\n" +VALUES +" ON DUPLICATE KEY UPDATE `shift`=VALUES(`shift`), `grp`=VALUES(`grp`);"; sql.empty()){ err("Строка запроса");
+				}else if(std::string sql = "INSERT DELAYED INTO `index_group` (" +titles +") VALUES\n" +VALUES +" ON DUPLICATE KEY UPDATE `shift`=VALUES(`shift`), `grp`=VALUES(`grp`);"; sql.empty()){ err("Строка запроса");
 				}else if(mysql_query(bmf::mysql, sql.c_str())){ mpre("Установка изменений " +sql +"\n" +mysql_error(bmf::mysql), __LINE__);
 				}else if(bmf::ARGV.end() == bmf::ARGV.find("-microtime")){ //mpre("Не отображаем время обновления группы", __LINE__);
-				}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Изменение групп " +sql, __LINE__); //mpre("Сохрание значения INDEX_GROUP[" +group +"][" +to_string(key) +"]=" +GROUP.at(group).at(group), __LINE__); //mpre("Обновление " +sql, __LINE__);
+				}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Изменение значений групп " +to_string(UPDATE.size()) +" ", __LINE__); //mpre("Сохрание значения INDEX_GROUP[" +group +"][" +to_string(key) +"]=" +GROUP.at(group).at(group), __LINE__); //mpre("Обновление " +sql, __LINE__);
 				}return false; }()){ err("Сохранение изменений");
 			}else if([&](){ for(auto &itog_itr:bmf::List(bmf::ITOG, {}, __LINE__)){ // Проверка списка итогов
 				if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - microtime; false){ mpre("ОШИБКА расчета времени эпохи", __LINE__);
@@ -1674,13 +1676,14 @@ int main(int argc, char **argv){
 					}else if(val == calc){ //mpre("Расчетный результат совпал с картой", __LINE__);
 					}else if(imap[key] = atoi(calc.c_str()); imap.empty()){ err("Установка расчетного бита в карту");
 					}else if(std::string map = [&](std::string map = ""){ boost::to_string(imap, map); return map; }(); (map.length() != dataset_count)){ mpre("ОШИБКА установки карты исходника", __LINE__);
-					}else if(TMs index_map = bmf::Up(bmf::DATASET_MAP, {{"id", dataset_map_id}}, {{"map", map}}, {{"map", map}}, __LINE__); index_map.empty()){ mpre("ОШИБКА обнолвения карты исходника", __LINE__);
+					}else if(TMs index_map = bmf::Up(bmf::DATASET_MAP, {{"id", dataset_map_id}}, {{"dataset_id", bmf::dataset.at("id")}, {"alias", "index"}, {"map", map}}, {{"dataset_id", bmf::dataset.at("id")}, {"alias", "index"}, {"map", map}}, __LINE__); index_map.empty()){ mpre("ОШИБКА обнолвения карты исходника", __LINE__);
 					}else{ //mpre("Сохранение обновленной карты морфа map=" +map, __LINE__);
 					}return false; }()){ err("Сохранение результата в индекс")
 				}else if(TMs index = [&](TMs index = {}, std::string list = ""){ // Обучение
-					if(bmf::ARGV.end() == bmf::ARGV.find("learn")){ //mpre("Пропускаем обучение", __LINE__);
-					}else if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени эпохи", __LINE__);
+					if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени эпохи", __LINE__);
 					}else if(learn == calc){ //mpre("Сравнение key=" +to_string(key) +" " +learn +"=" +calc, __LINE__);
+					}else if(bmf::ARGV.end() == bmf::ARGV.find("learn")){ //mpre("Пропускаем обучение", __LINE__);
+					}else if(err+=1; !err){ mpre("Инкремент ошибок", __LINE__);
 					}else if(TMMs UPDATE = {}; false){ err("Список изменений");
 					}else if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени эпохи", __LINE__);
 					}else if(std::string learn_id = [&](std::string next_id, std::string learn_id = "", int count = 750){ do{ // Поиск изменений
@@ -1738,10 +1741,11 @@ int main(int argc, char **argv){
 						}}while(learn_id.empty()); return learn_id; }(itog.at("index_id")); learn_id.empty()){ mpre("ОШИБКА Поиск изменений learn_id=" +learn_id, __LINE__);
 					}else if([&](){ // Отображение времени обучения
 						if(bmf::ARGV.end() == bmf::ARGV.find("-microtime")){ //mpre("Не отображаем время обновления группы", __LINE__);
-						}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Обучение", __LINE__);
+						}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Обучение " +learn_id +" ", __LINE__);
 						}return false; }()){ err("Уведомление о времени обучения");
 					}else if([&](){ // Сохранение изменений
-						if(UPDATE.empty()){ //mpre("Пустой список обновлений", __LINE__);
+						if(bmf::ARGV.end() == bmf::ARGV.find("learn")){ //mpre("Не сохраняем изменения", __LINE__);
+						}else if(UPDATE.empty()){ //mpre("Пустой список обновлений", __LINE__);
 						}else if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени эпохи", __LINE__);
 						}else if(TMs one = UPDATE.begin()->second; one.empty()){ err("Одна строка для заголовка");
 						}else if(string titles = [&](string titles = "`id` ,`dataset_id` ,`shift`"){ for(auto one_itr:one){
@@ -1763,16 +1767,16 @@ int main(int argc, char **argv){
 						}else if(std::string sql = "INSERT INTO `index_shift` (" +titles +") VALUES\n" +VALUES +" ON DUPLICATE KEY UPDATE `shift`=`shift`+1;"; sql.empty()){ err("Строка запроса");
 						}else if(mysql_query(bmf::mysql, sql.c_str())){ mpre("Установка изменений " +sql +"\n" +mysql_error(bmf::mysql), __LINE__);
 						}else if(bmf::ARGV.end() == bmf::ARGV.find("-microtime")){ //mpre("Не отображаем время обновления группы", __LINE__);
-						}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Сохранение изменений " +sql, __LINE__); //mpre("Сохрание значения INDEX_GROUP[" +group +"][" +to_string(key) +"]=" +GROUP.at(group).at(group), __LINE__); //mpre("Обновление " +sql, __LINE__);
+						}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Сохранение изменений ", __LINE__); //mpre("Сохрание значения INDEX_GROUP[" +group +"][" +to_string(key) +"]=" +GROUP.at(group).at(group), __LINE__); //mpre("Обновление " +sql, __LINE__);
 						}return false; }()){ err("Сохранение изменений");
 					}else if(index = [&](TMs index = {}){ // Добавление нового морфа
-						//if(TMs _dano = bmf::Choice(list, key); _dano.empty()){ err("Уведомление");
-						if(TMs _dano = [&](TMs _dano = {}){ // Выбор новой связи
+						if(bmf::ARGV.end() == bmf::ARGV.find("learn")){ //mpre("Не сохраняем изменения", __LINE__);
+						}else if(TMs _dano = [&](TMs _dano = {}){ // Выбор новой связи
 							if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени эпохи", __LINE__);
 							//}else if(TMMs DANO = bmf::List(bmf::DANO, {}, __LINE__); DANO.empty()){ err("Список итогов");
 							}else if(_dano = bmf::Choice(list, key, DANO, DANO_BITMAP); _dano.empty()){ err("Уведомление");
 							}else if(bmf::ARGV.end() == bmf::ARGV.find("-microtime")){ //mpre("Не отображаем время обновления группы", __LINE__);
-							}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Выбор новой связи list=" +list, __LINE__);
+							}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Выбор новой связи list.length()=" +to_string(list.length()), __LINE__);
 							}return _dano; }(); _dano.empty()){ err("Выбор новой связи");
 						}else if(700 <= learn_id.length()){ err("Длинна идентификатора");
 						}else if(std::string group = [&](std::string group = ""){ // Расчет группы
@@ -1786,7 +1790,6 @@ int main(int argc, char **argv){
 						}else if(bmf::Shift({{"group", group}, {"dataset_id", bmf::dataset.at("id")}, {"key", to_string(key)}}, __LINE__); false){ err("Установка изменения");
 						}else{ //mpre(index, "Добавление нового морфа", __LINE__);
 						}return index; }(); index.empty()){ err("Добавление нового морфа");
-					}else if(err+=1; !err){ mpre("Инкремент ошибок", __LINE__);
 					//}else if(bmf::ARGV.end() == bmf::ARGV.find("-microtime")){ //mpre("Не отображаем время обновления группы", __LINE__);
 					}else{ //mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Обучение " +itog.at("id"), __LINE__); //mpre("Обучение " +index.at("id") +" calc=" +calc +" learn=" +learn, __LINE__);
 					}return index; }(); false){ mpre("ОШИБКА обучения", __LINE__);
