@@ -1521,9 +1521,6 @@ int main(int argc, char **argv){
 			}else if(TMMs INDEX_GROUP = [&](TMMs INDEX_GROUP = {}){ // Значения групп
 				if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени", __LINE__);
 				}else if(INDEX_GROUP = bmf::Group({{"dataset_id", bmf::dataset.at("id")}, {"key", to_string(key)}}, __LINE__); false){ err("Выборка списка значений");
-				//}else if(mpre(INDEX_GROUP, "Значения dataset_id=" +bmf::dataset.at("id") +" key=" +to_string(key), __LINE__); false){ err("Уведмоление");
-				//}else if(bmf::ARGV.end() == bmf::ARGV.find("-microtime")){ //mpre("Не отображаем время обучения", __LINE__);
-				//}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Список значений групп size=" +to_string(INDEX_GROUP.size()) +" ", __LINE__);
 				}return INDEX_GROUP; }(); false){ err("Значения групп");
 			}else if(TMMs UPDATE = [&](TMMs UPDATE = {}){ for(auto &group_itr:GROUP){ // Расчет значений
 				if(std::string group = group_itr.first; group.empty()){ err("Выборка группы");
@@ -1545,8 +1542,6 @@ int main(int argc, char **argv){
 						}else if(index_shift.end() == index_shift.find("shift")){ err("Поле изменений не найдено");
 						}else{ //mpre(index_shift, "Изменения", __LINE__);
 						}return index_shift; }(); index_shift.empty()){ err("Список изменений пуст");
-					}else if(index_group.at("shift") != index_shift.at("shift")){ err("Устаревшее значение кеша");
-					}else if(index_group.at("key") != to_string(key)){ err("Не правильный ключ группы");
 					}else if(grp = index_group.at("grp"); (2 != grp.length())){ err("Значение группы");
 					}else if(GROUP[group][group] = grp; false){ err("Установка значения из кеша");
 					}else{ //mpre("Значение из кеша group=" +group +" key=" +to_string(key) +" grp=" +grp, __LINE__);
@@ -1555,41 +1550,8 @@ int main(int argc, char **argv){
 					if(std::string index_id = index_itr.first; index_id.empty()){ err("Выборка идентификатора морфа");
 					}else if(BMF_INDEX.end() == BMF_INDEX.find(index_id)){ err("Морф с идентификатором не найден в справочнике");
 					}else if(TMs index = BMF_INDEX.at(index_id); index.empty()){ err("Выборка морфа");
-
 					}else if(string grp = bmf::Grp(index, key, BMF_INDEX, GROUP, DANO_BITMAP, ITOG_BITMAP); grp.empty()){ err("Вызов фукнции расчета значения");
 					}else if(index_itr.second = grp; false){ err("Сохранение значения в массиве");
-					/*}else if(std::string way = index_id.substr(1, index_id.length()); false){ err("Путь до текущего морфа");
-					}else if(std::string id1 = "11" +way; id1.empty()){ err("Идентификатор старшего морфа");
-					}else if(std::string id0 = "10" +way; id0.empty()){ err("Идентификатор старшего морфа");
-					}else if(std::string dano_val = [&](std::string dano_val = ""){ // Значение исходника
-						if(index.end() == index.find("dano_id")){ err("Поле исходника ненайдено");
-						}else if(std::string dano_id = index.at("dano_id"); dano_id.empty()){ err("Идентификатор исходника не установлен");
-						}else if(DANO_BITMAP.end() == DANO_BITMAP.find(dano_id)){ err("Карта исходника не найдена");
-						}else if(dano_val = (DANO_BITMAP[dano_id].test(key) ? "1" : "0"); dano_val.empty()){ err("Выборка значения исходника");
-						}else{ //mpre("Выборка исходного значения dano_val=" +dano_val, __LINE__);
-						}return dano_val; }(); false){ err("Значение исходника");
-					}else if(std::string v1 = [&](std::string v1){ //Группа старшего морфа
-						if(BMF_INDEX.end() == BMF_INDEX.find(id1)){ //mpre("Морф с идентификатором не найден в справочнике", __LINE__);
-						}else if(BMF_INDEX.at(id1).end() == BMF_INDEX.at(id1).find("group")){ err("Поля группы не найдено");
-						}else if(std::string group1 = BMF_INDEX.at(id1).at("group"); group1.empty()){ err("Поле группы");
-						}else if(GROUP.end() == GROUP.find(group1)){ err("Группа в расчетах не найдена");
-						}else if(GROUP.at(group1).end() == GROUP.at(group1).find(id1)){ err("Идентификатор в группе расчетов не найдена");
-						}else if(std::string grp = GROUP.at(group1).at(id1); (2 != grp.length())){ mpre("Выборка значения GROUP[" +group1 +"][" +id1 +"]", __LINE__); err("Выборка группы");
-						}else if(v1 = ("01" == grp ? "1" : "0"); v1.empty()){ err("Выборка значения потомка из расчетных");
-						}else{ //mpre("Группа старшего потомка", __LINE__);
-						}return v1; }(dano_val); v1.empty()){ err("Группа старшего морфа");
-					}else if(std::string v0 = [&](std::string v0){ //Группа старшего морфа
-						if(BMF_INDEX.end() == BMF_INDEX.find(id0)){ //mpre("Морф с идентификатором не найден в справочнике", __LINE__);
-						}else if(BMF_INDEX.at(id0).end() == BMF_INDEX.at(id0).find("group")){ err("Поля группы не найдено");
-						}else if(std::string group0 = BMF_INDEX.at(id0).at("group"); group0.empty()){ err("Поле группы");
-						}else if(GROUP.end() == GROUP.find(group0)){ err("Группа в расчетах не найдена");
-						}else if(GROUP.at(group0).end() == GROUP.at(group0).find(id0)){ err("Идентификатор в группе расчетов не найдена");
-						}else if(std::string grp = GROUP.at(group0).at(id0); (2 != grp.length())){ err("Выборка группы");
-						}else if(v0 = ("01" == grp ? "0" : "1"); v0.empty()){ err("Выборка значения потомка из расчетных");
-						}else{ //mpre("Группа старшего потомка", __LINE__);
-						}return v0; }(dano_val); v0.empty()){ err("Группа старшего морфа");
-					}else if(index_itr.second = v1 +v0; 2 != index_itr.second.length()){ err("Значение группы");*/
-
 					}else{ //mpre("Установка значения GROUP[" +group +"][" +index_id +"]=" +GROUP[group][index_id], __LINE__);
 					}}return false; }()){ err("Расчет группы");
 				}else if([&](){ // Сохраняем значение
@@ -1600,24 +1562,20 @@ int main(int argc, char **argv){
 						if(TMs index_shift = (INDEX_SHIFT.end() == INDEX_SHIFT.find(group) ? index_shift : INDEX_SHIFT.at(group)); false){ err("Выборка изменений");
 						}else if(shift = (index_shift.end() == index_shift.find("shift") ? "0" : index_shift.at("shift")); shift.empty()){ err("Расчет изменений");
 						}else if(!index_shift.empty()){ //mpre("Изменения уже установлены", __LINE__);
-						//}else if(bmf::Shift({{"group", group}, {"dataset_id", bmf::dataset.at("id")}, {"key", to_string(key)}}, __LINE__); false){ err("Установка изменения");
 						}else{ //mpre("Установка модели group=" +group, __LINE__); //mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Установка изменений group=" +group, __LINE__);
 						}return shift; }(); shift.empty()){ err("Расчет изменений");
 					}else if(TMs update = {{"group", group}, {"key", to_string(key)}, {"grp", grp}, {"shift", shift}}; update.empty()){ err("Значение обновления");
-					//}else if(bmf::Group(update, __LINE__); false){ err("Сохранение результата");
 					}else if(UPDATE.insert(make_pair(to_string(UPDATE.size()), update)); UPDATE.empty()){ err("Сохранение обновления");
 					}else{ //mpre(INDEX_SHIFT, "Изменения", __LINE__); //mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Изменение группы group=" +group +" key=" +to_string(key) +" grp=" +grp, __LINE__); //mpre("Сохрание значения INDEX_GROUP[" +group +"][" +to_string(key) +"]=" +GROUP.at(group).at(group), __LINE__);
 					}return false; }()){ err("Сохраняем значение");
 				}else{ //mpre("Расчет группы " +group +" size=" +to_string(group_itr.second.size()), __LINE__);
 				}}return UPDATE; }(); false){ err("Расчет значений");
-			//}else if(mpre(UPDATE, "Обновления", __LINE__); false){ err("Уведомление");
 			}else if([&](){ // Время расчета
 				if(bmf::ARGV.end() == bmf::ARGV.find("-microtime")){ //mpre("Не отображаем время обучения", __LINE__);
 				}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Расчет модели GROUP.size=" +to_string(GROUP.size()), __LINE__);
 				}return false; }()){ err("Время расчета");
 			}else if([&](){ // Сохранение изменений
 				if(UPDATE.empty()){ //mpre("Пустой список обновлений", __LINE__);
-				//}else if(mpre(INDEX_SHIFT, "Изменения", __LINE__); false){ err("Уведомление");
 				}else if(bmf::ARGV.end() == bmf::ARGV.find("learn")){ //mpre("Не сохраняем", __LINE__);
 				}else if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени эпохи", __LINE__);
 				}else if(TMs one = UPDATE.begin()->second; one.empty()){ err("Одна строка для заголовка");
