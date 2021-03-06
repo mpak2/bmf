@@ -22,7 +22,8 @@
 #sqlite3 ./2 -column -header "SELECT * FROM mp_bmf_test ORDER BY id DESC LIMIT 10; -- SELECT COUNT(*) as step, SUM(change) as SumChange, MAX(bmf) as bmf FROM mp_bmf_test WHERE perc<10;"
 #sqlite3 ./2 -column -header "SELECT * FROM mp_bmf_index ORDER BY id DESC"
 
-#cat clump/tri.json | ./bimorph - ./3
+cat clump/dva.json | ./bimorph mysql://localhost/dva -c -
+./bimorph mysql://localhost/dva ds=f43e8e4b2864a93704048a1eaef6c374 epoch=1000 learn
 #sqlite3 ./3 -column -header "SELECT * FROM mp_bmf_test ORDER BY id DESC LIMIT 10; -- SELECT COUNT(*) as step, SUM(change) as SumChange, MAX(bmf) as bmf FROM mp_bmf_test WHERE perc<10;"
 ##sqlite3 ./3 -column -header "SELECT * FROM mp_bmf_index ORDER BY id DESC"
 ##./bimorph ./3 -j '[{"dano":{"Один":"0", "Два":"0", "Три":"0"}}]'
@@ -44,10 +45,10 @@
 #./bimorph redis://localhost/0 ds=495e7de50abef9a66166cc5ea4b6927e epoch=100 learn # ?cache=shared
 #./bimorph redis://localhost/0; echo "\n" # ?cache=shared
 
-./bimorph mysql://localhost/iris -c
-cat clump/iris.json | ./bimorph mysql://localhost/iris - # ?cache=shared
-./bimorph mysql://localhost/iris ds=495e7de50abef9a66166cc5ea4b6927e epoch=100 learn group_level=4 cache=clean #-microtime # ?cache=shared
-./bimorph mysql://localhost/iris; echo "\n" # ?cache=shared
+#./bimorph mysql://localhost/iris -c
+#cat clump/iris.json | ./bimorph mysql://localhost/iris - # ?cache=shared
+#./bimorph mysql://localhost/iris ds=495e7de50abef9a66166cc5ea4b6927e epoch=100 learn cache=clean #-microtime # ?cache=shared
+#./bimorph mysql://localhost/iris; echo "\n" # ?cache=shared
 #./bimorph mysql://localhost/mnist ds=ed480c7a6d1e0145b9e0511e95252b98 epoch=100 learn
 
 #for loop in {1..10}; do
