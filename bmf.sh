@@ -14,7 +14,7 @@
 #./bimorph mysql://localhost/tri ds=83989155d7b38929265afecb9f2188df epoch=100 learn
 
 cat clump/iris.json | ./bimorph mysql://localhost/iris -c - # ?cache=shared
-./bimorph mysql://localhost/iris ds=495e7de50abef9a66166cc5ea4b6927e epoch=100 learn cache=clean #-microtime # ?cache=shared
+./bimorph mysql://localhost/iris ds=495e7de50abef9a66166cc5ea4b6927e epoch=100 learn #-microtime # ?cache=shared
 
 #	#sqlite3 clump/iris -column -header "SELECT MAX(depth) FROM mp_bmf_index"
 #./bimorph clump/iris -dano '[{"dano":{"ДлиннаЧашелистика":"2.0","ШиринаЧашелистика":"4.0","ДлиннаЛепестка":"1.8","ШиринаЛепестка":"1.8"}}]'
