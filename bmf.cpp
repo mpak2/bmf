@@ -1279,7 +1279,7 @@ int main(int argc, char **argv){
 	}else if(int loop = [&](int loop = 0){ // Количетсво повторов
 		if(int epoch = (bmf::ARGV.end() == bmf::ARGV.find("epoch") ? 0 : atoi(bmf::ARGV.at("epoch").c_str())); (0 > epoch)){ mpre("ОШИБКА расчета количества эпох", __LINE__);
 		}else if(bmf::ARGV.end() == bmf::ARGV.find("epoch")){ //mpre("Для обучения укажите количество эпох epoch", __LINE__);
-		}else if(!epoch){ loop = -1; mpre("Указано нулевое количество эпох расчитываем до полного совпадения", __LINE__);
+		}else if(!epoch){ loop = 1; mpre("Указано нулевое количество эпох расчитываем до полного совпадения", __LINE__);
 		}else if(loop = epoch){ //mpre("Набор данных -ds " +bmf::dataset.at("id")+ " количество эпох -epoch " +to_string(loop), __LINE__);
 		}else{ mpre("ОШИБКА расчтеа количества повторений", __LINE__);
 		}return loop; }(); false){ mpre("ОШИБКА расчета колчиества повторений", __LINE__);
@@ -1291,9 +1291,9 @@ int main(int argc, char **argv){
 		}return BMF_INDEX; }(); false){ err("Выборка данных");
 	}else if(int errors = [&](int errors = 0, bool pass = false){ do{ // Итерации обучения
 		if(bmf::loop++ >= loop){ //mpre("Остановка по максимальному количеству эпох", __LINE__);
+		//}else if(mpre("Количетсво эпох bmf::loop=" +to_string(bmf::loop) +" loop=" +to_string(loop), __LINE__); false){ err("Уведомление");
 		}else if(bmf::dataset.empty()){ mpre("ОШИБКА набор данных не установлен", __LINE__);
 		}else if(int dataset_count = atoi(bmf::dataset["count"].c_str()); (0 >= dataset_count)){ mpre("ОШИБКА нулевое количество в наборе данных", __LINE__);
-		}else if(long microtime = ("0" == bmf::dataset.at("key") ? (std::chrono::system_clock::now().time_since_epoch()).count()/1e9 : atol(bmf::dataset.at("microtime").c_str())); !microtime){ mpre("ОШИБКА расчета времени", __LINE__);
 		}else if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени", __LINE__);
 		}else if(TMMs DANO = bmf::List(bmf::DANO, {}, __LINE__); DANO.empty()){ err("Список итогов");
 		}else if(TMMb DANO_BITMAP = [&](TMMs DATASET_MAP, std::map<string,boost::dynamic_bitset<>> DANO_BITMAP = {}){ for(auto dano_itr:DANO){ // Список карт исходников
@@ -1349,12 +1349,14 @@ int main(int argc, char **argv){
 			}return false; }()){ err("Время расчета");
 		}else if(int key = [&](int key = 0){ // Позиция обучения
 			if(bmf::dataset.end() == bmf::dataset.find("key")){ err("Поле ключа не найдено в базе");
-			//}else if(int epoch = (bmf::ARGV.end() == bmf::ARGV.find("epoch"))){
+			}else if(int epoch = (bmf::ARGV.end() == bmf::ARGV.find("epoch") ? 0 : atoi(bmf::ARGV.at("epoch").c_str())); !epoch){ //mpre("Локальный ключ" ,__LINE__);
 			}else if(key = atoi(bmf::dataset.at("key").c_str()); 0 > key){ err("Расчет значения последнего ключа");
 			}else{ //mpre("Текущее состояние ключа key=" +to_string(key), __LINE__);
 			}return key; }(); false){ err("Расчет позиции обучения");
+		}else if(long microtime = (!key ? (std::chrono::system_clock::now().time_since_epoch()).count()/1e9 : atol(bmf::dataset.at("microtime").c_str())); !microtime){ mpre("ОШИБКА расчета времени", __LINE__);
 		}else if(int err = [&](int err = 0){ // Позиция обучения
-			if(bmf::dataset.end() == bmf::dataset.find("err")){ err("Поле ключа не найдено в базе");
+			if(int epoch = (bmf::ARGV.end() == bmf::ARGV.find("epoch") ? 0 : atoi(bmf::ARGV.at("epoch").c_str())); !epoch){ //mpre("Локальный ключ" ,__LINE__);
+			}else if(bmf::dataset.end() == bmf::dataset.find("err")){ err("Поле ключа не найдено в базе");
 			}else if(err = atoi(bmf::dataset.at("err").c_str()); 0 > err){ err("Расчет значения последнего ключа");
 			}else{ //mpre("Текущее состояние ключа err=" +to_string(err), __LINE__);
 			}return err; }(); false){ err("Расчет позиции обучения");
@@ -1365,6 +1367,14 @@ int main(int argc, char **argv){
 				}else if(epoch = to_string(atoi(epoch.c_str()) + 1); epoch.empty()){ err("Инкремент эпохи");
 				}else{ //mpre("Увеличение значения эпохи " +epoch, __LINE__);
 				}return epoch; }(); epoch.empty()){ mpre("ОШИБКА расчета эпохи", __LINE__);
+			}else if([&](){ // Обнуление позиции
+				if(string epoch = (bmf::ARGV.end() == bmf::ARGV.find("epoch") ? "" : bmf::ARGV.at("epoch")); "0" != epoch){ //mpre("Только для нулевой эпохи");
+				}else if(static int err_current = 0; false){ err("Текущее количество ошибок");
+				}else if(err == err_current){ //mpre("Количество ошибок не изменилось", __LINE__);
+				}else if(err_current = err; false){ err("Сохранение текущего количества ошибок");
+				}else if(key = 0; false){ err("Начинаем с нуля при каждой ошибке");
+				}else{ //mpre("Обнуление позиции при нулевой эпохе" ,__LINE__);
+				}return false; }()){ err("Обнуление позиции расчета при нулевом количестве эпох");
 			}else if(std::string itog_str = (bmf::ARGV.end() == bmf::ARGV.find("itog") ? "" : "." +bmf::ARGV.at("itog")); false){ mpre("ОШИБКА формирования итога в консоли", __LINE__);
 			}else if([&](){ // Выборка данных
 				if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени", __LINE__);
@@ -1434,7 +1444,8 @@ int main(int argc, char **argv){
 						}else if(STAIRS.insert(make_pair(STAIRS.size(), stairs)); !STAIRS.size()){ err("Первоначальное заполнение лестницы");
 						}return STAIRS; }(); STAIRS.empty()){ err("Список ступеней пуст");
 					}else if(TMs CACHE = {}; false){ err("Создание кеша");
-					}else if(int loop_max = loop = 1e9; !loop){ err("Количество повторений");
+					}else if(int _loop_max = 1e9; !_loop_max){ err("Количество повторений");
+					}else if(int _loop = _loop_max; !_loop){ err("Количество повторений");
 					}else if([&](){ do{ // Расчет лестницы
 						if(auto stairs_itr = STAIRS.rbegin(); (STAIRS.rend() == stairs_itr)){ err("Выборка последней ступени");
 						}else if(TMs stairs = stairs_itr->second; stairs.empty()){ err("Выборка последней ступени");
@@ -1588,11 +1599,11 @@ int main(int argc, char **argv){
 								}return false; }()){ err("Отключение обучения у родителя");
 							}else{ //mpre(_parent, "Родитель", __LINE__); //mpre("Установка свойств родителю STAIRS.size()=" +to_string(STAIRS.size()), __LINE__);
 							}return false; }()){ err("Изменение размера лестницы");
-						}else{ //mpre(STAIRS, "Расчет ступени link=" +link +" loop=" +to_string(loop), __LINE__);
-						}}while((0 < STAIRS.size()) && (0 < --loop)); }(); !STAIRS.empty()){ err("Расчет лестницы по количеству циклов");
+						}else{ //mpre(STAIRS, "Расчет ступени link=" +link +" _loop=" +to_string(_loop), __LINE__);
+						}}while((0 < STAIRS.size()) && (0 < --_loop)); }(); !STAIRS.empty()){ err("Расчет лестницы по количеству циклов");
 					}else if([&](){ // Информация о запроса
 						if(bmf::ARGV.end() == bmf::ARGV.find("-microtime")){ //mpre("Не отображаем время обучения", __LINE__);
-						}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Расчет структуры затронутых элементов " +to_string(loop_max -loop) +" size=" +to_string(BMF_INDEX.size()) +" ", __LINE__);
+						}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Расчет структуры затронутых элементов " +to_string(_loop_max -_loop) +" size=" +to_string(BMF_INDEX.size()) +" ", __LINE__);
 						}return false; }()){ err("Вывод инморфации о запросе");
 					}else if(calc = [&](string val = ""){ // Результат расчета
 						if(_stairs_.empty()){ err("Значение ступени");
@@ -1619,6 +1630,7 @@ int main(int argc, char **argv){
 				}}return false; }()){ mpre("ОШИБКА сравнения результата расчета", __LINE__);
 			}else if(bmf::dataset = [&](){ // Обновление ключа
 				if(bmf::ARGV.end() == bmf::ARGV.find("learn")){ //mpre("Не изменяем позицию без обучения", __LINE__);
+				}else if(int epoch = (bmf::ARGV.end() == bmf::ARGV.find("epoch") ? 0 : atoi(bmf::ARGV.at("epoch").c_str())); !epoch){ //mpre("Не сохраняем свойства в эпоху" ,__LINE__);
 				}else if(bmf::dataset["key"] = std::to_string(key); bmf::dataset.empty()){ err("Установка нового ключа");
 				}else if(bmf::dataset["err"] = std::to_string(err); bmf::dataset.empty()){ err("Установка количества ошибок эпохи");
 				}else if(bmf::dataset["microtime"] = std::to_string(microtime); bmf::dataset.empty()){ err("Установка времени расчета эпохи");
