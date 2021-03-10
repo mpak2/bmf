@@ -1372,7 +1372,7 @@ int main(int argc, char **argv){
 				}else if(static int err_current = 0; false){ err("Текущее количество ошибок");
 				}else if(err == err_current){ //mpre("Количество ошибок не изменилось", __LINE__);
 				}else if(err_current = err; false){ err("Сохранение текущего количества ошибок");
-				}else if(key = 0; false){ err("Начинаем с нуля при каждой ошибке");
+				}else if(key = round(key/2); false){ err("Начинаем с нуля при каждой ошибке");
 				}else{ //mpre("Обнуление позиции при нулевой эпохе" ,__LINE__);
 				}return false; }()){ err("Обнуление позиции расчета при нулевом количестве эпох");
 			}else if(std::string itog_str = (bmf::ARGV.end() == bmf::ARGV.find("itog") ? "" : "." +bmf::ARGV.at("itog")); false){ mpre("ОШИБКА формирования итога в консоли", __LINE__);
@@ -1564,10 +1564,13 @@ int main(int argc, char **argv){
 							}else if(string list = (_stairs.end() == _stairs.find("list") ? "" : _stairs.at("list")); list.empty()){ err("Выборка списка");
 							}else if(TMs dano = bmf::Choice(list, key, DANO, DANO_BITMAP); dano.empty()){ err("Выбор исходного значения");
 							}else if(TMs _index = {{"group", ""}, {"itog_values_id", itog.at("itog_values_id")}, {"dano_id", dano.at("id")}, {"itog_id", itog.at("id")}, {"index_id", ""}, {"bmf-index", ""}}; _index.empty()){ mpre("ОШИБКА формирования свойст нового морфа", __LINE__);
-							}else if(TMs index = bmf::Up(bmf::INDEX, {{"id", _index_id}}, _index, _index, __LINE__); index.empty()){ mpre("ОШИБКА добавления корневого морфа в базу", __LINE__);
+							}else if(TMs index = [&](TMs index = {}){ // Добавление нового морфа
+								if(index = bmf::Up(bmf::INDEX, {{"id", _index_id}}, {}, {}, __LINE__); !index.empty()){ //mpre("Уже в базе", __LINE__);
+								}else if(index = bmf::Up(bmf::INDEX, {{"id", _index_id}}, _index, {}, __LINE__); index.empty()){ //err("Добавления морфа в базу");
+								}else if(!++err){ err("Инкремент обучения");
+								}return index; }(); index.empty()){ mpre("Морф уже в базе", __LINE__);
 							}else if(BMF_INDEX.insert(make_pair(index.at("id"), index)); BMF_INDEX.empty()){ err("Добавление в справочник");
 							}else if(_stairs = {}; false){ err("Обнуление направления обучения");
-							}else if(!++err){ err("Инкремент обучения");
 							}else{ //mpre("Добавляем новый морф _index_id=" +_index_id ,__LINE__);
 							}return false; }()){ err("Обучение");
 						}else if([&](){ // Изменение размера лестницы

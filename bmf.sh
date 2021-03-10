@@ -3,9 +3,9 @@
 #sudo apt install libsqlite3-dev
 #sudo apt install libdb5.3-stl-dev
 #sudo apt install libdb5.3++-dev
-#sudo apt install libmariadbd-dev
 #sudo apt install libhiredis-dev
 #sudo apt install libacl1-dev
+#sudo apt install libmariadbd-dev
 
 #cat clump/dva.json | ./bimorph mysql://localhost/dva -c -
 #./bimorph mysql://localhost/dva ds=f43e8e4b2864a93704048a1eaef6c374 epoch=1000 learn
