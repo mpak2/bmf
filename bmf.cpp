@@ -213,7 +213,7 @@ int main(int argc, char **argv){
 			}return in; }(); false){ mpre("ОШИБКА получения входного потока", __LINE__);
 		}else{ //mpre(bmf::ARGV, "Список параметров", __LINE__);
 		}return in; }(); false){ mpre("ОШИБКА параметры консоли не заданы", __LINE__);
-	}else if([&](bool skip = true){ // Остановки из консоли
+	}else if([&](bool skip = false){ // Остановки из консоли
 		if([&](bool skip = false){ // Версия программы
 			if(bmf::ARGV.end() == bmf::ARGV.find("-v")){ //mpre("Пропускаем отображение версии", __LINE__);
 			}else if(skip = !skip; false){ mpre("Условия выхода", __LINE__);
@@ -222,18 +222,15 @@ int main(int argc, char **argv){
 				std::cout << "Copyright (C) 2021 биморф.рф" << endl;
 				std::cout << "Нет НИКАКИХ ГАРАНТИЙ до степени, разрешённой законом." << endl << endl;
 				std::cout << "Лицензия freemium https://ru.wikipedia.org/wiki/Freemium" << endl;
-				std::cout << "Данная версия является условной бесплатной с граничением сети в "+ to_string(bmf::size_max)+ " связей" << endl;
+				std::cout << "Данная версия является условной бесплатной с некоторыми граничениями" << endl;
 				std::cout << "Морф — наименьшая осмысленная единица языка (логики)" << endl << endl;
 
 				std::cout << "Авторы программы -- Кривошлыков Евгений Павлович +79618063797" << endl << endl;
 			}return skip; }()){ exit(mpre("Информация о версии", __LINE__));
-		}else if([&](){ // Отображение атрибутов командной строки
-			if(bmf::ARGV.end() == bmf::ARGV.find("-a")){ return false; //mpre("Пропускаем отображение версии", __LINE__);
-			}else{ mpre(bmf::ARGV, __LINE__, "Атрибуты командной строки");
-			} return true; }()){ mpre("Атрибуты параметров командной строки", __LINE__);
 		}else if([&](){ // Раздел помощи
 			if(bmf::ARGV.end() == bmf::ARGV.find("-h")){ return false; //mpre("Пропускаем раздел помощи", __LINE__);
 			}else if(string file = (1 <= argc ? argv[0] : "./bimorph"); (0 >= file.length())){ mpre("ОШИБКА получения имени файла", __LINE__);
+			}else if(skip = !skip; false){ mpre("Условие выхода", __LINE__);
 			}else{ std::cout << endl;
 				std::cout << "Использование: "+ file+ " [КЛЮЧИ]… [SQLITE ФАЙЛ]… [КЛЮЧИ]…" << endl;
 				std::cout << "epoch		количество эпох выполнения при полном совпадении процесс обучения останавливается" << endl;
@@ -251,11 +248,13 @@ int main(int argc, char **argv){
 				std::cout << "Пример обучения набора данных $ "+ file+ " iris ds=1 epoch=10" << endl;
 				std::cout << "Пример расчета $"+ file+ " iris dano=[{\"dano\":{\"Параметр_0\":\"0\",\"Параметр_1\":\"1\"}}]" << endl << endl;
 
-				std::cout << "Оперативная справка: http://биморф.рф/" << endl;
-				std::cout << "Об ошибках в переводе сообщений «биморф» сообщайте по адресу: <bimorph@mpak.su>" << endl;
-				std::cout << "Полная документация: http://биморф.рф/" << endl << endl;
+				std::cout << "Об ошибках «биморф» сообщайте по адресу: <bimorph@mpak.su>" << endl;
+				std::cout << "Дополнительная инморфация: http://биморф.рф/" << endl << endl;
 			} return true; return false; }()){ mpre("Раздел помощи", __LINE__);
-		}else if(skip = !skip; false){ mpre("Условие выхода", __LINE__);
+		}else if([&](){ // Отображение атрибутов командной строки
+			if(bmf::ARGV.end() == bmf::ARGV.find("-a")){ return false; //mpre("Пропускаем отображение версии", __LINE__);
+			}else{ mpre(bmf::ARGV, __LINE__, "Атрибуты командной строки");
+			} return true; }()){ mpre("Атрибуты параметров командной строки", __LINE__);
 		}else{
 		}return skip; }()){ exit(mpre("Остановка выполнения", __LINE__));
 	}else if([&](){ // Подключение БД
