@@ -62,6 +62,8 @@
 //	#define CL_USE_DEPRECATED_OPENCL_2_0_APIS
 //#include "CL/cl2.hpp"
 
+#include "version.txt"
+
 #define pre(x) if(x){ printf("%d.%s\n", __LINE__, x); }
 #define err(x) if(x){ printf("%d.\x1b[37;41m ОШИБКА \x1b[0m %s\n", __LINE__, x); exit(1); }
 
@@ -69,6 +71,7 @@
 
 using namespace std; //setlocale(LC_ALL, "ru_RU");
 namespace fs = std::experimental::filesystem;
+
 
 struct comp{ bool operator()(const std::string& lhs, const std::string& rhs) const{ size_t ls = lhs.size(); size_t rs = rhs.size(); return std::tie(ls, lhs) > std::tie(rs, rhs); }};
 
@@ -215,7 +218,7 @@ int main(int argc, char **argv){
 			if(bmf::ARGV.end() == bmf::ARGV.find("-v")){ //mpre("Пропускаем отображение версии", __LINE__);
 			}else if(skip = !skip; false){ mpre("Условия выхода", __LINE__);
 			}else{ std::cout << endl;
-				std::cout << "bimorph v10.1" << endl;
+				std::cout << "bimorph " << version << endl;
 				std::cout << "Copyright (C) 2021 биморф.рф" << endl;
 				std::cout << "Нет НИКАКИХ ГАРАНТИЙ до степени, разрешённой законом." << endl << endl;
 				std::cout << "Лицензия freemium https://ru.wikipedia.org/wiki/Freemium" << endl;
@@ -223,7 +226,7 @@ int main(int argc, char **argv){
 				std::cout << "Морф — наименьшая осмысленная единица языка (логики)" << endl << endl;
 
 				std::cout << "Авторы программы -- Кривошлыков Евгений Павлович +79618063797" << endl << endl;
-			}return skip; }()){ mpre("Информация о версии", __LINE__);
+			}return skip; }()){ exit(mpre("Информация о версии", __LINE__));
 		}else if([&](){ // Отображение атрибутов командной строки
 			if(bmf::ARGV.end() == bmf::ARGV.find("-a")){ return false; //mpre("Пропускаем отображение версии", __LINE__);
 			}else{ mpre(bmf::ARGV, __LINE__, "Атрибуты командной строки");
