@@ -1391,21 +1391,11 @@ int main(int argc, char **argv){
 				}else{ mpre("==========", __LINE__); mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Обновление модели " +to_string(_BMF_INDEX.size()) +" size=" +to_string(BMF_INDEX.size()) +" ", __LINE__);
 				}return false; }()){ err("Обновление модели");
 			}else if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени", __LINE__);
-			/*}else if(TMMs INDEX_SHIFT = [&](TMMs INDEX_SHIFT = {}){ // Выборка изменений
-				if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени", __LINE__);
-				}else if(INDEX_SHIFT = bmf::Shift({{"dataset_id", bmf::dataset.at("id")}, {"key", to_string(key)}}, __LINE__); false){ err("Выборка изменений модели");
-				}else if(bmf::ARGV.end() == bmf::ARGV.find("-microtime")){ //mpre("Не отображаем время обучения", __LINE__);
-				}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Список изменений size=" +to_string(INDEX_SHIFT.size()) +" ", __LINE__);
-				}return INDEX_SHIFT; }(); false){ err("Выборка изменений");
-			}else if(TMMs INDEX_GROUP = [&](TMMs INDEX_GROUP = {}){ // Значения групп
-				if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени", __LINE__);
-				}else if(INDEX_GROUP = bmf::Group({{"dataset_id", bmf::dataset.at("id")}, {"key", to_string(key)}}, __LINE__); false){ err("Выборка списка значений");
-				}return INDEX_GROUP; }(); false){ err("Значения групп");*/
 			}else if([&](){ // Расчет модели
 				if(false){ mpre("Пропуск расчета модели" ,__LINE__);
-				}else if([&](){ for(auto bmf_index_itr:BMF_INDEX){ // Расчет модели
-					if(false){ mpre("Пропуск расчетов модели" ,__LINE__);
-					}else{ mpre(bmf_index_itr.second, "Расчет модели" ,__LINE__);
+				}else if([&](){ for(auto index_itr:BMF_INDEX){ // Расчет модели
+					if(TMs index = index_itr.second; index.empty()){ mpre("Выборка морфа", __LINE__);
+					}else{ mpre(index, "Расчет модели" ,__LINE__);
 					}}return false; }()){ err("Расчет модели");
 				}else{ mpre("Расчет модели" ,__LINE__);
 				}return false; }()){ err("ОШИБКА расчета модели");

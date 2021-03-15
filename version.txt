@@ -1,1 +1,1 @@
-std::string version = "12.0a";
+std::string version = "v12.0b-2-gdda75b2";
