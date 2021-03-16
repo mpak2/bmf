@@ -5,6 +5,7 @@
 clear
 echo "=== Сборка bmf ==="
 echo "std::string version = \"`git describe --tags`\";" > version.txt
+cat version.txt
 gcc bmf.cpp -O0 -lstdc++ -Wreturn-local-addr -lsqlite3 -std=c++17 -lstdc++fs -lm -lpthread -ldb_stl -lmariadb -lhiredis -o bimorph && bash bmf.sh
 #gcc inc/mariadb.cpp -O0 -lstdc++ -Wreturn-local-addr -std=c++17 -lstdc++fs -lm -lpthread -lmariadb -o inc/mariadb && ./inc/mariadb
 #for n in {1..10}; do echo "123"; done;
