@@ -10,20 +10,31 @@ int mpre(string mess, int line, string comment = ""){
 }
 
 int mpre(TMs row, int line, string comment = "", string prefix = "", string key = ""){
-	if(string num = [&](string num = ""){ // Получение ключа
-			if("" != key){ num = key;
-			}else if(row.end() != row.find("id")){ num = row["id"];
-			}else{ //mpre("Ни ключ ни идентификатор не задан", __LINE__);
-			} return num;
-		}(); false){ //mpre("ОШИБКА получения ключа", __LINE__);
-	}else{
-		std::cerr << prefix << num << " => " << "( // __" << to_string(line) << "__ " << comment << "\n";
+	if(string id = [&](string id = ""){ // Получение ключа
+		if("" != key){ id = key;
+		}else if(row.end() != row.find("id")){ id = row["id"];
+		}else{ //mpre("Ни ключ ни идентификатор не задан", __LINE__);
+		}return id; }(); false){ //mpre("ОШИБКА получения ключа", __LINE__);
+	/*}else if([&](){ // Замена ОШИБКА в уведомлении
+			if(string str = "ОШИБКА"; str.empty()){ err("Часто уведомления которое выделяем");
+			}else if(string str_to = "[37;41m ОШИБКА \x1b[0m"; str_to.empty()){ err("Сообщение на которое заменяем");
+			}else if(auto npos = comment.find_first_of(str); string::npos == npos){ mpre("Сообщение не найдено", __LINE__);
+			//}else if(comment.replace(npos, str.length(), str); false){ mpre("Не получилось заменить" ,__LINE__);
+			}else{ //mpre("Замена", __LINE__);
+			}return false;
+		}()){*/
+	}else if([&](){ // [37;41m ОШИБКА \x1b[0m
+		std::cerr << prefix << id << " => " << "( // __" << to_string(line) << "__ " << comment << "\n";
 		for(TMs::iterator itr = row.begin(); itr != row.end(); itr++){
 			string field = (string) itr->first;
 			string val = (string) itr->second;
 			std::cerr << prefix << "\t[" << field << "]=>" << val << "," << endl;
-		}; std::cerr << prefix << ")\n";
-	} return 1;
+		}; std::cerr << prefix << ")\n"; return false; }()){ err("Вывод массива");
+	}else if(int npos = comment.find("ОШИБКА"); (-1 == npos)){ //mpre("Вхождение ключевого слова", __LINE__);
+	}else if(std::cerr << line << ".^^^ Критическое сообщение ^^^ Остановка выполнения программы" << std::endl; false){ mpre("ОШИБКА отображения информации об ошибке", __LINE__);
+	}else if(int response = system("sleep 1"); true){ exit(mpre("Остановка выполнения программы", __LINE__));
+	}else{
+	}return 1;
 } int mpre(TMs row, string comment, int line){
 	return mpre(row, line, comment);
 }
