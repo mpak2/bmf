@@ -13,8 +13,12 @@
 #cat clump/tri.json | ./bimorph mysql://localhost/tri -c -
 #./bimorph mysql://localhost/tri ds=94ef291de9259a47fc7c957db4979fb8 epoch=100 learn
 
-cat clump/iris.json | ./bimorph mysql://localhost/iris -c - # ?cache=shared
-./bimorph mysql://localhost/iris ds=495e7de50abef9a66166cc5ea4b6927e epoch=100 learn #-microtime # ?cache=shared
+./bimorph mysql://localhost/iris -c
+cat clump/iris_1.json | ./bimorph mysql://localhost/iris - # ?cache=shared
+cat clump/iris_2.json | ./bimorph mysql://localhost/iris - # ?cache=shared
+cat clump/iris_3.json | ./bimorph mysql://localhost/iris - # ?cache=shared
+#./bimorph mysql://localhost/iris ds=fc8c9622e85a712e109eb6993bdfff95 epoch=100 learn #-microtime # ?cache=shared
+#./bimorph mysql://localhost/iris ds=425146b12b837f025e1f7ebdd78b8561 epoch=100 learn #-microtime # ?cache=shared
 
 #	#sqlite3 clump/iris -column -header "SELECT MAX(depth) FROM mp_bmf_index"
 #./bimorph clump/iris -dano '[{"dano":{"ДлиннаЧашелистика":"2.0","ШиринаЧашелистика":"4.0","ДлиннаЛепестка":"1.8","ШиринаЛепестка":"1.8"}}]'
