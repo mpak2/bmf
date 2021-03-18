@@ -485,7 +485,7 @@ int main(int argc, char **argv){
 						}else{ //mpre("Список полей значений " +insert_itr.first +" => " +insert_itr.second, __LINE__);
 						}}return "(" +fields +") VALUES (" +values +")" /*+" ON DUPLICATE KEY UPDATE " +duplicate*/; }(); VALUES.empty()){ err("Получение пар полей значений запроса");
 					}else if(std::string sql = "INSERT INTO `" +ROWS +"` " +VALUES +";"; sql.empty()){ err("Запрос на добавление");
-					}else if(mysql_query(bmf::mysql, sql.c_str())){ mpre("Запрос таблица " +ROWS +" line=" +to_string(line) +" " +sql +"\n" +string(mysql_error(bmf::mysql)), __LINE__); err("Результат выполнения запроса");
+					}else if(mysql_query(bmf::mysql, sql.c_str())){ mpre("Запрос таблица " +ROWS +" line=" +to_string(line) +" " +sql +"\n" +string(mysql_error(bmf::mysql)), __LINE__); //err("Результат выполнения запроса");
 					}else if(std::string id = to_string(mysql_insert_id(bmf::mysql)); id.empty()){ err("Идентификатор новой записи");
 					}else if(insert.insert(make_pair("id", id)); insert.empty()){ err("Установка идентификатора");
 					//}else if((_row = insert).empty()){ mpre("ОШИБКА Обновленное значение", __LINE__);
@@ -1390,7 +1390,8 @@ int main(int argc, char **argv){
 				}return false; }()){ err("Обновление модели");
 			//}else if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени", __LINE__);
 			}else if([&](TMMs _BMF_INDEX = {}, TMMs INDEX = {}, TMMs _INDEX = {}){ //Список изменений
-				if(string sql = "SELECT i.* FROM `index` AS i LEFT JOIN `index_vals` AS iv ON i.id=iv.index_md5 AND iv.`dataset_id`='" +bmf::dataset.at("id") +"' AND iv.key=" +to_string(key) +" WHERE iv.id IS NULL;"; sql.empty()){ err("Запрос на выборку изменений");
+				if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени", __LINE__);
+				}else if(string sql = "SELECT i.* FROM `index` AS i LEFT JOIN `index_vals` AS iv ON i.id=iv.index_md5 AND iv.`dataset_id`='" +bmf::dataset.at("id") +"' AND iv.key=" +to_string(key) +" WHERE iv.id IS NULL;"; sql.empty()){ err("Запрос на выборку изменений");
 				//}else if(mpre("Выборка морфов " +sql ,__LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
 				}else if(_BMF_INDEX = bmf::List_mysql("index" ,{} ,sql ,__LINE__); _BMF_INDEX.empty()){ //mpre("Список изменений пуст" ,__LINE__);
 				}else if([&](){ for(auto index_itr:_BMF_INDEX){ // Полный список изменений
@@ -1429,10 +1430,9 @@ int main(int argc, char **argv){
 						}}return false; }()){ err("Список родителей морфа");
 					}else{ //mpre(index ,"Изменившийся морф" ,__LINE__);
 					}}return false; }(); INDEX.empty()){ err("Составление списк изменений");
-				//}else if(mpre(INDEX, "Список морфов" ,__LINE__); false){ err("Уведомление");
-				//}else if(mpre(_INDEX, "Список значений" ,__LINE__); false){ err("Уведомление");
 				}else if([&](){ // Выборка списка расчитанных ранее групп
-					if(TMMs _BMF_INDEX_VALS = [&]( TMMs _BMF_INDEX_VALS = {}){ // Расчетные значения
+					if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени", __LINE__);
+					}else if(TMMs _BMF_INDEX_VALS = [&]( TMMs _BMF_INDEX_VALS = {}){ // Расчетные значения
 						if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени", __LINE__);
 						}else if(string in = [&](string in = ""){ for(auto index_itr:_INDEX){ // Список id через запятую
 							if(TMs index = index_itr.second; index.empty()){ err("Список всех родных");
