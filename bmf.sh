@@ -18,7 +18,7 @@
 #cat clump/iris_2.json | ./bimorph mysql://localhost/iris - # ?cache=shared
 #cat clump/iris_3.json | ./bimorph mysql://localhost/iris - # ?cache=shared
 cat clump/iris.json | ./bimorph mysql://localhost/iris - # ?cache=shared
-./bimorph mysql://localhost/iris ds=495e7de50abef9a66166cc5ea4b6927e epoch=100 learn #-microtime # ?cache=shared
+./bimorph mysql://localhost/iris ds=495e7de50abef9a66166cc5ea4b6927e epoch=100 learn -microtime # ?cache=shared
 #./bimorph mysql://localhost/iris ds=425146b12b837f025e1f7ebdd78b8561 epoch=100 learn #-microtime # ?cache=shared
 
 #	#sqlite3 clump/iris -column -header "SELECT MAX(depth) FROM mp_bmf_index"
