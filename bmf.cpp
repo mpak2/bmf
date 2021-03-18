@@ -477,11 +477,13 @@ int main(int argc, char **argv){
 					}return (insert == _row); }()){ mpre("Значения при обновлении совпали", __LINE__);
 				//}else if(auto [itr, ret] = ROWS->insert(make_pair(insert["id"], insert)); !ret){ mpre("ОШИБКА добавления значения в базу", __LINE__);a
 				}else if(_row = [&](){ // Добавление значения
-					if(std::string VALUES = [&](std::string VALUES = "", std::string fields = "", std::string values = ""){ for(auto insert_itr:insert){
-						if(fields += std::string(fields.empty() ? "" : " ,") +"`" +insert_itr.first +"`"; fields.empty()){ err("Поле значения");
-						}else if(values += std::string(values.empty() ? "" : " ,") +"'" +insert_itr.second +"'"; values.empty()){ err("Значение");
+					if(std::string VALUES = [&](string VALUES = "", string fields = "", string values = "", string duplicate = ""){ for(auto insert_itr:insert){
+						if(fields += string(fields.empty() ? "" : " ,") +"`" +insert_itr.first +"`"; fields.empty()){ err("Поле значения");
+						}else if(values += string(values.empty() ? "" : " ,") +"'" +insert_itr.second +"'"; values.empty()){ err("Значение");
+						//}else if("id" == insert_itr.first){ //mpre("Не дублируем идентификатор" ,__LINE__);
+						//}else if(duplicate += string(duplicate.empty() ? "" : " ,") + "`" +insert_itr.first +"` = VALUES(`" +insert_itr.first +"`)"; duplicate.empty()){ err("Установка дубликата");
 						}else{ //mpre("Список полей значений " +insert_itr.first +" => " +insert_itr.second, __LINE__);
-						}}return "(" +fields +") VALUES (" +values +")"; }(); VALUES.empty()){ err("Получение пар полей значений запроса");
+						}}return "(" +fields +") VALUES (" +values +")" /*+" ON DUPLICATE KEY UPDATE " +duplicate*/; }(); VALUES.empty()){ err("Получение пар полей значений запроса");
 					}else if(std::string sql = "INSERT INTO `" +ROWS +"` " +VALUES +";"; sql.empty()){ err("Запрос на добавление");
 					}else if(mysql_query(bmf::mysql, sql.c_str())){ mpre("Запрос таблица " +ROWS +" line=" +to_string(line) +" " +sql +"\n" +string(mysql_error(bmf::mysql)), __LINE__); err("Результат выполнения запроса");
 					}else if(std::string id = to_string(mysql_insert_id(bmf::mysql)); id.empty()){ err("Идентификатор новой записи");
@@ -1602,6 +1604,7 @@ int main(int argc, char **argv){
 					}return calc; }(); 1 != calc.length()){ err("Расширение модели");
 				}else if([&](){ // Расширение модели
 					if(calc == learn){ //mpre("Расчетные и обучающие значения совпадают", __LINE__);
+					}else if(bmf::ARGV.end() == bmf::ARGV.find("learn")){ //mpre("Пропускаем обучение" ,__LINE__);
 					}else if(string grow_md5 = (index_vals.end() == index_vals.find("grow_md5") ? "" : index_vals.at("grow_md5")); grow_md5.empty()){ err("Идентификатор расширения");
 					}else if(TMs index_grow = bmf::Up("index" ,{{"id", grow_md5}} ,{} ,{} ,__LINE__); index_grow.empty()){ err("Расширяемый морф");
 					}else if(TMs where = {{"dataset_id", bmf::dataset.at("id")} ,{"index_md5", grow_md5}, {"key", to_string(key)}}; where.empty()){ err("Условие выборки");
@@ -1630,15 +1633,6 @@ int main(int argc, char **argv){
 					}else if(TMs _index = {{"itog_values_id", index_grow.at("itog_values_id")}, {"addr", index_id_grow}, {"dano_id", dano_grow.at("id")}, {"itog_id", index_grow.at("itog_id")}}; _index.empty()){ mpre("ОШИБКА формирования свойст нового морфа", __LINE__);
 					}else if(_index = bmf::Up("index", {{"id", md5(index_id_grow)}}, _index, {}, __LINE__); _index.empty()){ mpre("ОШИБКА добавления корневого морфа в базу", __LINE__);
 					}else if(!(err += 1)){ err("Инкримент изменений");
-					//}else if(mpre(BMF_INDEX ,"Список морфов" ,__LINE__); false){ err("Уведомление");
-					/*}else if(mpre("Расчетные значения learn=" +learn +" calc=" +calc +" " ,__LINE__); false){ err("Уведомление");
-					}else if([&](){ for(auto dano_itr:DANO){ // Список значений
-						if(TMs dano = dano_itr.second; dano.empty()){ err("Выюлока исходника");
-						}else if(string dano_id = (dano.end() == dano.find("id") ? "" : dano.at("id")); dano_id.empty()){ err("Идентификатор исходника");
-						}else if(DANO_BITMAP.end() == DANO_BITMAP.find(dano_id)){ err("Не найдено значение исходника");
-						}else if(string val = (DANO_BITMAP.at(dano_id).test(key) ? "1" : "0"); val.empty()){ err("Выборка значения исходника");
-						}else{ mpre("Исходник " +dano.at("id") +" val=" +val,__LINE__);
-						}}return false; }()){ err("Список значений");*/
 					}else{ //mpre(_index ,"Расширение index_id_grow=" +index_id_grow ,__LINE__); //mpre(index_vals_grow, "Значение рашисряемого морфа" ,__LINE__);
 					}return false; }()){ err("Расширение");
 				}else if([&](){ // Сохранение результата в индекс
