@@ -683,7 +683,7 @@ int main(int argc, char **argv){
 					}else{ //mpre("Обновленный элемент списка " +ROW.at("id"), __LINE__);
 					}}return false; }()){ err("ОШИБКА перебора значений");
 				}else if([&](){ // Информация о запроса
-					if(bmf::ARGV.end() == bmf::ARGV.find("-microtime")){ //mpre("Не отображаем время обучения", __LINE__);
+					if(bmf::ARGV.end() == bmf::ARGV.find("verbose")){ //mpre("Не отображаем время обучения", __LINE__);
 					}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Выборка значений групп size=" +to_string(LIST.size()), __LINE__);
 					}return false; }()){ err("Вывод инморфации о запросе");
 				}else if(mysql_free_result(result); false){ err("Очистка ресурсов");
@@ -1007,7 +1007,7 @@ int main(int argc, char **argv){
 				}else if(_dano = dano_itr->second; _dano.empty()){ mpre("ОШИБКА выборки оставшегося значения", __LINE__);
 				}else{ //mpre(_dano, "Оставшееся значение", __LINE__);
 				}return _dano; }(); _dano.empty()){ mpre("ОШИБКА выборки оставшегося значения", __LINE__);
-			}else if(bmf::ARGV.end() == bmf::ARGV.find("-microtime")){ //mpre("Не отображаем время обновления группы", __LINE__);
+			}else if(bmf::ARGV.end() == bmf::ARGV.find("verbose")){ //mpre("Не отображаем время обновления группы", __LINE__);
 			}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Выбор подходящей связи size=" +to_string(_DANO.size()) +" list.length()=" +to_string(list.length()) +" ", __LINE__); //mpre("Сохрание значения INDEX_GROUP[" +group +"][" +to_string(key) +"]=" +GROUP.at(group).at(group), __LINE__); //mpre("Обновление " +sql, __LINE__);
 			}return _dano; }); false){ mpre("ОШИБКА установки функции выбора Исходного значения", __LINE__);
 		}else if(bmf::Vals = ([&](TMs VALUE, string alias, int key, std::string table, std::string BMF_VALUES, std::string BMF_TITLES){ // Установка входных значений
@@ -1317,7 +1317,7 @@ int main(int argc, char **argv){
 	}else if(TMMs BMF_INDEX /*= [&](TMMs BMF_INDEX = {}){ // Справочник морфов
 		if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени", __LINE__);
 		}else if(BMF_INDEX = bmf::List(bmf::INDEX, {}, __LINE__); false){ err("ОШИБКА выборки списка морфов");
-		}else if(bmf::ARGV.end() == bmf::ARGV.find("-microtime")){ //mpre("Не отображаем время обучения", __LINE__);
+		}else if(bmf::ARGV.end() == bmf::ARGV.find("verbose")){ //mpre("Не отображаем время обучения", __LINE__);
 		}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Выборка модели размер " +to_string(BMF_INDEX.size()), __LINE__);
 		}return BMF_INDEX; }()*/; false){ err("Выборка данных");
 	}else if(int errors = [&](int errors = 0, bool pass = false){ do{ // Итерации обучения
@@ -1345,11 +1345,11 @@ int main(int argc, char **argv){
 				}else if(TMs dataset_map = bmf::Up(bmf::DATASET_MAP, {{"id", dataset_map_id}}, {}, {{"dataset_id", bmf::dataset.at("id")}, {"alias", alias}}, __LINE__); false){ mpre("Выборка карты итога " +dataset_map_id, __LINE__); err("Выборка карты исходника");
 				}else{ mpre("Обновление алиаса " +alias +" " +dataset_map_id, __LINE__);
 				}return false; }()){ err("Обновление алиаса");
-			}else if(bmf::ARGV.end() == bmf::ARGV.find("-microtime")){ //mpre("Не отображаем время обучения", __LINE__);
+			}else if(bmf::ARGV.end() == bmf::ARGV.find("verbose")){ //mpre("Не отображаем время обучения", __LINE__);
 			}else{ //mpre("Исходные сигналы dano_id=" +dano.at("id"), __LINE__);
 			}}return DANO_BITMAP; }(bmf::List(bmf::DATASET_MAP, {{"dataset_id", bmf::dataset.at("id")}, {"alias", "dano"}}, __LINE__)); DANO_BITMAP.empty()){ err("Список карт исходников");
 		}else if([&](){ // Отображение времени загрузки исходных сигналов
-			if(bmf::ARGV.end() == bmf::ARGV.find("-microtime")){ //mpre("Не отображаем время обучения", __LINE__);
+			if(bmf::ARGV.end() == bmf::ARGV.find("verbose")){ //mpre("Не отображаем время обучения", __LINE__);
 			}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Загрузка исходных сигналов size=" +to_string(DANO_BITMAP.size()), __LINE__);
 			}return false; }()){ err("Время расчета");
 		}else if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени", __LINE__);
@@ -1371,11 +1371,11 @@ int main(int argc, char **argv){
 				}else if(TMs dataset_map = bmf::Up(bmf::DATASET_MAP, {{"id", dataset_map_id}}, {}, {{"dataset_id", bmf::dataset.at("id")}, {"alias", alias}}, __LINE__); false){ mpre("Выборка карты итога " +dataset_map_id, __LINE__); err("Выборка карты исходника");
 				}else{ mpre("Обновление алиаса " +alias +" " +dataset_map_id, __LINE__);
 				}return false; }()){ err("Обновление алиаса");
-			}else if(bmf::ARGV.end() == bmf::ARGV.find("-microtime")){ //mpre("Не отображаем время обучения", __LINE__);
+			}else if(bmf::ARGV.end() == bmf::ARGV.find("verbose")){ //mpre("Не отображаем время обучения", __LINE__);
 			}else{ //mpre("Итоговые сигналы dano_id=" +dano.at("id"), __LINE__);
 			}}return ITOG_BITMAP; }(bmf::List(bmf::DATASET_MAP, {{"dataset_id", bmf::dataset.at("id")}, {"alias", "itog"}}, __LINE__)); ITOG_BITMAP.empty()){ err("Список карт исходников");
 		}else if([&](){ // Отображение времени загрузки итоговых сигналов
-			if(bmf::ARGV.end() == bmf::ARGV.find("-microtime")){ //mpre("Не отображаем время обучения", __LINE__);
+			if(bmf::ARGV.end() == bmf::ARGV.find("verbose")){ //mpre("Не отображаем время обучения", __LINE__);
 			}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Загрузка итоговых сигналов size=" +to_string(ITOG_BITMAP.size()), __LINE__);
 			}return false; }()){ err("Время расчета");
 		}else if(int key = [&](int key = 0){ // Позиция обучения
@@ -1416,7 +1416,7 @@ int main(int argc, char **argv){
 					}else if(BMF_INDEX.insert(make_pair(index.at("addr"), index)); BMF_INDEX.empty()){ err("Обновление справочника");
 					}else{ //mpre(_BMF_INDEX ,"Обновление струкруты групп", __LINE__);
 					}}return false; }()){ err("Обновление структуры групп и списка морфов");
-				}else if(bmf::ARGV.end() == bmf::ARGV.find("-microtime")){ //mpre("Не отображаем время обучения", __LINE__);
+				}else if(bmf::ARGV.end() == bmf::ARGV.find("verbose")){ //mpre("Не отображаем время обучения", __LINE__);
 				}else{ mpre("", __LINE__); mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Обновление модели " +to_string(_BMF_INDEX.size()) +" size=" +to_string(BMF_INDEX.size()) +" ", __LINE__);
 				}return false; }()){ err("Обновление модели");
 			//}else if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени", __LINE__);
@@ -1455,8 +1455,8 @@ int main(int argc, char **argv){
 						}else if(string sql = "SELECT * ,index_md5 AS id ,id as uid FROM `" +table_vals +"` WHERE `dataset_id`='" +bmf::dataset.at("id") +"' AND `key`=" +to_string(key) +" AND parent IN(" +in +");"; sql.empty()){ err("Запрос на выборку значений");
 						//}else if(mpre("Выборка значений " +sql, __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);	
 						}else if(_BMF_INDEX_VALS = bmf::List_mysql(table_vals ,{} ,sql ,__LINE__); false){ mpre("Список значений пуст sql=" +sql ,__LINE__);
-						}else if(bmf::ARGV.end() == bmf::ARGV.find("-microtime")){ //mpre("Не отображаем время обучения", __LINE__);
-						}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Выборка значений " +sql +" " +to_string(_BMF_INDEX_VALS.size()) +" INDEX.size()=" +to_string(INDEX.size()), __LINE__);
+						}else if(int verbose = atoi(bmf::ARGV.end() == bmf::ARGV.find("verbose") ? "" : bmf::ARGV.at("verbose").c_str()); bmf::ARGV.end() == bmf::ARGV.find("verbose")){ //mpre("Не отображаем время обучения", __LINE__);
+						}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Выборка значений " +(verbose ? sql : "") +" " +to_string(_BMF_INDEX_VALS.size()) +" INDEX.size()=" +to_string(INDEX.size()), __LINE__);
 						}return _BMF_INDEX_VALS; }(); false){ err("Расчетные значения");
 					}else if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени", __LINE__);
 					}else if(TMMs UPDATE = [&](TMMs UPDATE = {}){ for(auto index_itr:INDEX){ // Расчет значений модели
@@ -1543,7 +1543,7 @@ int main(int argc, char **argv){
 						}else{ //mpre("Окончение расчета модели key=" +to_string(key) ,__LINE__);
 						}}return UPDATE; }(); false){ err("Расчет модели");
 					}else if([&](){ // Уведомление о времени расчета модели
-						if(bmf::ARGV.end() == bmf::ARGV.find("-microtime")){ //mpre("Не отображаем время обучения", __LINE__);
+						if(bmf::ARGV.end() == bmf::ARGV.find("verbose")){ //mpre("Не отображаем время обучения", __LINE__);
 						}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Расчет модели " +to_string(INDEX.size()) +" ", __LINE__);
 						}return false; }()){ err("Уведомление");
 					}else if([&](){ // Сохранение значений
@@ -1558,11 +1558,11 @@ int main(int argc, char **argv){
 						}else if(string sql = "INSERT INTO `" +table_vals +"` (" +names +") VALUES " +VALUES +" ON DUPLICATE KEY UPDATE `grow_md5`=VALUES(grow_md5), `grp`=VALUES(grp);"; sql.empty()){ err("Начало запроса");
 						//}else if(mpre("Запрос\n" +sql ,__LINE__); false){ err("Уведомление");
 						}else if(mysql_query(bmf::mysql, sql.c_str())){ mpre("ОШИБКА " +string(mysql_error(bmf::mysql)), __LINE__);
-						}else if(bmf::ARGV.end() == bmf::ARGV.find("-microtime")){ //mpre("Не отображаем время обучения", __LINE__);
+						}else if(bmf::ARGV.end() == bmf::ARGV.find("verbose")){ //mpre("Не отображаем время обучения", __LINE__);
 						}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Сохранение модели UPDATE.size()=" +to_string(UPDATE.size()) +" ", __LINE__);
 						}return false; }()){ err("Сохранение значений");
 					}return false; }()){ err("Выборка всех нужных групп морфов");
-				//}else if(bmf::ARGV.end() == bmf::ARGV.find("-microtime")){ //mpre("Не отображаем время обучения", __LINE__);
+				//}else if(bmf::ARGV.end() == bmf::ARGV.find("verbose")){ //mpre("Не отображаем время обучения", __LINE__);
 				}else{ //mpre("==========", __LINE__); mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Расчет модели " +to_string(_BMF_INDEX.size()) +" size=" +to_string(BMF_INDEX.size()) +" ", __LINE__);
 				//}else{ //mpre(INDEX ,"Изменившиеся морфы" ,__LINE__); mpre(_BMF_INDEX_VALS ,"Список значений изменений " ,__LINE__);
 				}return false; }()){ err("Список изменений");
@@ -1649,7 +1649,7 @@ int main(int argc, char **argv){
 					}else if(_index = bmf::Up("index", {{"id", md5(index_id_grow)}}, _index, {}, __LINE__); _index.empty()){ mpre("ОШИБКА добавления корневого морфа в базу", __LINE__);
 					}else if(!(err += 1)){ err("Инкримент изменений");
 					//}else{ //mpre(_index ,"Расширение index_id_grow=" +index_id_grow ,__LINE__); //mpre(index_vals_grow, "Значение рашисряемого морфа" ,__LINE__);
-					}else if(bmf::ARGV.end() == bmf::ARGV.find("-microtime")){ //mpre("Не отображаем время обучения", __LINE__);
+					}else if(bmf::ARGV.end() == bmf::ARGV.find("verbose")){ //mpre("Не отображаем время обучения", __LINE__);
 					}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Расширение модели " +index_id_grow +" ", __LINE__);
 					}return false; }()){ err("Расширение");
 				}else if([&](){ // Сохранение результата в индекс
