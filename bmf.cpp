@@ -1442,6 +1442,10 @@ int main(int argc, char **argv){
 						}}return false; }()){ err("Список родителей морфа");
 					}else{ //mpre(index ,"Изменившийся морф" ,__LINE__);
 					}}return INDEX; }(); INDEX.empty()){ err("Составление списк изменений");
+				}else if([&](){ // Загрузка морфов
+					if(int verbose = atoi(bmf::ARGV.end() == bmf::ARGV.find("verbose") ? "" : bmf::ARGV.at("verbose").c_str()); bmf::ARGV.end() == bmf::ARGV.find("verbose")){ //mpre("Не отображаем время обучения", __LINE__);
+					}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Выборка обновлений морфов " +(verbose ? sql : "") +" INDEX.size()=" +to_string(INDEX.size()), __LINE__);
+					}return false; }()){ err("Уведомление о загрузке морфов");
 				}else if([&](){ // Выборка списка расчитанных ранее групп
 					//if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени", __LINE__);
 					if(TMMs _BMF_INDEX_VALS = [&]( TMMs _BMF_INDEX_VALS = {}){ // Расчетные значения
