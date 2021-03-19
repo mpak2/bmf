@@ -41,15 +41,15 @@
 //#include <unistd.h>
 //#include <termios.h> // Функции нажатий клавиш консоли
 //#include <curses.h>
-#include <curses.h>
+//#include <curses.h>
 #include <ncurses.h>
 #include <stdlib.h>
 //#include <unistd.h>
 //#include <termios.h>
 #include <memory>
 
-#include <db_cxx.h>
-#include <dbstl_map.h>
+//#include <db_cxx.h>
+//#include <dbstl_map.h>
 #include <pthread.h>
 #include <unistd.h>
 
@@ -81,7 +81,7 @@ typedef std::map<int, TMs> TMMi;
 typedef std::map<string, TMMi> TM3i;
 typedef std::map<string,boost::dynamic_bitset<>> TMMb;
 
-typedef dbstl::db_map<string, TMs> TMMt;
+//typedef dbstl::db_map<string, TMs> TMMt;
 //typedef std::map<std::string, TMMt*> TMMg;
 
 std::recursive_mutex mu;
@@ -132,8 +132,8 @@ namespace bmf{ // Глобальные переменные
 	int timestamp =  time(0); // Расчет выполнения участков кода
 	auto microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9;
 
-	DbEnv *env; //Окружение БД
-	TMMt *TEST; // Справочнк морфов
+//	DbEnv *env; //Окружение БД
+//	TMMt *TEST; // Справочнк морфов
 
 	std::string INDEX = "index"; // Справочнк морфов
 	std::string INDEX_GROUP = "index_group"; // Промежуточные значения
@@ -158,7 +158,7 @@ namespace bmf{ // Глобальные переменные
 	std::function<void(string,float,int)> Progress; // Отрисовка полосы выполнения
 	std::function<TMs(TMs&,std::string,int)> Maps; // Расчет карт результатов
 
-	std::function<Db*(string)> Open; // Список баз данных
+//	std::function<Db*(string)> Open; // Список баз данных
 	std::function<bool(int)> Close; // Закрытие соединения с БД
 	std::function<TMMs(TMs,string,int,string,string,string)> Vals; // Обучение
 	std::function<TMs(string,TMs,TMs,TMs,int)> Up; // Обучение
@@ -1310,7 +1310,7 @@ int main(int argc, char **argv){
 	}else if(int loop = [&](int loop = 0){ // Количетсво повторов
 		if(int epoch = (bmf::ARGV.end() == bmf::ARGV.find("epoch") ? 0 : atoi(bmf::ARGV.at("epoch").c_str())); (0 > epoch)){ mpre("ОШИБКА расчета количества эпох", __LINE__);
 		}else if(bmf::ARGV.end() == bmf::ARGV.find("epoch")){ //mpre("Для обучения укажите количество эпох epoch", __LINE__);
-		}else if(!epoch){ loop = 1; mpre("Указано нулевое количество эпох расчитываем до полного совпадения", __LINE__);
+		}else if(!epoch){ loop = 1; //mpre("Указано нулевое количество эпох расчитываем до полного совпадения", __LINE__);
 		}else if(loop = epoch){ //mpre("Набор данных -ds " +bmf::dataset.at("id")+ " количество эпох -epoch " +to_string(loop), __LINE__);
 		}else{ mpre("ОШИБКА расчтеа количества повторений", __LINE__);
 		}return loop; }(); false){ mpre("ОШИБКА расчета колчиества повторений", __LINE__);
@@ -1417,10 +1417,10 @@ int main(int argc, char **argv){
 					}else{ //mpre(_BMF_INDEX ,"Обновление струкруты групп", __LINE__);
 					}}return false; }()){ err("Обновление структуры групп и списка морфов");
 				}else if(bmf::ARGV.end() == bmf::ARGV.find("-microtime")){ //mpre("Не отображаем время обучения", __LINE__);
-				}else{ mpre("==========", __LINE__); mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Обновление модели " +to_string(_BMF_INDEX.size()) +" size=" +to_string(BMF_INDEX.size()) +" ", __LINE__);
+				}else{ mpre("", __LINE__); mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Обновление модели " +to_string(_BMF_INDEX.size()) +" size=" +to_string(BMF_INDEX.size()) +" ", __LINE__);
 				}return false; }()){ err("Обновление модели");
 			//}else if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени", __LINE__);
-			}else if(string table_vals = "index_vals_" +bmf::dataset.at("id") /*+ "_"+to_string(key)*/; table_vals.empty()){ err("ОШИБКА расчета имени таблицы");
+			}else if(string table_vals = "index_vals_" +bmf::dataset.at("id") + "_"+to_string(key); table_vals.empty()){ err("ОШИБКА расчета имени таблицы");
 			}else if(mysql_query(bmf::mysql, std::string("CREATE TABLE IF NOT EXISTS `" +table_vals +"` LIKE `index_vals`;").c_str())){ mpre("Вставка данных " +string(mysql_error(bmf::mysql)) ,__LINE__); 
 			}else if([&](TMMs _BMF_INDEX = {}){ //Список изменений
 				if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени", __LINE__);
@@ -1526,7 +1526,6 @@ int main(int argc, char **argv){
 							}else if(string uid = (index_vals.end() == index_vals.find("uid") ? "" : index_vals.at("uid")); uid.empty()){ err("Значение идентификатора записи");
 							}else if(index_vals.erase("uid"); false){ err("Удаление верменного поля идентификатора");
 							}else if(index_vals.erase("id"); false){ err("Удаление верменного поля идентификатора");
-							//}else if(index_vals = bmf::Up("index_vals", {{"id", uid}} ,{} ,index_vals ,__LINE__); index_vals.empty()){ err("Обновление значения");
 							}else if(UPDATE.insert(make_pair(uid, index_vals)); UPDATE.empty()){ err("Изменяемое значение");
 							}else if(_BMF_INDEX_VALS[index_vals.at("index_md5")] = index_vals; _BMF_INDEX_VALS.empty()){ err("Обновление значения в списке значений");
 							}else{ //mpre(index_vals ,"Сохранение значения в расчет " +addr ,__LINE__);
@@ -1535,11 +1534,10 @@ int main(int argc, char **argv){
 							if(!index_vals.empty()){ //mpre("Расчет уже создан", __LINE__);
 							}else if(string grp = v1 +v0; 2 != grp.length()){ err("Значение группы");
 							}else if(TMs _index_vals = {{"index_md5", index.at("id")}, {"parent", index.at("parent")}, {"grp", grp}, {"dataset_id", bmf::dataset.at("id")}, {"key", to_string(key)}, {"grow_md5", grow_md5}}; _index_vals.empty()){ err("Группа морфа");
-							//}else if(TMs index_vals = bmf::Up("index_vals", {{"id", md5(addr +"-" +bmf::dataset.at("id") +"-" +to_string(key))}}, _index_vals, {}, __LINE__); index_vals.empty()){ err("Сохранение группы морфа");
-							}else if(_BMF_INDEX_VALS.insert(make_pair(_index_vals.at("index_md5"), _index_vals)); _BMF_INDEX_VALS.empty()){ err("Обновление текущих значений");
 							}else if(TMs update = {{"index_md5", index.at("id")}, {"addr", addr}, {"grp", grp}, {"dataset_id", bmf::dataset.at("id")}, {"key", to_string(key)}, {"grow_md5", grow_md5}}; update.empty()){ err("Значение обновления");
 							}else if(string uid = md5(addr +"-" +bmf::dataset.at("id") +"-" +to_string(key)); uid.empty()){ err("Расчет идентификатора");
 							}else if(UPDATE.insert(make_pair(uid, _index_vals)); UPDATE.empty()){ err("Добавление нового значения");
+							}else if(_BMF_INDEX_VALS.insert(make_pair(_index_vals.at("index_md5"), _index_vals)); _BMF_INDEX_VALS.empty()){ err("Обновление текущих значений");
 							}else{ //mpre(index_vals ,"Добавление нового значения key=" +index_vals.at("key") +" index_vals_id=" +index_vals.at("id") +" grow_md5=" +grow_md5 +" " +addr +" " ,__LINE__);
 							}return false; }()){ err("Добавление значение расчета");
 						}else{ //mpre("Окончение расчета модели key=" +to_string(key) ,__LINE__);
@@ -1620,6 +1618,7 @@ int main(int argc, char **argv){
 					}return calc; }(); 1 != calc.length()){ err("Расширение модели");
 				}else if([&](){ // Расширение модели
 					if(calc == learn){ //mpre("Расчетные и обучающие значения совпадают", __LINE__);
+					}else if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени", __LINE__);
 					}else if(bmf::ARGV.end() == bmf::ARGV.find("learn")){ //mpre("Пропускаем обучение" ,__LINE__);
 					}else if(string grow_md5 = (index_vals.end() == index_vals.find("grow_md5") ? "" : index_vals.at("grow_md5")); grow_md5.empty()){ err("Идентификатор расширения");
 					}else if(TMs index_grow = bmf::Up("index" ,{{"id", grow_md5}} ,{} ,{} ,__LINE__); index_grow.empty()){ err("Расширяемый морф");
