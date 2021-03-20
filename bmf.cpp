@@ -732,7 +732,6 @@ int main(int argc, char **argv){
 			}else if("mysql" != bmf::dbtype){ //mpre("Используем не mysql", __LINE__);
 			}else if(mysql_query(bmf::mysql, std::string("DROP TABLE IF EXISTS `index`;").c_str())){ err("ОШИБКА удаления таблицы");
 			}else if(mysql_query(bmf::mysql, std::string("DROP TABLE IF EXISTS `index_vals`;").c_str())){ err("ОШИБКА удаления таблицы");
-			//}else if(mysql_query(bmf::mysql, std::string("DROP TABLE IF EXISTS `index_shift`;").c_str())){ err("ОШИБКА удаления таблицы");
 			}else if(mysql_query(bmf::mysql, std::string("DROP TABLE IF EXISTS `dataset`;").c_str())){ err("ОШИБКА удаления таблицы");
 			}else if(mysql_query(bmf::mysql, std::string("DROP TABLE IF EXISTS `dataset_map`;").c_str())){ err("ОШИБКА удаления таблицы");
 			}else if(mysql_query(bmf::mysql, std::string("DROP TABLE IF EXISTS `dataset_vals`;").c_str())){ err("ОШИБКА удаления таблицы");
@@ -743,7 +742,7 @@ int main(int argc, char **argv){
 			}else if(mysql_query(bmf::mysql, std::string("DROP TABLE IF EXISTS `itog_values`;").c_str())){ err("ОШИБКА удаления таблицы");
 			}else if(mysql_query(bmf::mysql, std::string("DROP TABLE IF EXISTS `itog_titles`;").c_str())){ err("ОШИБКА удаления таблицы");
 			}else if([&](){ // Шард таблицы
-				if(string sql = "SHOW TABLES FROM iris;"; sql.empty()){ err("Запрос списка всех таблиц базы данных");
+				if(string sql = "SHOW TABLES FROM " +bmf::dbname +";"; sql.empty()){ err("Запрос списка всех таблиц базы данных");
 				}else if(mysql_query(bmf::mysql, sql.c_str())){ mpre("Выбор данных из таблицы " +sql +"\n" +string(mysql_error(bmf::mysql)), __LINE__);
 				}else if(MYSQL_RES *result = mysql_store_result(bmf::mysql); false){ err("ОШИБКА выполнения запроса");
 				}else if(TMMs TABLES = [&](TMMs TABLES = {} ,TMs titles = {}){ while(MYSQL_ROW row = mysql_fetch_row(result)){
@@ -1422,7 +1421,7 @@ int main(int argc, char **argv){
 				}else{ mpre("", __LINE__); mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Обновление модели " +to_string(_INDEX.size()) +" size=" +to_string(BMF_INDEX.size()) +" ", __LINE__);
 				}return false; }()){ err("Обновление модели");
 			//}else if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени", __LINE__);
-			}else if(string table_vals = "index_vals_" +bmf::dataset.at("id") + "_"+to_string(key); table_vals.empty()){ err("ОШИБКА расчета имени таблицы");
+			}else if(string table_vals = "index_vals" /*+"_" +bmf::dataset.at("id")*/ +string("_") +to_string(key); table_vals.empty()){ err("ОШИБКА расчета имени таблицы");
 			}else if(mysql_query(bmf::mysql, std::string("CREATE TABLE IF NOT EXISTS `" +table_vals +"` LIKE `index_vals`;").c_str())){ mpre("Вставка данных " +string(mysql_error(bmf::mysql)) ,__LINE__); 
 			}else if([&](){ //Список изменений
 				if(TMMs INDEX = [&](TMMs INDEX = {}){ // Все прародители
