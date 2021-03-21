@@ -985,8 +985,8 @@ int main(int argc, char **argv){
 			}else if([&](int pos = 0, int loop = 2e9){ while((string::npos != (pos = list.find_last_of(";"))) && (loop-- > 0) && (1 < _DANO.size())){ // Исключение повторяющихся исходников
 				if(false){ mpre("Пропуск исключений", __LINE__);
 				}else if(std::string dano_id =list.substr(pos +1, list.length()); dano_id.empty()){ mpre("ОШИБКА получения идентификатор исходника " +list, __LINE__);
-				//}else if(_DANO.end() == _DANO.find(dano_id)){ mpre(_DANO, " `"+ list +"` ", __LINE__); mpre("ОШИБКА Исходник не найден в списке list=`" +list +"` `"+ dano_id +"`", __LINE__);
 				}else if(list =list.substr(0, pos); false){ mpre("ОШИБКА сокращение длинны списка", __LINE__);
+				}else if(_DANO.end() == _DANO.find(dano_id)){ //mpre(_DANO, " `"+ list +"` ", __LINE__); mpre("Исходник не найден в списке list=`" +list +"` `"+ dano_id +"`", __LINE__);
 				}else if(_DANO.erase(dano_id); _DANO.empty()){ mpre("ОШИБКА не удаляем последнее значение", __LINE__);
 				}else{ //mpre("Пропуск выбора исходника list=" +list +" `" +dano_id +"`", __LINE__);
 				}}return _DANO.empty(); }()){ mpre("ОШИБКА список не должен оставаться пустым", __LINE__);
@@ -1449,10 +1449,10 @@ int main(int argc, char **argv){
 					if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени", __LINE__);
 					}else if(TMMs _BMF_INDEX_VALS = [&]( TMMs _BMF_INDEX_VALS = {}){ // Расчетные значения
 						if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени", __LINE__);
-						}else if(string in = [&](string in = "''"){ for(auto index_itr:INDEX){ // Список id через запятую
+						}else if(string in = [&](string in = "0"){ for(auto index_itr:INDEX){ // Список id через запятую
 							if(TMs index = index_itr.second; index.empty()){ err("Список всех родных");
 							}else if(string id = (index.end() == index.find("id") ? "" : index.at("id")); id.empty()){ err("Выборка идентификатора родных");
-							}else if(in += ",'" +id +"'"; in.empty()){ err("Список");
+							}else if(in += "," +id; in.empty()){ err("Список");
 							}else{ //mpre("Новый идентификатор в список id=" +id, __LINE__);
 							}}return in; }(); in.empty()){ err("Уведомление");
 						}else if(string sql = "SELECT * ,index_md5 AS id ,id as uid FROM `" +table_vals +"` WHERE `dataset_id`='" +bmf::dataset.at("id") +"' AND `key`=" +to_string(key) +" AND parent IN(" +in +");"; sql.empty()){ err("Запрос на выборку значений");
