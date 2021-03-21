@@ -985,8 +985,8 @@ int main(int argc, char **argv){
 			}else if([&](int pos = 0, int loop = 2e9){ while((string::npos != (pos = list.find_last_of(";"))) && (loop-- > 0) && (1 < _DANO.size())){ // Исключение повторяющихся исходников
 				if(false){ mpre("Пропуск исключений", __LINE__);
 				}else if(std::string dano_id =list.substr(pos +1, list.length()); dano_id.empty()){ mpre("ОШИБКА получения идентификатор исходника " +list, __LINE__);
+				//}else if(_DANO.end() == _DANO.find(dano_id)){ mpre(_DANO, " `"+ list +"` ", __LINE__); mpre("ОШИБКА Исходник не найден в списке list=`" +list +"` `"+ dano_id +"`", __LINE__);
 				}else if(list =list.substr(0, pos); false){ mpre("ОШИБКА сокращение длинны списка", __LINE__);
-				}else if(_DANO.end() == _DANO.find(dano_id)){ mpre(_DANO, " `"+ list +"` ", __LINE__); mpre("ОШИБКА Исходник не найден в списке list=`" +list +"` `"+ dano_id +"`", __LINE__);
 				}else if(_DANO.erase(dano_id); _DANO.empty()){ mpre("ОШИБКА не удаляем последнее значение", __LINE__);
 				}else{ //mpre("Пропуск выбора исходника list=" +list +" `" +dano_id +"`", __LINE__);
 				}}return _DANO.empty(); }()){ mpre("ОШИБКА список не должен оставаться пустым", __LINE__);
