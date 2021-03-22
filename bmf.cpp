@@ -1423,10 +1423,15 @@ int main(int argc, char **argv){
 			}else if(string table_vals = "index_vals" /*+"_" +bmf::dataset.at("id")*/ +string("_") +to_string(key); table_vals.empty()){ err("ОШИБКА расчета имени таблицы");
 			}else if(mysql_query(bmf::mysql, std::string("CREATE TABLE IF NOT EXISTS `" +table_vals +"` LIKE `index_vals`;").c_str())){ mpre("Вставка данных " +string(mysql_error(bmf::mysql)) ,__LINE__); 
 			}else if([&](){ //Список изменений
-				if(TMMs INDEX = [&](TMMs INDEX = {}){ // Все прародители
+				if(TMMs _INDEX = [&](TMMs _INDEX = {}){ // Список новых морфов
 					if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени", __LINE__);
 					}else if(string sql = "SELECT i.* FROM `index` AS i LEFT JOIN `" +table_vals +"` AS iv ON i.id=iv.index_md5 AND iv.`dataset_id`='" +bmf::dataset.at("id") +"' AND iv.key=" +to_string(key) +" WHERE iv.id IS NULL;"; sql.empty()){ err("Запрос на выборку изменений");
-					}else if(TMMs _INDEX = bmf::List_mysql("index" ,{} ,sql ,__LINE__); _INDEX.empty()){ //mpre("Список изменений пуст" ,__LINE__);
+					}else if(_INDEX = bmf::List_mysql("index" ,{} ,sql ,__LINE__); _INDEX.empty()){ //mpre("Список изменений пуст" ,__LINE__);
+					}else if(int verbose = atoi(bmf::ARGV.end() == bmf::ARGV.find("verbose") ? "" : bmf::ARGV.at("verbose").c_str()); bmf::ARGV.end() == bmf::ARGV.find("verbose")){ //mpre("Не отображаем время обучения", __LINE__);
+					}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Выборка обновлений морфов" +(verbose ? " " +sql : "") +" _INDEX.size()=" +to_string(_INDEX.size()), __LINE__);
+					}return _INDEX; }(); false){ err("Список новых морфов");
+				}else if(TMMs INDEX = [&](TMMs INDEX = {}){ // Все прародители
+					if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени", __LINE__);
 					}else if([&](){ for(auto index_itr:_INDEX){ // Полный список изменений
 						if(TMs index = index_itr.second; index.empty()){ err("Выбор морфа");
 						}else if(string addr = (index.end() == index.find("addr") ? "" : index.at("addr")); addr.empty()){ err("Адрес морфа");
@@ -1443,7 +1448,7 @@ int main(int argc, char **argv){
 						}else{ //mpre(index ,"Изменившийся морф" ,__LINE__);
 						}}return false; }()){ err("Составление списк изменений");
 					}else if(int verbose = atoi(bmf::ARGV.end() == bmf::ARGV.find("verbose") ? "" : bmf::ARGV.at("verbose").c_str()); bmf::ARGV.end() == bmf::ARGV.find("verbose")){ //mpre("Не отображаем время обучения", __LINE__);
-					}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Выборка обновлений морфов" +(verbose ? " " +sql : "") +" INDEX.size()=" +to_string(INDEX.size()), __LINE__);
+					}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Расчет родителей INDEX.size()=" +to_string(INDEX.size()), __LINE__);
 					}return INDEX; }(); INDEX.empty()){ //mpre("Список родственной структуры пуст" ,__LINE__);
 				}else if([&](){ // Выборка списка расчитанных ранее групп
 					if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени", __LINE__);
