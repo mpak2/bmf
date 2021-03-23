@@ -12,7 +12,7 @@
 #include <boost/dynamic_bitset.hpp>
 #include <cmath> // Возведение в степень
 #include <unistd.h> // sleep
-#include <sqlite3.h>
+//#include <sqlite3.h>
 #include <sys/file.h> // umask
 #include <cstdlib>
 
@@ -42,7 +42,7 @@
 //#include <termios.h> // Функции нажатий клавиш консоли
 //#include <curses.h>
 //#include <curses.h>
-#include <ncurses.h>
+//#include <ncurses.h>
 #include <stdlib.h>
 //#include <unistd.h>
 //#include <termios.h>

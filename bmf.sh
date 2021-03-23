@@ -1,12 +1,13 @@
 #!/bin/bash
 
-#sudo apt install libsqlite3-dev
-#sudo apt install libdb5.3-stl-dev
-#sudo apt install libdb5.3++-dev
-#sudo apt install libhiredis-dev
-#sudo apt install libacl1-dev
-#sudo apt install libmariadbd-dev
-#sudo apt install libboost-all-dev
+## sudo apt install libsqlite3-dev
+## sudo apt install libdb5.3-stl-dev
+## sudo apt install libdb5.3++-dev
+## sudo apt install libhiredis-dev
+## sudo apt install libacl1-dev
+
+# sudo apt install libmariadbd-dev
+# sudo apt install libboost-all-dev
 
 #cat clump/dva.json | ./bimorph mysql://localhost/dva -c -
 #./bimorph mysql://localhost/dva ds=1 epoch=10 learn
@@ -14,13 +15,13 @@
 #cat clump/tri.json | ./bimorph mysql://localhost/tri -c -
 #./bimorph mysql://localhost/tri ds=1 epoch=100 learn
 
-./bimorph mysql://localhost/iris -c
+./bimorph mysql://iris:iris@localhost/iris -c
 #cat clump/iris_1.json | ./bimorph mysql://localhost/iris - # ?cache=shared
 #cat clump/iris_2.json | ./bimorph mysql://localhost/iris - # ?cache=shared
 #cat clump/iris_3.json | ./bimorph mysql://localhost/iris - # ?cache=shared
-cat clump/iris.json | ./bimorph mysql://localhost/iris - # ?cache=shared
-./bimorph mysql://localhost/iris ds=1 epoch=100 learn #-microtime # ?cache=shared
-./bimorph mysql://localhost/iris
+cat clump/iris.json | ./bimorph mysql://iris:iris@localhost/iris - # ?cache=shared
+./bimorph mysql://iris:iris@localhost/iris ds=1 epoch=100 learn #-microtime # ?cache=shared
+./bimorph mysql://iris:iris@localhost/iris
 #./bimorph mysql://localhost/iris ds=1 epoch=100 learn #-microtime # ?cache=shared
 
 #	#sqlite3 clump/iris -column -header "SELECT MAX(depth) FROM mp_bmf_index"
