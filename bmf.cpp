@@ -1441,6 +1441,7 @@ int main(int argc, char **argv){
 							}else if(string str = addr.substr(i, npos-i); str.empty()){ err("Формирование части адреса");
 							}else if(string adr = "1" + str.substr(1, str.length()); adr.empty()){ err("Установка формата адреса");
 							}else if(string _addr = adr +addr.substr(npos, addr.length()); _addr.empty()){ err("Формирование адреса");
+							}else if(INDEX.end() != INDEX.find(_addr)){ //mpre("Родитель уже установлен");
 							}else if(TMs _index = (BMF_INDEX.end() == BMF_INDEX.find(_addr) ? _index : BMF_INDEX.at(_addr)); _index.empty()){ //mpre("Родительский морф " +addr +" > " +_addr ,__LINE__);
 							}else if(INDEX.insert(make_pair(_addr, _index)); INDEX.empty()){ err("Список родителей");
 							}else{ //mpre("Формирование родителя i=" +to_string(i) +" adr=" +adr +" _addr=" +_addr +" " +addr ,__LINE__);
