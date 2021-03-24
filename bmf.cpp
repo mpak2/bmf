@@ -1433,12 +1433,11 @@ int main(int argc, char **argv){
 				}else if(TMMs INDEX = [&](TMMs INDEX = {}){ // Все прародители
 					if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени", __LINE__);
 					}else if([&](){ for(auto index_itr:_INDEX){ // Полный список изменений
-						if(TMs index = index_itr.second; index.empty()){ err("Выбор морфа");
-						}else if(string addr = (index.end() == index.find("addr") ? "" : index.at("addr")); addr.empty()){ err("Адрес морфа");
+						//if(TMs index = index_itr.second; index.empty()){ err("Выбор морфа");
+						if(string addr = (index_itr.second.end() == index_itr.second.find("addr") ? "" : index_itr.second.at("addr")); addr.empty()){ err("Адрес морфа");
 						}else if(auto npos = addr.find_first_of("-"); string::npos == npos){ err("Не найден разделитель в адресе");
 						}else if([&](){ for(int i=0; i<npos; i++){ // Родители морфа
-							if(false){ mpre("Пропуск формирования родителя", __LINE__);
-							}else if(string str = addr.substr(i, npos-i); str.empty()){ err("Формирование части адреса");
+							if(string str = addr.substr(i, npos-i); str.empty()){ err("Формирование части адреса");
 							}else if(string adr = "1" + str.substr(1, str.length()); adr.empty()){ err("Установка формата адреса");
 							}else if(string _addr = adr +addr.substr(npos, addr.length()); _addr.empty()){ err("Формирование адреса");
 							}else if(INDEX.end() != INDEX.find(_addr)){ //mpre("Родитель уже установлен");
