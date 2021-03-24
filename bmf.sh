@@ -20,7 +20,7 @@
 #cat clump/iris_2.json | ./bimorph mysql://localhost/iris - # ?cache=shared
 #cat clump/iris_3.json | ./bimorph mysql://localhost/iris - # ?cache=shared
 cat clump/iris.json | ./bimorph mysql://iris:iris@localhost/iris - # ?cache=shared
-./bimorph mysql://iris:iris@localhost/iris ds=1 epoch=100 learn #-microtime # ?cache=shared
+./bimorph mysql://iris:iris@localhost/iris ds=1 epoch=100 learn #verbose=3 #-microtime # ?cache=shared
 ./bimorph mysql://iris:iris@localhost/iris
 #./bimorph mysql://localhost/iris ds=1 epoch=100 learn #-microtime # ?cache=shared
 

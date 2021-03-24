@@ -1553,14 +1553,14 @@ int main(int argc, char **argv){
 						}else if(string names = [&](string names = ""){ for(auto titles_itr:titles){ names += ", `" +titles_itr.first +"`"; }return names.substr(2, -1); }(); names.empty()){ err("Имена полей");
 						}else if(string VALUES = [&](string VALUES = ""){ for(auto update_itr:UPDATE){
 							/*if(string uid = "'" +update_itr.first +"'"; uid.empty()){ err("Идентификатор записи");
-							}else*/ if(string values = [&](string values = ""){ for(auto values_itr:update_itr.second){ values += ", '" +values_itr.second +"'"; }return values.substr(2, -1); }(); values.empty()){ err("Значения полей");
+							}else*/ if(string values = [&](string values = ""){ for(auto values_itr:update_itr.second){ values += "," +("grp" == values_itr.first ? "'" +values_itr.second +"'" : values_itr.second); }return values.substr(1, -1); }(); values.empty()){ err("Значения полей");
 							}else{ VALUES += "\n(" +values +"),";
 							}}return VALUES.substr(0, VALUES.length() -1); }(); VALUES.empty()){ err("Добавление значений");
 						}else if(string sql = "INSERT INTO `" +table_vals +"` (" +names +") VALUES " +VALUES +" ON DUPLICATE KEY UPDATE `grow_md5`=VALUES(grow_md5), `grp`=VALUES(grp);"; sql.empty()){ err("Начало запроса");
 						//}else if(mpre("Запрос\n" +sql ,__LINE__); false){ err("Уведомление");
 						}else if(mysql_query(bmf::mysql, sql.c_str())){ mpre("ОШИБКА " +string(mysql_error(bmf::mysql)) +"\n" +sql, __LINE__);
-						}else if(bmf::ARGV.end() == bmf::ARGV.find("verbose")){ //mpre("Не отображаем время обучения", __LINE__);
-						}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Сохранение модели UPDATE.size()=" +to_string(UPDATE.size()) +" ", __LINE__);
+						}else if(int verbose = atoi(bmf::ARGV.end() == bmf::ARGV.find("verbose") ? "" : bmf::ARGV.at("verbose").c_str()); bmf::ARGV.end() == bmf::ARGV.find("verbose")){ //mpre("Не отображаем время обучения", __LINE__);
+						}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Сохранение модели" +(3 <= verbose ? " " +sql : "") +" UPDATE.size()=" +to_string(UPDATE.size()) +" ", __LINE__);
 						}return false; }()){ err("Сохранение значений");
 					}return false; }()){ err("Выборка всех нужных групп морфов");
 				//}else if(bmf::ARGV.end() == bmf::ARGV.find("verbose")){ //mpre("Не отображаем время обучения", __LINE__);
@@ -1632,13 +1632,13 @@ int main(int argc, char **argv){
 					}else if(string link_grow = grp_grow.substr(atoi(dano_val_grow.c_str()), 1); 1 != link_grow.length()){ err("Ссылка расширяемого морфа");
 					}else if(string addr_grow = (index_grow.end() == index_grow.find("addr") ? "" : index_grow.at("addr")); addr_grow.empty()){ err("Расчет адреса расширяющего морфа");
 					}else if(string index_id_grow = "1" +link_grow +addr_grow.substr(1, addr_grow.length()); index_id_grow.empty()){ err("Новый адрес");
-					}else if(BMF_INDEX.end() != BMF_INDEX.find(index_id_grow)){ mpre(index_vals_grow ,"ОШИБКА Морф уже в базе key=" +to_string(key) +" grow_md5=" +grow_md5 +" addr_grow=" +addr_grow +" > " +index_id_grow ,__LINE__);
+					}else if(BMF_INDEX.end() != BMF_INDEX.find(index_id_grow)){ mpre(index_vals_grow ,"Морф уже в базе key=" +to_string(key) +" grow_md5=" +grow_md5 +" addr_grow=" +addr_grow +" > " +index_id_grow ,__LINE__);
 					}else if(string list = [&](string list = ""){ // Список родителей
 						if(auto npos = index_id_grow.find_first_of("-"); string::npos == npos){ err("Разделитель в новом идентификаторе не найден");
 						}else if([&](){ for(int i = 2; i <= npos; i++){ // Список исходников
 							if(string adr = "1" +index_id_grow.substr(i, npos-i); adr.empty()){ err("Расчетный адрес");
 							}else if(string _addr = adr +index_id_grow.substr(npos, -1); _addr.empty()){ err("Полный адрес");
-							}else if(BMF_INDEX.end() == BMF_INDEX.find(_addr)){ mpre("ОШИБКА Родитель в справочнике не найден " +adr +" ", __LINE__);
+							}else if(BMF_INDEX.end() == BMF_INDEX.find(_addr)){ mpre("Родитель в справочнике не найден " +adr +" ", __LINE__);
 							}else if(string dano_id = (BMF_INDEX.at(_addr).end() == BMF_INDEX.at(_addr).find("dano_id") ? "" : BMF_INDEX.at(_addr).at("dano_id")); dano_id.empty()){ err("Выборка исходного идентификатора");
 							}else if(list = ";" +dano_id +list; list.empty()){ err("Инкремент списка");
 							}else{ //mpre("Значение i=" +to_string(i) +" adr=" +adr +" index_id_grow=" +index_id_grow ,__LINE__);
