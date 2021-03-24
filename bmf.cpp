@@ -435,7 +435,7 @@ int main(int argc, char **argv){
 				}else if(std::string sql = "SELECT * FROM `" + ROWS+"` WHERE " +_where; sql.empty()){ err("Запрос к БД");
 				}else if(_row = [&](TMs _row = {}){ // Получение значения
 					if(mysql_query(bmf::mysql, sql.c_str()); !bmf::mysql){ mpre("Выбор данных из таблицы " +sql, __LINE__);
-					}else if(MYSQL_RES *result = mysql_store_result(bmf::mysql); !result){ err("ОШИБКА выполнения запроса");
+					}else if(MYSQL_RES *result = mysql_store_result(bmf::mysql); !result){ mpre("ОШИБКА выполнения запроса\n" +sql +"\n" +string(mysql_error(bmf::mysql)) ,__LINE__);
 					}else if(int count = mysql_num_fields(result); !count){ err("Получение количества полей");
 					}else if(std::string FIELDS[count]; false){ err("Массив списка полей");
 					}else if([&](int i = 0){ while(MYSQL_FIELD *field = mysql_fetch_field(result)){ FIELDS[i++] = field->name; }return false; }()){ mpre("ОШИБКА получения полей", __LINE__);
@@ -1419,7 +1419,6 @@ int main(int argc, char **argv){
 				}else if(bmf::ARGV.end() == bmf::ARGV.find("verbose")){ //mpre("Не отображаем время обучения", __LINE__);
 				}else{ mpre("", __LINE__); mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Обновление модели " +to_string(_INDEX.size()) +" size=" +to_string(BMF_INDEX.size()) +" ", __LINE__);
 				}return false; }()){ err("Обновление модели");
-			//}else if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени", __LINE__);
 			}else if(string table_vals = "index_vals" /*+"_" +bmf::dataset.at("id")*/ +string("_") +to_string(key); table_vals.empty()){ err("ОШИБКА расчета имени таблицы");
 			}else if(mysql_query(bmf::mysql, std::string("CREATE TABLE IF NOT EXISTS `" +table_vals +"` LIKE `index_vals`;").c_str())){ mpre("Вставка данных " +string(mysql_error(bmf::mysql)) ,__LINE__); 
 			}else if([&](){ //Список изменений
@@ -1432,8 +1431,7 @@ int main(int argc, char **argv){
 					}return _INDEX; }(); false){ err("Список новых морфов");
 				}else if(TMMs INDEX = [&](TMMs INDEX = {}){ // Все прародители
 					if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени", __LINE__);
-					}else if([&](){ for(auto index_itr:_INDEX){ // Полный список изменений
-						//if(TMs index = index_itr.second; index.empty()){ err("Выбор морфа");
+					}else if([&](){ for(auto index_itr:_INDEX){ // Полный список необходимых значений
 						if(string addr = (index_itr.second.end() == index_itr.second.find("addr") ? "" : index_itr.second.at("addr")); addr.empty()){ err("Адрес морфа");
 						}else if(auto npos = addr.find_first_of("-"); string::npos == npos){ err("Не найден разделитель в адресе");
 						}else if([&](){ for(int i=0; i<npos; i++){ // Родители морфа
@@ -1441,8 +1439,8 @@ int main(int argc, char **argv){
 							}else if(string adr = "1" + str.substr(1, str.length()); adr.empty()){ err("Установка формата адреса");
 							}else if(string _addr = adr +addr.substr(npos, addr.length()); _addr.empty()){ err("Формирование адреса");
 							}else if(INDEX.end() != INDEX.find(_addr)){ //mpre("Родитель уже установлен");
-							}else if(TMs _index = (BMF_INDEX.end() == BMF_INDEX.find(_addr) ? _index : BMF_INDEX.at(_addr)); _index.empty()){ //mpre("Родительский морф " +addr +" > " +_addr ,__LINE__);
-							}else if(INDEX.insert(make_pair(_addr, _index)); INDEX.empty()){ err("Список родителей");
+							}else if(BMF_INDEX.end() == BMF_INDEX.find(_addr)){ //mpre("Родительский морф " +addr +" > " +_addr ,__LINE__);
+							}else if(INDEX.insert(make_pair(_addr, BMF_INDEX.at(_addr))); INDEX.empty()){ err("Список родителей");
 							}else{ //mpre("Формирование родителя i=" +to_string(i) +" adr=" +adr +" _addr=" +_addr +" " +addr ,__LINE__);
 							}}return false; }()){ err("Список родителей морфа");
 						}else{ //mpre(index ,"Изменившийся морф" ,__LINE__);
