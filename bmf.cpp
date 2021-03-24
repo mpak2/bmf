@@ -432,7 +432,7 @@ int main(int argc, char **argv){
 						}return false; }()){ err("Строка условий");
 					}else{ //mpre("Условия выборки "+ _where, __LINE__);
 					}return _where; }(); false){ err("Составления условий выборки");
-				}else if(std::string sql = "SELECT * FROM `" + ROWS+"` WHERE " +_where; sql.empty()){ err("Запрос к БД");
+				}else if(std::string sql = "SELECT * FROM `" + ROWS+"` WHERE " +_where +";"; sql.empty()){ err("Запрос к БД");
 				}else if(_row = [&](TMs _row = {}){ // Получение значения
 					if(mysql_query(bmf::mysql, sql.c_str()); !bmf::mysql){ mpre("Выбор данных из таблицы " +sql, __LINE__);
 					}else if(MYSQL_RES *result = mysql_store_result(bmf::mysql); !result){ mpre("ОШИБКА выполнения запроса\n" +sql +"\n" +string(mysql_error(bmf::mysql)) ,__LINE__);
