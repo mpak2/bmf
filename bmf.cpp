@@ -1564,19 +1564,15 @@ int main(int argc, char **argv){
 						}else if(TMs titles = UPDATE.begin()->second; titles.empty()){ err("Заголовки не найдены");
 						}else if(string names = [&](string names = ""){ for(auto titles_itr:titles){ names += ", `" +titles_itr.first +"`"; }return names.substr(2, -1); }(); names.empty()){ err("Имена полей");
 						}else if(string VALUES = [&](string VALUES = ""){ for(auto update_itr:UPDATE){
-							/*if(string uid = "'" +update_itr.first +"'"; uid.empty()){ err("Идентификатор записи");
-							}else*/ if(string values = [&](string values = ""){ for(auto values_itr:update_itr.second){ values += "," +("grp" == values_itr.first ? "'" +values_itr.second +"'" : values_itr.second); }return values.substr(1, -1); }(); values.empty()){ err("Значения полей");
+							if(string values = [&](string values = ""){ for(auto values_itr:update_itr.second){ values += "," +("grp" == values_itr.first ? "'" +values_itr.second +"'" : values_itr.second); }return values.substr(1, -1); }(); values.empty()){ err("Значения полей");
 							}else{ VALUES += "\n(" +values +"),";
 							}}return VALUES.substr(0, VALUES.length() -1); }(); VALUES.empty()){ err("Добавление значений");
 						}else if(string sql = "INSERT INTO `" +table_vals +"` (" +names +") VALUES " +VALUES +" ON DUPLICATE KEY UPDATE `grow_md5`=VALUES(grow_md5), `grp`=VALUES(grp);"; sql.empty()){ err("Начало запроса");
-						//}else if(mpre("Запрос\n" +sql ,__LINE__); false){ err("Уведомление");
 						}else if(mysql_query(bmf::mysql, sql.c_str())){ mpre("ОШИБКА " +string(mysql_error(bmf::mysql)) +"\n" +sql, __LINE__);
 						}else if(int verbose = atoi(bmf::ARGV.end() == bmf::ARGV.find("verbose") ? "" : bmf::ARGV.at("verbose").c_str()); bmf::ARGV.end() == bmf::ARGV.find("verbose")){ //mpre("Не отображаем время обучения", __LINE__);
 						}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Сохранение модели" +(3 <= verbose ? " " +sql : "") +" UPDATE.size()=" +to_string(UPDATE.size()) +" ", __LINE__);
 						}return false; }()){ err("Сохранение значений");
 					}return false; }()){ err("Выборка всех нужных групп морфов");
-				//}else if(bmf::ARGV.end() == bmf::ARGV.find("verbose")){ //mpre("Не отображаем время обучения", __LINE__);
-				//}else{ //mpre("==========", __LINE__); mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Расчет модели " +to_string(_BMF_INDEX.size()) +" size=" +to_string(BMF_INDEX.size()) +" ", __LINE__);
 				}else{ //mpre(INDEX ,"Изменившиеся морфы" ,__LINE__); mpre(_BMF_INDEX_VALS ,"Список значений изменений " ,__LINE__);
 				}return _INDEX; }(); false){ err("Список изменений");
 			}else if([&](){ for(auto &itog_itr:bmf::List(bmf::ITOG, {}, __LINE__)){ // Проверка списка итогов
@@ -1703,8 +1699,9 @@ int main(int argc, char **argv){
 			//}else if(true){ mpre("ОШИБКА Остановка", __LINE__);
 			}else{ //mpre("Итерации err=" +to_string(err) ,__LINE__);
 			}}while(!(rep = !rep)); return err; }(); (0 > err)){ mpre("ОШИБКА проверки списка итогов", __LINE__);
-		}else if([&](){ // Прибавление эпохи
+		}else if([&](){ // Обнуление счетчика эпохи
 			if(!err){ //mpre("Не увеличиваем эпохи без обучения", __LINE__);
+			}else if(bmf::ARGV.end() == bmf::ARGV.find("learn")){ //mpre("Не сохраняем результаты на расчёте" ,__LINE__);
 			}else if(TMs dataset = bmf::dataset = bmf::Up(bmf::DATASET, {{"id", bmf::dataset.at("id")}}, {}, {}, __LINE__); bmf::dataset.empty()){ err("Выборка набора данных");
 			}else if(bmf::dataset["epoch"] = to_string(atoi(bmf::dataset["epoch"].c_str())+1); bmf::dataset.at("epoch").empty()){ err("Инкремента эпох");
 			}else if(bmf::dataset["key"] = "0"; false){ err("Обнуление позиции");
