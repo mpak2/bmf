@@ -15,14 +15,6 @@ int mpre(TMs row, int line, string comment = "", string prefix = "", string key 
 		}else if(row.end() != row.find("id")){ id = row["id"];
 		}else{ //mpre("Ни ключ ни идентификатор не задан", __LINE__);
 		}return id; }(); false){ //mpre("ОШИБКА получения ключа", __LINE__);
-	/*}else if([&](){ // Замена ОШИБКА в уведомлении
-			if(string str = "ОШИБКА"; str.empty()){ err("Часто уведомления которое выделяем");
-			}else if(string str_to = "[37;41m ОШИБКА \x1b[0m"; str_to.empty()){ err("Сообщение на которое заменяем");
-			}else if(auto npos = comment.find_first_of(str); string::npos == npos){ mpre("Сообщение не найдено", __LINE__);
-			//}else if(comment.replace(npos, str.length(), str); false){ mpre("Не получилось заменить" ,__LINE__);
-			}else{ //mpre("Замена", __LINE__);
-			}return false;
-		}()){*/
 	}else if([&](){ // [37;41m ОШИБКА \x1b[0m
 		std::cerr << prefix << id << " => " << "( // __" << to_string(line) << "__ " << comment << "\n";
 		for(TMs::iterator itr = row.begin(); itr != row.end(); itr++){
