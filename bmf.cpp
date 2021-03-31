@@ -1403,6 +1403,9 @@ int main(int argc, char **argv){
 				}return epoch; }(); epoch.empty()){ mpre("ОШИБКА расчета эпохи", __LINE__);
 			}else if(key = [&](int key){ // Установка зависимой позиции
 				if(string _key = (bmf::ARGV.end() == bmf::ARGV.find("key") ? "" : bmf::ARGV.at("key")); _key.empty()){ //mpre("Пропуск расчета" ,__LINE__);
+				}else if(static int key_static = -1; false){ err("Установка статического значения");
+				}else if(key_static == key){ mpre("Пауза" ,__LINE__);
+				}else if(key_static = key; false){ err("Сохранение значения ключа для дальнейших сравнений");
 				}else if(0 != _key.find_first_of("-+")){ mpre("Не установлен знак в ключе key=" +_key +" " ,__LINE__);
 				}else if(int _key_ = atoi(_key.c_str()); !_key_){ mpre("Значение для изменения не задано" ,__LINE__);
 				}else if(string dataset_id = (bmf::dataset.end() == bmf::dataset.find("id") ? "" : bmf::dataset.at("id")); dataset_id.empty()){
@@ -1796,7 +1799,15 @@ int main(int argc, char **argv){
 					}else if(string link_grow = grp_grow.substr(atoi(dano_val_grow.c_str()), 1); 1 != link_grow.length()){ err("Ссылка расширяемого морфа");
 					}else if(string addr_grow = (index_grow.end() == index_grow.find("addr") ? "" : index_grow.at("addr")); addr_grow.empty()){ err("Расчет адреса расширяющего морфа");
 					}else if(string index_id_grow = "1" +link_grow +addr_grow.substr(1, addr_grow.length()); index_id_grow.empty()){ err("Новый адрес");
-					}else if(BMF_INDEX.end() != BMF_INDEX.find(index_id_grow)){ mpre(index_vals_grow ,"Значение" ,__LINE__); mpre("ОШИБКА Морф уже в базе key=" +to_string(key) +" grow_md5=" +grow_md5 +" addr_grow=" +addr_grow +" > " +index_id_grow ,__LINE__); //bmf::Up(table_vals ,{{"id", index_vals_grow.at("id")}}, {} ,{{"grow_md5", "-1"}} ,__LINE__);
+					//}else if(BMF_INDEX.end() != BMF_INDEX.find(index_id_grow)){ mpre("Морф уже в базе key=" +to_string(key) +" grow_md5=" +grow_md5 +" addr_grow=" +addr_grow +" > " +index_id_grow ,__LINE__); //bmf::Up(table_vals ,{{"id", index_vals_grow.at("id")}}, {} ,{{"grow_md5", "-1"}} ,__LINE__);
+					}else if([&](TMs _index = {}){ // Проверка наличия морфа в базе	
+						if(BMF_INDEX.end() == BMF_INDEX.find(index_id_grow)){ //mpre("Морф еще не установлен" ,__LINE__);
+						}else if(_index = BMF_INDEX.at(index_id_grow); _index.empty()){ err("Выборка нового морфа из базы");
+						}else if(string index_id = (_index.end() == _index.find("id") ? "" : _index.at("id")); index_id.empty()){ err("Выборка идентификатора нового морфа");
+						}else if(string sql = "DELETE FROM " +table_vals +" WHERE dataset_id=" +bmf::dataset.at("id") +" AND index_md5=" +index_id +" AND `key`=" +to_string(key) +""; sql.empty()){ err("Составление запроса удаление расчета нового морфа");
+						}else if(mysql_query(bmf::mysql, sql.c_str())){ mpre("Запрос " +sql, __LINE__); mpre("ОШИБКА " +string(mysql_error(bmf::mysql)), __LINE__);
+						}else{ //mpre("Морф уже в базе" ,__LINE__);
+						}return !_index.empty(); }()){ mpre("Морф уже в базе key=" +to_string(key) +" " +addr_grow +" > " +index_id_grow ,__LINE__);
 					}else if(string list = [&](string list = ""){ // Список родителей
 						if(auto npos = index_id_grow.find_first_of("-"); string::npos == npos){ err("Разделитель в новом идентификаторе не найден");
 						}else if([&](){ for(int i = 2; i <= npos; i++){ // Список исходников
