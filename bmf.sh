@@ -3,10 +3,11 @@
 ## sudo apt install libsqlite3-dev
 ## sudo apt install libdb5.3-stl-dev
 ## sudo apt install libdb5.3++-dev
-## sudo apt install libhiredis-dev
 ## sudo apt install libacl1-dev
 
+# sudo apt install libmariadb3
 # sudo apt install libmariadbd-dev
+# sudo apt install libhiredis-dev
 # sudo apt install libboost-all-dev
 
 #cat clump/dva.json | ./bimorph mysql://dva:dva@localhost/dva -c -

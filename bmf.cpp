@@ -1404,7 +1404,7 @@ int main(int argc, char **argv){
 			}else if(key = [&](int key){ // Установка зависимой позиции
 				if(string _key = (bmf::ARGV.end() == bmf::ARGV.find("key") ? "" : bmf::ARGV.at("key")); _key.empty()){ //mpre("Пропуск расчета" ,__LINE__);
 				}else if(static int key_static = -1; false){ err("Установка статического значения");
-				}else if(key_static == key){ mpre("Пауза" ,__LINE__);
+				}else if(key_static == key){ std::cerr << ".";
 				}else if(key_static = key; false){ err("Сохранение значения ключа для дальнейших сравнений");
 				}else if(0 != _key.find_first_of("-+")){ mpre("Не установлен знак в ключе key=" +_key +" " ,__LINE__);
 				}else if(int _key_ = atoi(_key.c_str()); !_key_){ mpre("Значение для изменения не задано" ,__LINE__);
@@ -1807,7 +1807,7 @@ int main(int argc, char **argv){
 						}else if(string sql = "DELETE FROM " +table_vals +" WHERE dataset_id=" +bmf::dataset.at("id") +" AND index_md5=" +index_id +" AND `key`=" +to_string(key) +""; sql.empty()){ err("Составление запроса удаление расчета нового морфа");
 						}else if(mysql_query(bmf::mysql, sql.c_str())){ mpre("Запрос " +sql, __LINE__); mpre("ОШИБКА " +string(mysql_error(bmf::mysql)), __LINE__);
 						}else{ //mpre("Морф уже в базе" ,__LINE__);
-						}return !_index.empty(); }()){ mpre("Морф уже в базе key=" +to_string(key) +" " +addr_grow +" > " +index_id_grow ,__LINE__);
+						}return !_index.empty(); }()){ //mpre("Морф уже в базе key=" +to_string(key) +" " +addr_grow +" > " +index_id_grow ,__LINE__);
 					}else if(string list = [&](string list = ""){ // Список родителей
 						if(auto npos = index_id_grow.find_first_of("-"); string::npos == npos){ err("Разделитель в новом идентификаторе не найден");
 						}else if([&](){ for(int i = 2; i <= npos; i++){ // Список исходников
