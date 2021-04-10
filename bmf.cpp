@@ -1451,10 +1451,10 @@ int main(int argc, char **argv){
 						}else if(auto npos = addr.find_first_of("-"); string::npos == npos){ err("Не найден разделитель в адресе");
 						}else if([&](){ for(int i=0; i<npos; i++){ // Родители морфа
 							if(string _addr = "1" +addr.substr(i +1, -1); _addr.empty()){ err("Формирование адреса");
-							}else if(auto index_itr = BMF_INDEX.find(_addr); BMF_INDEX.end() == index_itr){ mpre("Родитель не найден " +_addr ,__LINE__);
-							}else if(string index_id = (index_itr->second.end() == index_itr->second.find("id") ? "" : index_itr->second.at("id")); index_id.empty()){ err("Выборка идентификатора морфа");
-							}else if(INDEX[_addr] = index_id; INDEX.empty()){ err("Уведомление");
-							}else{ //mpre("Адреса adr=" +adr +" _addr=" +_addr ,__LINE__); //mpre("Формирование родителя i=" +to_string(i) +" adr=" +adr +" _addr=" +_addr +" " +addr ,__LINE__);
+							}else if(INDEX.end() != INDEX.find(_addr)){ //mpre("Уже добавили" ,__LINE__);
+							}else if(auto index_itr = BMF_INDEX.find(_addr); BMF_INDEX.end() == index_itr){ //mpre("Родитель не найден " +_addr ,__LINE__);
+							}else if(INDEX[_addr] = index_itr->second.at("id"); INDEX.empty()){ err("Уведомление");
+							//}else{ mpre("Адреса adr=" +adr +" _addr=" +_addr ,__LINE__); //mpre("Формирование родителя i=" +to_string(i) +" adr=" +adr +" _addr=" +_addr +" " +addr ,__LINE__);
 							}}return false; }()){ err("Список родителей морфа");
 						}else{ //mpre(index ,"Изменившийся морф" ,__LINE__);
 						}}return false; }()){ err("Составление списк изменений");
