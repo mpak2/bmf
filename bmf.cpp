@@ -1007,7 +1007,7 @@ int main(int argc, char **argv){
 				}else if(list =list.substr(0, pos); false){ mpre("ОШИБКА сокращение длинны списка", __LINE__);
 				}else if(EPT[dano_id] = to_string(EPT.size()); EPT.empty()){ err("Очередное исключение");
 				}else{ //mpre("Исключение " +dano_id ,__LINE__);
-				}}return EPT; }(); EPT.empty()){ err("Формирование списка исключений"); //}else if(mpre(EPT ,"Список исключений" ,__LINE__); false){ err("Уведомление");
+				}}return EPT; }(); false){ err("Формирование списка исключений"); //}else if(mpre(EPT ,"Список исключений" ,__LINE__); false){ err("Уведомление");
 			}else if(TMs RES = [&](auto count_itr, TMs RES = {}){ do{ // Выбор подходящей связи
 				if(false){ err("Пропуск");
 				}else if([&](){ for(auto cnt_itr:count_itr->second){ // Исходники разнообразия
@@ -1626,7 +1626,8 @@ int main(int argc, char **argv){
 				}else if(TMs itog = itog_itr.second; itog.empty()){ //mpre("ОШИБКА выборки итога", __LINE__);
 				}else if(itog.end() == itog.find("id")){ mpre("ОШИБКА не найден идентификатор итога", __LINE__);
 				}else if(TMs index = [&](TMs index = {}){ // Добавление первоначального морфа
-					if(TMs dano = DANO.begin()->second; dano.empty()){ mpre("ОШИБКА выборки первого исходника", __LINE__);
+					//if(TMs dano = DANO.begin()->second; dano.empty()){ mpre("ОШИБКА выборки первого исходника", __LINE__);	
+					if(TMs dano = bmf::Choice("", key, DANO, DANO_BITMAP); dano.empty()){ err("Выборка первоначального исходника");
 					}else if([&](){ // Выборка морфа из базы
 						if(itog.end() == itog.find("index_id")){ //mpre("У итога не найдено поле морфа", __LINE__);
 						}else if(std::string index_id = itog.at("index_id"); index_id.empty()){ //mpre("Пустое поле корневого морфа", __LINE__);
@@ -1641,6 +1642,8 @@ int main(int argc, char **argv){
 					}else if(BMF_INDEX[addr] = index; BMF_INDEX.empty()){ err("Добавление нового морфа в список");
 					}else if(string dano_val = (DANO_BITMAP.at(dano.at("id")).test(key) ? "1" : "0"); dano_val.empty()){ err("Значение исходника");
 					//}else if(TMs _index_vals = {{"index_md5", index.at("id")}, {"addr", addr}, {"grp", string(dano_val +dano_val)}, {"dataset_id", bmf::dataset.at("id")} ,{"key", to_string(key)} ,{"grow_md5", index.at("id")}}; _index_vals.empty()){ err("Группа морфа");
+					//}else if(std::string map = [&](std::string map = ""){ boost::to_string(DANO_BITMAP.at(dano.at("id")), map); return map; }(); (map.length() != dataset_count)){ mpre("ОШИБКА установки карты исходника", __LINE__);
+					//}else if(mpre("Первоначальный морф " +addr +" dano_id=" +dano.at("id") +" map=" +map ,__LINE__); false){ err("Уведомление");
 					//}else if(TMs index_vals = bmf::Up("index_vals", {{"id", md5(addr +"-" +to_string(key))}}, _index_vals, {}, __LINE__); index_vals.empty()){ err("Сохранение группы морфа");
 					}else{ //mpre(index, "Добавление первоначального морфа " +index.at("id"), __LINE__);
 					}return index; }(); index.empty()){ mpre("ОШИБКА морф связи не найден", __LINE__);
@@ -1713,6 +1716,8 @@ int main(int argc, char **argv){
 					}else if(TMs _index = {{"itog_values_id", index_grow.at("itog_values_id")}, {"addr", index_id_grow}, {"dano_id", dano_grow.at("id")}, {"itog_id", index_grow.at("itog_id")}}; _index.empty()){ mpre("ОШИБКА формирования свойст нового морфа", __LINE__);
 					}else if(_index = bmf::Up_mysql("index", {/*{"id", md5(index_id_grow)}*/}, _index, {}, __LINE__); _index.empty()){ mpre("ОШИБКА добавления корневого морфа в базу", __LINE__);
 					}else if(!(err += 1)){ err("Инкримент изменений");
+					//}else if(std::string map = [&](std::string map = ""){ boost::to_string(DANO_BITMAP.at(dano_grow.at("id")), map); return map; }(); (map.length() != dataset_count)){ mpre("ОШИБКА установки карты исходника", __LINE__);
+					//}else if(mpre("Расширение модели " +index_id_grow +" dano_id=" +dano_grow.at("id") +" map=" +map ,__LINE__); false){ err("Уведомление");
 					}else if(bmf::ARGV.end() == bmf::ARGV.find("verbose")){ //mpre("Не отображаем время обучения", __LINE__);
 					}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Расширение модели " +index_id_grow +" ", __LINE__);
 					}return false; }()){ err("Расширение");
