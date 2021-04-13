@@ -1021,7 +1021,7 @@ int main(int argc, char **argv){
 					}else if(RES.end() != RES.find(grp)){ //mpre("Значение уже установлено [" +grp +"]" ,__LINE__);
 					//}else if((RES.end() != RES.find(grp)) & (val_prev != val_cur)){ //mpre("Значение уже установлено [" +grp +"]" ,__LINE__);
 					}else if(RES[grp] = cnt_itr.first; RES.empty()){ err("Установка значения");
-					}else{ //mpre(RES ,"Проверка исходника key_prev=" +to_string(key_prev) +" " +cnt_itr.first ,__LINE__);
+					}else{ //mpre(RES ,"Выбор исходника grp=" +grp +" count=" +to_string(count_itr->first) +" key_prev=" +to_string(key_prev) +" " +cnt_itr.first ,__LINE__);
 					}}return false; }()){ err("Перебор исходников разнообразия");
 				}else{ //mpre("Обзор разнообразия " +to_string(count_itr->first) ,__LINE__);
 				}}while((COUNT.rend() != ++count_itr) && (RES.end() == RES.find("01"))); return RES; }(COUNT.rbegin()); RES.empty()){ err("Выбор подходящей связи");
