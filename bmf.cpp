@@ -1615,7 +1615,6 @@ int main(int argc, char **argv){
 				}return _INDEX; }(); false){ err("Список изменений");
 			}else if([&](){ for(auto &itog_itr:bmf::List(bmf::ITOG, {}, __LINE__)){ // Проверка списка итогов
 				if(auto _microtime_ = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - microtime; false){ mpre("ОШИБКА расчета времени эпохи", __LINE__);
-				}else if(bmf::Progress("Набор:" +bmf::dataset.at("id") + itog_str+" Эпоха:" +epoch +" Примеров:" +to_string(key+1) +" Изменений:"+ to_string(err)+ " (" +to_string(_microtime_) +" сек.)", (float)(key+1)/dataset_count, __LINE__); false){ mpre("Индикатор прогресса", __LINE__);
 				}else if(TMs itog = itog_itr.second; itog.empty()){ //mpre("ОШИБКА выборки итога", __LINE__);
 				}else if(itog.end() == itog.find("id")){ mpre("ОШИБКА не найден идентификатор итога", __LINE__);
 				}else if(TMs index = [&](TMs index = {}){ // Добавление первоначального морфа
@@ -1715,6 +1714,7 @@ int main(int argc, char **argv){
 					}else if(bmf::ARGV.end() == bmf::ARGV.find("verbose")){ //mpre("Не отображаем время обучения", __LINE__);
 					}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Расширение модели " +index_id_grow +" ", __LINE__);
 					}return false; }()){ err("Расширение");
+				}else if(bmf::Progress("Набор:" +bmf::dataset.at("id") + itog_str+" Эпоха:" +epoch +" Примеров:" +to_string(key+1) +" Изменений:"+ to_string(err)+ " (" +to_string(_microtime_) +" сек.)", (float)(key+1)/dataset_count, __LINE__); false){ mpre("Индикатор прогресса", __LINE__);
 				}else if([&](){ // Сохранение результата в индекс
 					if(std::string dataset_map_id = "index," +index.at("id") +"," +bmf::dataset.at("id"); dataset_map_id.empty()){ mpre("ОШИБКА составления идентификатора карты", __LINE__);
 					}else if(TMs index_map = bmf::Up(bmf::DATASET_MAP, {{"id", dataset_map_id}}, {}, {}, __LINE__); false){ mpre("ОШИБКА обнолвения карты исходника", __LINE__);
