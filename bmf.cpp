@@ -182,37 +182,34 @@ namespace bmf{ // Глобальные переменные
 
 int main(int argc, char **argv){
 	if(setlocale(LC_ALL, "LC_ALL=C.UTF-8"); false){ mpre("ОШИБКА установки кирилицы", __LINE__);
-	}else if(nlohmann::json in = [&](nlohmann::json in = {}){ // Параметры консоли
-		if([&](){ for(int i = 0; i < argc; i++){ // Перебор всех параметров
-			if(0 >= i){ //mpre("Имя файла", __LINE__);
-			}else if(string str = argv[i]; (0 >= str.length())){ mpre("ОШИБКА получения аргумента консоли", __LINE__);
-			}else if(int npos = str.find("="); false){ mpre("Расчет позиции равно в строке аргументов", __LINE__);
-			}else if(std::string arg = (std::string::npos == npos ? str : str.substr(0, npos)); false){ mpre("ОШИБКА получения имени аргумента", __LINE__);
-			}else if(std::string val = (std::string::npos == npos ? "" : str.substr(npos +1, str.length())); false){ mpre("ОШИБКА получения значения аргумента", __LINE__);
-			}else if([&](bool skip = false){
-				if(std::string::npos != npos){ //mpre("Задан аргумент", __LINE__);
-				}else if("-" != arg){ //mpre("Не признак загрузки", __LINE__);
-				}else if(bmf::ARGV.insert(make_pair("-", "")); bmf::ARGV.empty()){ mpre("ОШИБКА установки нового артибута в массив", __LINE__);
-				}else if(!(skip = true)){ mpre("Установка значения пропуска", __LINE__);
-				}return skip; }()){ // Признак загрузки
-			}else if([&](bool skip = false){ // Установка БД
-				if(std::string::npos != npos){ //mpre("Задан аргумент", __LINE__);
-				}else if(bmf::ARGV.end() != bmf::ARGV.find("db")){ //mpre("ОШИБКА дублирование аргументов командной строки `" +bmf::ARGV.at("db") + "` " +arg, __LINE__);
-				}else if(bmf::ARGV.insert(make_pair("db", arg)); bmf::ARGV.empty()){ mpre("ОШИБКА установки нового артибута в массив", __LINE__);
-				}else if(!(skip = true)){ mpre("Установка значения пропуска", __LINE__);
-				}else{ //mpre("Установка БД " +arg, __LINE__);
-				}return skip; }()){ //mpre("ОШИБКА установки БД", __LINE__);
-			}else if(bmf::ARGV.insert(make_pair(arg, val)); bmf::ARGV.empty()){ mpre("ОШИБКА установки нового артибута в массив", __LINE__);
-			}else{ //mpre("Аргумент консоли "+ arg + "=" +val, __LINE__);
-			}}return false; }()){ mpre("ОШИБКА разбора параметров консоли", __LINE__);
-		}else if(in = [&](nlohmann::json in = {}){ // Входной поток
-			if(bmf::ARGV.end() == bmf::ARGV.find("-")){ //mpre("Данные для обучения не установлены", __LINE__);
-			}else if([&](string str = ""){ while(getline(std::cin, str)){ bmf::ARGV.at("-") += ("\n"+ str); }; return (0 >= bmf::ARGV.at("-").length()); }()){ mpre("ОШИБКА входящий параметр не задан", __LINE__);
-			}else if(in = nlohmann::json::parse(bmf::ARGV.at("-")); false){ mpre("ОШИБКА Входящий параметр с обучающими данными пуст", __LINE__);
-			}else{ //mpre("Данные из потока std::cin "+ in.dump(), __LINE__);
-			}return in; }(); false){ mpre("ОШИБКА получения входного потока", __LINE__);
-		}else{ //mpre(bmf::ARGV, "Список параметров", __LINE__);
-		}return in; }(); false){ mpre("ОШИБКА параметры консоли не заданы", __LINE__);
+	}else if(bmf::ARGV = [&](TMs ARGV = {}){ for(int i = 0; i < argc; i++){ // Перебор всех параметров
+		if(0 >= i){ //mpre("Имя файла", __LINE__);
+		}else if(string str = argv[i]; (0 >= str.length())){ mpre("ОШИБКА получения аргумента консоли", __LINE__);
+		}else if(int npos = str.find("="); false){ mpre("Расчет позиции равно в строке аргументов", __LINE__);
+		}else if(std::string arg = (std::string::npos == npos ? str : str.substr(0, npos)); false){ mpre("ОШИБКА получения имени аргумента", __LINE__);
+		}else if(std::string val = (std::string::npos == npos ? "" : str.substr(npos +1, str.length())); false){ mpre("ОШИБКА получения значения аргумента", __LINE__);
+		}else if([&](bool skip = false ){ // Параметры консоли
+			if(std::string::npos != npos){ //mpre("Задан аргумент", __LINE__);
+			}else if("-" != arg){ //mpre("Не признак загрузки", __LINE__);
+			}else if(ARGV.insert(make_pair("-", "")); ARGV.empty()){ mpre("ОШИБКА установки нового артибута в массив", __LINE__);
+			}else if(!(skip = true)){ mpre("Установка значения пропуска", __LINE__);
+			}return skip; }()){ // Признак загрузки
+		}else if([&](bool skip = false){ // Установка БД
+			if(std::string::npos != npos){ //mpre("Задан аргумент", __LINE__);
+			}else if(ARGV.end() != ARGV.find("db")){ //mpre("ОШИБКА дублирование аргументов командной строки `" +ARGV.at("db") + "` " +arg, __LINE__);
+			}else if(ARGV.insert(make_pair("db", arg)); ARGV.empty()){ mpre("ОШИБКА установки нового артибута в массив", __LINE__);
+			}else if(!(skip = true)){ mpre("Установка значения пропуска", __LINE__);
+			}else{ //mpre("Установка БД " +arg, __LINE__);
+			}return skip; }()){ //mpre("ОШИБКА установки БД", __LINE__);
+		}else if(ARGV.insert(make_pair(arg, val)); ARGV.empty()){ mpre("ОШИБКА установки нового артибута в массив", __LINE__);
+		}else{ //mpre(ARGV ,"Аргументы консоли "+ arg + "=" +val , __LINE__);
+		}}return ARGV; }(); bmf::ARGV.empty()){ mpre("ОШИБКА разбора параметров консоли", __LINE__);
+	}else if(nlohmann::json in = [&](nlohmann::json in = {}){ // Входной поток
+		if(bmf::ARGV.end() == bmf::ARGV.find("-")){ //mpre("Данные для обучения не установлены", __LINE__);
+		}else if([&](string str = ""){ while(getline(std::cin, str)){ bmf::ARGV.at("-") += ("\n"+ str); }; return (0 >= bmf::ARGV.at("-").length()); }()){ mpre("ОШИБКА входящий параметр не задан", __LINE__);
+		}else if(in = nlohmann::json::parse(bmf::ARGV.at("-")); false){ mpre("ОШИБКА Входящий параметр с обучающими данными пуст", __LINE__);
+		}else{ //mpre("Данные из потока std::cin "+ in.dump(), __LINE__);
+		}return in; }(); false){ mpre("ОШИБКА получения входного потока", __LINE__);
 	}else if([&](bool skip = false){ // Остановки из консоли
 		if([&](bool skip = false){ // Версия программы
 			if(bmf::ARGV.end() == bmf::ARGV.find("-v")){ //mpre("Пропускаем отображение версии", __LINE__);
@@ -257,7 +254,7 @@ int main(int argc, char **argv){
 			} return true; }()){ mpre("Атрибуты параметров командной строки", __LINE__);
 		}else{
 		}return skip; }()){ exit(mpre("Остановка выполнения", __LINE__));
-	}else if([&](){ // Подключение БД
+	}else if(bmf::mysql = [&](MYSQL *mysql = NULL){ // Подключение БД
 		if(std::string db = [&](std::string db = ""){ // Имя базы данных
 			if(bmf::ARGV.end() == bmf::ARGV.find("db")){ mpre("ОШИБКА БД для сохранения не задана -db", __LINE__);
 			}else if(0 >= bmf::ARGV.at("db").length()){ mpre("База данных для сохранения не указана", __LINE__);
@@ -315,11 +312,11 @@ int main(int argc, char **argv){
 		}else if([&](){ // Подключение к БД mysql
 			if("mysql" != bmf::dbtype){ //mpre("Используем не mysql", __LINE__);
 			}else if(bmf::dbname.empty()){ err("Имя БД не задано");
-			}else if(bmf::mysql = mysql_init(NULL); (nullptr == bmf::mysql)){ err("ОШИБКА создания соединения");
-			}else if(bmf::mysql = mysql_real_connect(bmf::mysql, bmf::dbhost.c_str(), bmf::dbuser.c_str(), bmf::dbpassword.c_str(), bmf::dbname.c_str(), bmf::dbport, NULL, 0); !bmf::mysql){ mpre("Параметры подключения dbhost=" +bmf::dbhost +" dbport=" +to_string(bmf::dbport) +" dbuser=" +bmf::dbuser +" dbpassword=" +bmf::dbpassword +" database=" +bmf::dbname, __LINE__); err("Подключение БД"); 
-			}else if(mysql_query(bmf::mysql, std::string("SET NAMES utf8").c_str()); !bmf::mysql){ err("Установка кодировки");
-			}else{ //mpre("ОШИБКА: " +string(mysql_error(bmf::mysql)), __LINE__);
-			}return false; }()){ err("Подключение к БД mysql");
+			}else if(mysql = mysql_init(NULL); (nullptr == mysql)){ err("ОШИБКА создания соединения");
+			}else if(mysql = mysql_real_connect(mysql, bmf::dbhost.c_str(), bmf::dbuser.c_str(), bmf::dbpassword.c_str(), bmf::dbname.c_str(), bmf::dbport, NULL, 0); !mysql){ mpre("Параметры подключения dbhost=" +bmf::dbhost +" dbport=" +to_string(bmf::dbport) +" dbuser=" +bmf::dbuser +" dbpassword=" +bmf::dbpassword +" database=" +bmf::dbname, __LINE__); err("Подключение БД"); 
+			}else if(mysql_query(mysql, std::string("SET NAMES utf8").c_str()); !mysql){ err("Установка кодировки");
+			}else{ //mpre("ОШИБКА: " +string(mysql_error(mysql)), __LINE__);
+			}return mysql; }(); false){ err("Подключение к БД mysql");
 		}else if([&](){ // Подключение к БД redis
 			if("redis" != bmf::dbtype){ //mpre("Используем не mysql", __LINE__);
 			}else if(bmf::redis = redisConnect(bmf::dbhost.c_str() ,bmf::dbport); (bmf::redis == NULL)){ err("Подключение к redis");
@@ -327,7 +324,7 @@ int main(int argc, char **argv){
 			}else{ //pre("Подключение к redis");
 			}return false; }()){ err("Подключение к БД redis");
 		}else{ //mpre("Подключение БД " +bmf::dbname, __LINE__);
-		}return false; }()){ mpre("ОШИБКА подключения БД", __LINE__);
+		}return mysql; }(); false){ mpre("ОШИБКА подключения БД", __LINE__);
 	}else if([&](){ // Функции БД
 		if(bmf::Up = ([&](std::string ROWS, TMs where, TMs insert, TMs update, int line){
 			TMs _row; // Возвращаем обновленное значение
@@ -1424,6 +1421,7 @@ int main(int argc, char **argv){
 				}else if(string dataset_id = (bmf::dataset.end() == bmf::dataset.find("id") ? "" : bmf::dataset.at("id")); dataset_id.empty()){
 				}else if(TMs dataset = bmf::Up(bmf::DATASET, {{"id", dataset_id}}, {}, {}, __LINE__); dataset.empty()){ err("Выборка набора данных");
 				}else if(key = atoi(bmf::dataset.at("key").c_str()) +_key_; false){ err("Изменение ключа");
+				}else if(key = (key >= dataset_count ? key -dataset_count : key); key >= dataset_count){ err("Выход за пределы диапазона значений");
 				}else{ //mpre("Изменение позиции ключа " +to_string(_key_) +" > " +to_string(key) ,__LINE__);
 				}return key; }(key); (0 > key >= dataset_count)){ err("Изменение позиции ключа");
 			}else if([&](){ // Обнуление позиции

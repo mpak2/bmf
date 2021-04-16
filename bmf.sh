@@ -14,7 +14,7 @@
 #cat clump/iris_3.json | ./bimorph mysql://localhost/iris - # ?cache=shared
 
 cat clump/iris.json | ./bimorph mysql://iris:iris@192.168.1.6/iris -c - # ?cache=shared
-./bimorph mysql://iris:iris@192.168.1.6/iris ds=1 epoch=100 learn verbose #-microtime # ?cache=shared
+./bimorph mysql://iris:iris@192.168.1.6/iris ds=1 epoch=100 learn #verbose #-microtime # ?cache=shared
 ./bimorph mysql://iris:iris@192.168.1.6/iris
 
 #./bimorph mysql://iris:iris@192.168.1.6/iris dano='[{"dano":{"ДлинаЧашелистика":"5.9","ШиринаЧашелистика":"3.0","ДлинаЛепестка":"5.1","ШиринаЛепестка":"1.8"}}]' #Iris-virginica
