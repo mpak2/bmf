@@ -203,7 +203,7 @@ int main(int argc, char **argv){
 			}return skip; }()){ //mpre("ОШИБКА установки БД", __LINE__);
 		}else if(ARGV.insert(make_pair(arg, val)); ARGV.empty()){ mpre("ОШИБКА установки нового артибута в массив", __LINE__);
 		}else{ //mpre(ARGV ,"Аргументы консоли "+ arg + "=" +val , __LINE__);
-		}}return ARGV; }(); bmf::ARGV.empty()){ mpre("ОШИБКА разбора параметров консоли", __LINE__);
+		}}return ARGV; }(); bmf::ARGV.empty()){ err("Параметры консоли");
 	}else if(nlohmann::json in = [&](nlohmann::json in = {}){ // Входной поток
 		if(bmf::ARGV.end() == bmf::ARGV.find("-")){ //mpre("Данные для обучения не установлены", __LINE__);
 		}else if([&](string str = ""){ while(getline(std::cin, str)){ bmf::ARGV.at("-") += ("\n"+ str); }; return (0 >= bmf::ARGV.at("-").length()); }()){ mpre("ОШИБКА входящий параметр не задан", __LINE__);
@@ -1413,16 +1413,17 @@ int main(int argc, char **argv){
 				}return epoch; }(); epoch.empty()){ mpre("ОШИБКА расчета эпохи", __LINE__);
 			}else if(key = [&](int key){ // Установка зависимой позиции
 				if(string _key = (bmf::ARGV.end() == bmf::ARGV.find("key") ? "" : bmf::ARGV.at("key")); _key.empty()){ //mpre("Пропуск расчета" ,__LINE__);
+				//}else if(mpre("Изменение позиции ключа" ,__LINE__); false){ err("Уведомление");
 				}else if(static int key_static = -1; false){ err("Установка статического значения");
 				}else if(key_static == key){ std::cerr << ".";
 				}else if(key_static = key; false){ err("Сохранение значения ключа для дальнейших сравнений");
 				}else if(0 != _key.find_first_of("-+")){ mpre("Не установлен знак в ключе key=" +_key +" " ,__LINE__);
 				}else if(int _key_ = atoi(_key.c_str()); !_key_){ mpre("Значение для изменения не задано" ,__LINE__);
-				}else if(string dataset_id = (bmf::dataset.end() == bmf::dataset.find("id") ? "" : bmf::dataset.at("id")); dataset_id.empty()){
+				}else if(string dataset_id = (bmf::dataset.end() == bmf::dataset.find("id") ? "" : bmf::dataset.at("id")); dataset_id.empty()){ err("Идентификатор набора данных");
 				}else if(TMs dataset = bmf::Up(bmf::DATASET, {{"id", dataset_id}}, {}, {}, __LINE__); dataset.empty()){ err("Выборка набора данных");
 				}else if(key = atoi(bmf::dataset.at("key").c_str()) +_key_; false){ err("Изменение ключа");
 				}else if(key = (key >= dataset_count ? key -dataset_count : key); key >= dataset_count){ err("Выход за пределы диапазона значений");
-				}else{ //mpre("Изменение позиции ключа " +to_string(_key_) +" > " +to_string(key) ,__LINE__);
+				}else{ mpre("Изменение позиции ключа " +to_string(_key_) +" > " +to_string(key) ,__LINE__);
 				}return key; }(key); (0 > key >= dataset_count)){ err("Изменение позиции ключа");
 			}else if([&](){ // Обнуление позиции
 				if(string epoch = (bmf::ARGV.end() == bmf::ARGV.find("epoch") ? "" : bmf::ARGV.at("epoch")); "0" != epoch){ //mpre("Только для нулевой эпохи");
