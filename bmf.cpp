@@ -65,7 +65,7 @@
 #include "version.txt"
 
 #define pre(x) if(x){ printf("%d.%s\n", __LINE__, x); }
-#define err(x) if(x){ printf("%d.\x1b[37;41m ОШИБКА \x1b[0m %s\n", __LINE__, x); exit(1); }
+#define err(x) if(x){ printf("%d.\x1b[37;41m ОШИБКА \x1b[0m %s\n", __LINE__, x); exit(1); } // \x1b[37;41m \x1b[0m
 
 //using json = nlohmann::json; json in;
 
@@ -1399,6 +1399,7 @@ int main(int argc, char **argv){
 		}else if(int err = [&](int err = 0){ // Позиция обучения
 			if(bmf::ARGV.end() == bmf::ARGV.find("learn")){ //mpre("Не установлено обучение" ,__LINE__);
 			}else if(int epoch = (bmf::ARGV.end() == bmf::ARGV.find("epoch") ? 0 : atoi(bmf::ARGV.at("epoch").c_str())); !epoch){ //mpre("Локальный ключ" ,__LINE__);
+			//}else if(string _key = (bmf::ARGV.end() == bmf::ARGV.find("key") ? "" : bmf::ARGV.at("key")); string::npos != _key.find_first_not_of("0123456789")){
 			}else if(bmf::dataset.end() == bmf::dataset.find("err")){ err("Поле ключа не найдено в базе");
 			}else if(err = atoi(bmf::dataset.at("err").c_str()); 0 > err){ err("Расчет значения последнего ключа");
 			}else{ //mpre("Текущее состояние ключа err=" +to_string(err), __LINE__);
@@ -1428,8 +1429,8 @@ int main(int argc, char **argv){
 				}else if(static int key_static = -1; false){ err("Установка статического значения");
 				}else if(static int cnt = 0; false){ err("Количество повторений");
 				}else if(cnt += 1; false){ err("Расчет количества повторов");
-				}else if((key_static == key) && (repeat < cnt)){ mpre("ОШИБКА Остановка по зависимым повторам " +to_string(repeat) ,__LINE__);
-				}else if(key_static == key){ std::cerr << cnt << "!"; //sleep(1); //system("sleep 3");
+				}else if((key_static == key) && (repeat < cnt)){ mpre("ОШИБКА Остановка по зависимым повторам " +to_string(repeat) +" " ,__LINE__);
+				}else if(key_static == key){ std::cerr << "\x1b[37;41m " << cnt << " \x1b[0m"; //sleep(1); //system("sleep 3");
 				}else if(key_static = key; false){ err("Сохранение значения ключа для дальнейших сравнений");
 				}else if(cnt = 0; false){ err("Сохранение значения ключа для дальнейших сравнений");
 				}else{ //mpre("Не повтор");
