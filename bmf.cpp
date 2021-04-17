@@ -1718,6 +1718,7 @@ int main(int argc, char **argv){
 				}}return false; }()){ mpre("ОШИБКА сравнения результата расчета", __LINE__);
 			}else if(bmf::dataset = [&](TMs dataset){ // Обновление ключа
 				if(dataset = bmf::Up(bmf::DATASET, {{"id", dataset.at("id")}}, {}, {}, __LINE__); dataset.empty()){ err("Выборка набора данных");
+				}else if(dataset["epoch"] != bmf::dataset["epoch"]){ err("Дублирование управляющего процесса");
 				}else if(bmf::ARGV.end() == bmf::ARGV.find("learn")){ //mpre("Не изменяем позицию без обучения", __LINE__);
 				}else if(string _key = (bmf::ARGV.end() == bmf::ARGV.find("key") ? "" : bmf::ARGV.at("key")); false){ //mpre("Пропуск расчета" ,__LINE__);
 				}else if(string::npos != _key.find_first_of("0123456789")){ //mpre("Не сохраняем значение ключа и ошибок" ,__LINE__);
