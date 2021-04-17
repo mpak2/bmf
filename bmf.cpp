@@ -1403,7 +1403,7 @@ int main(int argc, char **argv){
 			}else if(err = atoi(bmf::dataset.at("err").c_str()); 0 > err){ err("Расчет значения последнего ключа");
 			}else{ //mpre("Текущее состояние ключа err=" +to_string(err), __LINE__);
 			}return err; }(); false){ err("Расчет позиции обучения");
-		}else if(long microtime = (!key ? (std::chrono::system_clock::now().time_since_epoch()).count()/1e9 : atol(bmf::dataset.at("microtime").c_str())); false){ mpre("ОШИБКА расчета времени", __LINE__);
+		}else if(long microtime = (/*bmf::ARGV.end() == bmf::ARGV.find("learn") ? (std::chrono::system_clock::now().time_since_epoch()).count()/1e9 :*/ atol(bmf::dataset.at("microtime").c_str())); false){ mpre("ОШИБКА расчета времени", __LINE__);
 		}else if([&](bool rep = false, TMMs VALUES = {}){ do{ // Повторение расчетов эпохи
 			if(std::string epoch = [&](std::string epoch = "1"){ // Расчет эпохи
 				if(bmf::dataset.end() == bmf::dataset.find("epoch")){ // mpre("Поле эпохи не задано", __LINE__);
@@ -1413,19 +1413,27 @@ int main(int argc, char **argv){
 				}return epoch; }(); epoch.empty()){ mpre("ОШИБКА расчета эпохи", __LINE__);
 			}else if(key = [&](int key){ // Установка зависимой позиции
 				if(string _key = (bmf::ARGV.end() == bmf::ARGV.find("key") ? "" : bmf::ARGV.at("key")); _key.empty()){ //mpre("Пропуск расчета" ,__LINE__);
+				//}else if(string::npos != _key.find_first_not_of("0123456789")){ mpre("Не сохраняем значение ключа и ошибок" ,__LINE__);
 				//}else if(mpre("Изменение позиции ключа" ,__LINE__); false){ err("Уведомление");
-				}else if(static int key_static = -1; false){ err("Установка статического значения");
-				}else if(static int count = 1; false){ err("Количество повторений");
-				}else if(count = (key_static == key ? count++ : 1); !count){ err("Расчет количества повторов");
-				}else if(key_static == key){ std::cerr << count << "."; //system("sleep 3");
-				}else if(key_static = key; false){ err("Сохранение значения ключа для дальнейших сравнений");
 				}else if(0 != _key.find_first_of("-+")){ mpre("Не установлен знак в ключе key=" +_key +" " ,__LINE__);
 				}else if(int _key_ = atoi(_key.c_str()); !_key_){ mpre("Значение для изменения не задано" ,__LINE__);
 				}else if(string dataset_id = (bmf::dataset.end() == bmf::dataset.find("id") ? "" : bmf::dataset.at("id")); dataset_id.empty()){ err("Идентификатор набора данных");
 				}else if(TMs dataset = bmf::Up(bmf::DATASET, {{"id", dataset_id}}, {}, {}, __LINE__); dataset.empty()){ err("Выборка набора данных");
 				}else if(key = (atoi(bmf::dataset.at("key").c_str()) +_key_) %dataset_count; false){ err("Изменение ключа");
+				//}else if(mpre("Ключ key_static=" +to_string(key_static) +" key=" +to_string(key) +" " ,__LINE__) ;false){ err("Уведомление");
 				}else{ //mpre("Изменение позиции ключа " +to_string(_key_) +" > " +to_string(key) ,__LINE__);
 				}return key; }(key); (0 > key >= dataset_count)){ err("Изменение позиции ключа");
+			}else if([&](int repeat = 100){ // Прворка на повторы
+				if(string _key = (bmf::ARGV.end() == bmf::ARGV.find("key") ? "" : bmf::ARGV.at("key")); _key.empty()){ //mpre("Пропуск расчета" ,__LINE__);
+				}else if(static int key_static = -1; false){ err("Установка статического значения");
+				}else if(static int cnt = 0; false){ err("Количество повторений");
+				}else if(cnt += 1; false){ err("Расчет количества повторов");
+				}else if((key_static == key) && (repeat < cnt)){ mpre("ОШИБКА Остановка по зависимым повторам " +to_string(repeat) ,__LINE__);
+				}else if(key_static == key){ std::cerr << cnt << "!"; //sleep(1); //system("sleep 3");
+				}else if(key_static = key; false){ err("Сохранение значения ключа для дальнейших сравнений");
+				}else if(cnt = 0; false){ err("Сохранение значения ключа для дальнейших сравнений");
+				}else{ //mpre("Не повтор");
+				}return false; }()){ err("Повтор ключа");
 			}else if([&](){ // Обнуление позиции
 				if(string epoch = (bmf::ARGV.end() == bmf::ARGV.find("epoch") ? "" : bmf::ARGV.at("epoch")); "0" != epoch){ //mpre("Только для нулевой эпохи");
 				}else if(static int err_current = 0; false){ err("Текущее количество ошибок");
@@ -1718,10 +1726,10 @@ int main(int argc, char **argv){
 				}}return false; }()){ mpre("ОШИБКА сравнения результата расчета", __LINE__);
 			}else if(bmf::dataset = [&](TMs dataset){ // Обновление ключа
 				if(dataset = bmf::Up(bmf::DATASET, {{"id", dataset.at("id")}}, {}, {}, __LINE__); dataset.empty()){ err("Выборка набора данных");
-				}else if(dataset["epoch"] != bmf::dataset["epoch"]){ err("Дублирование управляющего процесса");
 				}else if(bmf::ARGV.end() == bmf::ARGV.find("learn")){ //mpre("Не изменяем позицию без обучения", __LINE__);
-				}else if(string _key = (bmf::ARGV.end() == bmf::ARGV.find("key") ? "" : bmf::ARGV.at("key")); false){ //mpre("Пропуск расчета" ,__LINE__);
+				}else if(string _key = (bmf::ARGV.end() == bmf::ARGV.find("key") ? "" : bmf::ARGV.at("key")); !_key.empty()){ //mpre("Пропуск расчета" ,__LINE__);
 				}else if(string::npos != _key.find_first_of("0123456789")){ //mpre("Не сохраняем значение ключа и ошибок" ,__LINE__);
+				}else if(dataset["epoch"] != bmf::dataset["epoch"]){ err("Дублирование управляющего процесса");
 				}else if(int epoch = (bmf::ARGV.end() == bmf::ARGV.find("epoch") ? 0 : atoi(bmf::ARGV.at("epoch").c_str())); !epoch){ //mpre("Не сохраняем свойства в эпоху" ,__LINE__);
 				}else if(dataset["key"] = std::to_string(key); dataset.empty()){ err("Установка нового ключа");
 				}else if(dataset["err"] = std::to_string(err); dataset.empty()){ err("Установка количества ошибок эпохи");
@@ -1745,12 +1753,15 @@ int main(int argc, char **argv){
 			if(!err){ //mpre("Не увеличиваем эпохи без обучения", __LINE__);
 			}else if(bmf::ARGV.end() == bmf::ARGV.find("learn")){ //mpre("Не сохраняем результаты на расчёте" ,__LINE__);
 			}else if(TMs dataset = bmf::dataset = bmf::Up(bmf::DATASET, {{"id", bmf::dataset.at("id")}}, {}, {}, __LINE__); bmf::dataset.empty()){ err("Выборка набора данных");
-			}else if(bmf::dataset["epoch"] = to_string(atoi(bmf::dataset["epoch"].c_str())+1); bmf::dataset.at("epoch").empty()){ err("Инкремента эпох");
-			}else if(bmf::dataset["key"] = "0"; false){ err("Обнуление позиции");
-			}else if(bmf::dataset["err"] = "0"; false){ err("Обнуление позиции");
-			}else if(bmf::dataset["microtime"] = "0"; false){ err("Обнуление позиции");
-			}else if(bmf::dataset = bmf::Up(bmf::DATASET, {{"id", bmf::dataset.at("id")}}, bmf::dataset, bmf::dataset, __LINE__); bmf::dataset.empty()){ err("Выборка набора данных");
+			//}else if(string _key = (bmf::ARGV.end() == bmf::ARGV.find("key") ? "" : bmf::ARGV.at("key")); !_key.empty()){ //mpre("Пропуск расчета" ,__LINE__);
+			}else if(bool base = (bmf::ARGV.end() == bmf::ARGV.find("key")); false){ err("Расчет основного процесса");
+			}else if(dataset["epoch"] = (base ? to_string(atoi(dataset["epoch"].c_str())+1) : dataset["epoch"]); dataset.at("epoch").empty()){ err("Инкремента эпох");
+			}else if(dataset["key"] = (base ? "0" : dataset["key"]); false){ err("Обнуление позиции");
+			}else if(dataset["err"] = (base ? "0" : to_string(atoi(dataset["err"].c_str()) +err)); false){ err("Обнуление позиции");
+			}else if(dataset["microtime"] = "0"; false){ err("Обнуление позиции");
+			}else if(bmf::dataset = bmf::Up(bmf::DATASET, {{"id", dataset.at("id")}}, dataset, dataset, __LINE__); bmf::dataset.empty()){ err("Выборка набора данных");
 			}else if(auto _microtime_ = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - microtime; false){ mpre("ОШИБКА расчета времени эпохи", __LINE__);
+			}else if(!base){ //mpre("Не сохраняем значение ключа и ошибок" ,__LINE__);
 			}else if(TMs epoch = bmf::Up_mysql("epoch", {}, {{"epoch", bmf::dataset.at("epoch")}, {"dataset_id", dataset.at("id")}, {"microtime", to_string(_microtime_)}, {"err", dataset.at("err")}}, {} ,__LINE__); epoch.empty()){ err("Сохранение результатов эпохи");
 			}else{ //mpre("Инкремент эпох", __LINE__);
 			}return bmf::dataset; }(); bmf::dataset.empty()){ err("Инкремент эпох");
