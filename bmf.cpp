@@ -1459,7 +1459,7 @@ int main(int argc, char **argv){
 				if(table_vals = "index_vals" /*+"_" +bmf::dataset.at("id")*/ +string("_") +to_string(key); table_vals.empty()){ err("ОШИБКА расчета имени таблицы");
 				}else if(string data = (bmf::ARGV.end() == bmf::ARGV.find("data") ? "all" : bmf::ARGV.at("data")); data.empty()){ //mpre("Авторомный режим" ,__LINE__);
 				}else if(mysql_query(bmf::mysql, std::string("CREATE TABLE IF NOT EXISTS `" +table_vals +"` LIKE `index_vals`;").c_str())){ mpre("Вставка данных " +string(mysql_error(bmf::mysql)) ,__LINE__); 
-				}else{ mpre("Создание таблицы для промежуточных данных" ,__LINE__);
+				}else{ //mpre("Создание таблицы для промежуточных данных" ,__LINE__);
 				}return table_vals; }(); table_vals.empty()){ err("Таблица промежуточных данных");
 			}else if(TMMs _INDEX = [&](TMMs _INDEX = {}){ //Список изменений
 				if(string data = (bmf::ARGV.end() == bmf::ARGV.find("data") ? "all" : bmf::ARGV.at("data")); data.empty()){ _INDEX = BMF_INDEX; //mpre("Автономный режим расчетов" ,__LINE__);
@@ -1475,8 +1475,7 @@ int main(int argc, char **argv){
 				}else if([&](){ for(auto index_itr:_INDEX){ // Полный список необходимых значений
 					if(string addr = (index_itr.second.end() == index_itr.second.find("addr") ? "" : index_itr.second.at("addr")); addr.empty()){ err("Адрес морфа");
 					}else if(string data = [&](string data = ""){ // Укороченный режим расчета родителей для автономного режима
-						if(string data = (bmf::ARGV.end() == bmf::ARGV.find("data") ? "all" : bmf::ARGV.at("data")); false){ //mpre("Автономный режим расчетов" ,__LINE__);
-						}else if(!data.empty()){ mpre("Только для автономного режима" ,__LINE__);
+						if(data = (bmf::ARGV.end() == bmf::ARGV.find("data") ? "all" : bmf::ARGV.at("data")); !data.empty()){ //mpre("Автономный режим расчетов" ,__LINE__);
 						}else if(auto index_itr = BMF_INDEX.find(addr); BMF_INDEX.end() == index_itr){ //mpre("Родитель не найден " +_addr ,__LINE__);
 						}else if(INDEX[addr] = index_itr->second.at("id"); INDEX.empty()){ err("Уведомление");
 						}else{ //mpre("Расчет родителей в автономном режиме" ,__LINE__);
