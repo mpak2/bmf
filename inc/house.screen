@@ -1,20 +1,16 @@
-#termcapinfo xterm 'Co#256:AB=\E[48;5;%dm:AF=\E[38;5;%dm'
+termcapinfo xterm 'Co#256:AB=\E[48;5;%dm:AF=\E[38;5;%dm'
 
+screen -t cmd 1 bash 
 split -v
-screen
-!!bash -c "cat ../clump/iris.json | ~/git/bmf/bimorph mysql://iris:iris@192.168.1.6/iris -c -" # ~/git/bmf/clump/iris.json | ~/git/bmf/bimorph mysql://iris:iris@192.168.1.6/iris -c -
 
 focus
-screen
-exec bash -c "sleep 5; ./bimorph mysql://iris:iris@192.168.1.6/iris ds=1 epoch=100" # ~/git/bmf/clump/iris.json | ~/git/bmf/bimorph mysql://iris:iris@192.168.1.6/iris -c -
+screen -t win2 2 htop
+focus
 
-#split
-#focus
-#screen
-#screen -t win4 4 bash
+split
+focus
+screen -t win3 3 bash
 
-#focus
-#screen
-#screen -t win2 2 htop
-#focus
-
+split
+focus
+screen -t win4 4 bash
