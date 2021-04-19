@@ -1424,7 +1424,7 @@ int main(int argc, char **argv){
 				//}else if(mpre("Ключ key_static=" +to_string(key_static) +" key=" +to_string(key) +" " ,__LINE__) ;false){ err("Уведомление");
 				}else{ //mpre("Изменение позиции ключа " +to_string(_key_) +" > " +to_string(key) ,__LINE__);
 				}return key; }(key); (0 > key >= dataset_count)){ err("Изменение позиции ключа");
-			}else if([&](int repeat = 100){ // Прворка на повторы
+			}else if([&](int repeat = 1000){ // Прворка на повторы
 				if(string _key = (bmf::ARGV.end() == bmf::ARGV.find("key") ? "" : bmf::ARGV.at("key")); _key.empty()){ //mpre("Пропуск расчета" ,__LINE__);
 				}else if(static int key_static = -1; false){ err("Установка статического значения");
 				}else if(static int cnt = 0; false){ err("Количество повторений");
