@@ -1399,7 +1399,6 @@ int main(int argc, char **argv){
 		}else if(int err = [&](int err = 0){ // Позиция обучения
 			if(bmf::ARGV.end() == bmf::ARGV.find("learn")){ //mpre("Не установлено обучение" ,__LINE__);
 			}else if(int epoch = (bmf::ARGV.end() == bmf::ARGV.find("epoch") ? 0 : atoi(bmf::ARGV.at("epoch").c_str())); !epoch){ //mpre("Локальный ключ" ,__LINE__);
-			//}else if(string _key = (bmf::ARGV.end() == bmf::ARGV.find("key") ? "" : bmf::ARGV.at("key")); string::npos != _key.find_first_not_of("0123456789")){
 			}else if(bmf::dataset.end() == bmf::dataset.find("err")){ err("Поле ключа не найдено в базе");
 			}else if(err = atoi(bmf::dataset.at("err").c_str()); 0 > err){ err("Расчет значения последнего ключа");
 			}else{ //mpre("Текущее состояние ключа err=" +to_string(err), __LINE__);
@@ -1426,12 +1425,25 @@ int main(int argc, char **argv){
 				}else if(static int key_static = -1; false){ err("Установка статического значения");
 				}else if(static int cnt = 0; false){ err("Количество повторений");
 				}else if(cnt += 1; false){ err("Расчет количества повторов");
-				}else if((key_static == key) && (repeat < cnt)){ mpre("ОШИБКА Остановка по зависимым повторам " +to_string(repeat) +" " ,__LINE__);
-				}else if(key_static == key){ key += cnt; std::cerr << "\x1b[37;41m " << cnt << " \x1b[0m"; //sleep(1); //system("sleep 3");
+				}else if((key_static == key) && (repeat < cnt)){ mpre("ОШИБКА Остановка вслед за основным потоком " +to_string(repeat) +" " ,__LINE__);
+				/*}else if([&](bool skip = false){ //Повтор
+					if(key_static != key){ //mpre("Не меняем положение ключа" ,__LINE__);
+					}else if(skip = true; false){ err("Инкремент признака выхода");
+					}else if(key += cnt; key < dataset_count){ //mpre("Не произошло пересечение стартовой линии" ,__LINE__);
+					}else if(key = key %dataset_count; false){ err("Перенос в начало если больше максимального примера");
+					}else if(err = 0; false){ err("Обновляем значение ошибок");
+					}else{ //mpre("Возвращение к началу набора данных" .__LINE__);
+					}return skip; }()){ std::cerr << "\x1b[37;41m " << cnt << " \x1b[0m"; //sleep(1); //system("sleep 3");*/
+				}else if(key_static == key){ key = ((key + cnt) %dataset_count); std::cerr << "\x1b[37;41m " << cnt << " \x1b[0m"; //sleep(1); //system("sleep 3");
 				}else if(key_static = key; false){ err("Сохранение значения ключа для дальнейших сравнений");
 				}else if(cnt = 0; false){ err("Сохранение значения ключа для дальнейших сравнений");
 				}else{ //mpre("Не повтор");
 				}return false; }()){ err("Повтор ключа");
+			/*}else if(err = [&](){ // Расчет ошибок для зависимых процессов
+				if(key){ //mpre("Не в начале набора" ,__LINE__);
+				}else if(key = 0; false){ err("Скидывание количества ошибок");
+				}else{ //mpre("Обнуление если процесс находится в начале набора данных", __LINE__);
+				}return err; }() ;false){ err("Расчет ошибок");*/
 			}else if([&](){ // Обнуление позиции
 				if(string epoch = (bmf::ARGV.end() == bmf::ARGV.find("epoch") ? "" : bmf::ARGV.at("epoch")); "0" != epoch){ //mpre("Только для нулевой эпохи");
 				}else if(static int err_current = 0; false){ err("Текущее количество ошибок");
@@ -1655,7 +1667,7 @@ int main(int argc, char **argv){
 						if(index_vals = {{"index_md5", index.at("id")}, {"v1" ,dano_val} ,{"v0" ,dano_val} ,{"dataset_id", bmf::dataset.at("id")} ,{"key", to_string(key)} ,{"grow_md5", index.at("id")} ,{"g1" ,"0"} ,{"g0" ,"0"}}; index_vals.empty()){ err("Группа морфа");
 						}else if(string data = (bmf::ARGV.end() == bmf::ARGV.find("data") ? "all" : bmf::ARGV.at("data")); data.empty()){ //mpre("Только для укороченной схемы" ,__LINE__);
 						}else if(index_vals = bmf::Up_mysql(table_vals, {{"index_md5", index.at("id")} ,{"dataset_id", bmf::dataset.at("id")} ,{"key", to_string(key)}}, index_vals, {}, __LINE__); index_vals.empty()){ err("Сохранение группы морфа");
-						}else{
+						}else{ //mpre("Выборка значения первоначального морфа исходя из метода расчета" ,__LINE__);
 						}return index_vals; }() ;index_vals.empty()){ err("Значение корневого морфа");
 					}else if(_BMF_INDEX_VALS.insert(make_pair(index_id ,index_vals)); _BMF_INDEX_VALS.empty()){ err("Расчет первоначального морфа");
 					}else{ //mpre(bmf::dataset ,"Набор данных" ,__LINE__); mpre(index_vals, "Добавление расчета корневого морфа", __LINE__);
@@ -1705,7 +1717,7 @@ int main(int argc, char **argv){
 						}else if(string index_id = (_index.end() == _index.find("id") ? "" : _index.at("id")); index_id.empty()){ err("Выборка идентификатора нового морфа");
 						}else if(string sql = "DELETE FROM " +table_vals +" WHERE dataset_id=" +bmf::dataset.at("id") +" AND index_md5=" +index_id +" AND `key`=" +to_string(key) +""; sql.empty()){ err("Составление запроса удаление расчета нового морфа");
 						}else if(mysql_query(bmf::mysql, sql.c_str())){ mpre("Запрос " +sql, __LINE__); mpre("ОШИБКА " +string(mysql_error(bmf::mysql)), __LINE__);
-						}else{ mpre("Морф уже в базе " +index_id_grow ,__LINE__);
+						}else{ //mpre("Морф уже в базе " +index_id_grow ,__LINE__);
 						}return !_index.empty(); }()){ //mpre("Морф уже в базе key=" +to_string(key) +" " +addr_grow +" > " +index_id_grow ,__LINE__);
 					//}else if(mpre("Расширение", __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
 					}else if(string list = [&](string list = ""){ // Список родителей
@@ -1737,6 +1749,7 @@ int main(int argc, char **argv){
 					}else if(val == calc){ //mpre("Расчетный результат совпал с картой", __LINE__);
 					}else if(imap[key] = atoi(calc.c_str()); imap.empty()){ err("Установка расчетного бита в карту");
 					}else if(std::string map = [&](std::string map = ""){ boost::to_string(imap, map); return map; }(); (map.length() != dataset_count)){ mpre("ОШИБКА установки карты исходника", __LINE__);
+					}else if(TMs index_map = bmf::Up(bmf::DATASET_MAP, {{"id", dataset_map_id}}, {{"dataset_id", bmf::dataset.at("id")}, {"alias", "index"}, {"map", map}}, {}, {}); !index_map.empty()){ //mpre("Карта уже записана" ,__LINE__);
 					}else if(TMs index_map = bmf::Up(bmf::DATASET_MAP, {{"id", dataset_map_id}}, {{"dataset_id", bmf::dataset.at("id")}, {"alias", "index"}, {"map", map}}, {{"dataset_id", bmf::dataset.at("id")}, {"alias", "index"}, {"map", map}}, __LINE__); index_map.empty()){ mpre("ОШИБКА обнолвения карты исходника", __LINE__);
 					}else{ //mpre("Сохранение обновленной карты морфа map=" +map, __LINE__);
 					}return false; }()){ err("Сохранение результата в индекс")
