@@ -1420,12 +1420,12 @@ int main(int argc, char **argv){
 				}else if(key = (atoi(bmf::dataset.at("key").c_str()) +_key_) %dataset_count; false){ err("Изменение ключа");
 				}else{ //mpre("Изменение позиции ключа " +to_string(_key_) +" > " +to_string(key) ,__LINE__);
 				}return key; }(key); (0 > key >= dataset_count)){ err("Изменение позиции ключа");
-			}else if([&](int repeat = 1000){ // Прворка на повторы
+			}else if([&](int repeat = 100){ // Прворка на повторы
 				if(string _key = (bmf::ARGV.end() == bmf::ARGV.find("key") ? "" : bmf::ARGV.at("key")); _key.empty()){ //mpre("Пропуск расчета" ,__LINE__);
 				}else if(static int key_static = -1; false){ err("Установка статического значения");
 				}else if(static int cnt = 0; false){ err("Количество повторений");
 				}else if(cnt += 1; false){ err("Расчет количества повторов");
-				}else if((key_static == key) && (repeat < cnt)){ mpre("ОШИБКА Остановка вслед за основным потоком " +to_string(repeat) +" " ,__LINE__);
+				}else if((key_static == key) && (repeat < cnt)){ exit(mpre("Остановка вслед за основным потоком " +to_string(repeat) +" проверок " ,__LINE__));
 				/*}else if([&](bool skip = false){ //Повтор
 					if(key_static != key){ //mpre("Не меняем положение ключа" ,__LINE__);
 					}else if(skip = true; false){ err("Инкремент признака выхода");
@@ -1739,7 +1739,7 @@ int main(int argc, char **argv){
 					}else if(bmf::ARGV.end() == bmf::ARGV.find("verbose")){ //mpre("Не отображаем время обучения", __LINE__);
 					}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Расширение модели " +index_id_grow +" ", __LINE__);
 					}return false; }()){ err("Расширение");
-				}else if(bmf::Progress("Набор:" +bmf::dataset.at("id") + itog_str+" Эпоха:" +epoch +" Примеров:" +to_string(key+1) +" Изменений:"+ to_string(err)+ " (" +to_string(_microtime_) +" сек.)", (float)(key+1)/dataset_count, __LINE__); false){ mpre("Индикатор прогресса", __LINE__);
+				}else if(bmf::Progress("Набор:" +bmf::dataset.at("id") + itog_str+" Эпоха:" +epoch +" Примеров:" +to_string(key+1) +" Изменений:"+ to_string(err) /*+" (" +to_string(_microtime_) +" сек.)"*/ ,(float)(key+1)/dataset_count, __LINE__); false){ mpre("Индикатор прогресса", __LINE__);
 				}else if([&](){ // Сохранение результата в индекс
 					if(std::string dataset_map_id = "index," +index.at("id") +"," +bmf::dataset.at("id"); dataset_map_id.empty()){ mpre("ОШИБКА составления идентификатора карты", __LINE__);
 					}else if(TMs index_map = bmf::Up(bmf::DATASET_MAP, {{"id", dataset_map_id}}, {}, {}, __LINE__); false){ mpre("ОШИБКА обнолвения карты исходника", __LINE__);
