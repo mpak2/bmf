@@ -1481,12 +1481,14 @@ int main(int argc, char **argv){
 						}else if([&](){ for(int i=0; i<npos; i++){ // Родители морфа
 							if(string _addr = "1" +addr.substr(i +1, -1); _addr.empty()){ err("Формирование адреса");
 							}else if(INDEX.end() != INDEX.find(_addr)){ //mpre("Уже добавили" ,__LINE__);
-							}else if(auto index_itr = [&](auto index_itr){ // Выборка итератора родителя
-								if(index_itr = BMF_INDEX.find(_addr); BMF_INDEX.end() != index_itr){ //mpre("Родитель найден в справочнике " +_addr ,__LINE__);
+							}else if(auto _index_itr = [&](auto _index_itr){ // Выборка итератора родителя
+								if(_index_itr = BMF_INDEX.find(_addr); BMF_INDEX.end() != _index_itr){ //mpre("Родитель найден в справочнике " +_addr ,__LINE__);
 								}else if(addr != _addr){ err("Родитель не найден");
-								}else{ //mpre("Сам морф" ,__LINE__);
-								}return index_itr; }(BMF_INDEX.end()); BMF_INDEX.end() == index_itr){ //mpre("Сам морф", __LINE__);
-							}else if(INDEX[_addr] = index_itr->second.at("id"); INDEX.empty()){ err("Уведомление");
+								}else if(BMF_INDEX.insert(make_pair(addr, index_itr.second)); BMF_INDEX.empty()){ err("Добавление нового значения");
+								}else if(_index_itr = BMF_INDEX.find(_addr); BMF_INDEX.end() == _index_itr){ err("Добавление морфа в справочник");
+								}else{ //mpre("Морф добавленный между обновлением справочника и запросом значений" ,__LINE__);
+								}return _index_itr; }(BMF_INDEX.end()); BMF_INDEX.end() == _index_itr){ //mpre("Сам морф", __LINE__);
+							}else if(INDEX[_addr] = _index_itr->second.at("id"); INDEX.empty()){ err("Уведомление");
 							//}else{ mpre("Адреса adr=" +adr +" _addr=" +_addr ,__LINE__); //mpre("Формирование родителя i=" +to_string(i) +" adr=" +adr +" _addr=" +_addr +" " +addr ,__LINE__);
 							}}return false; }()){ err("Список родителей морфа");
 						}else{ //mpre(index ,"Изменившийся морф" ,__LINE__);
@@ -1501,12 +1503,7 @@ int main(int argc, char **argv){
 					}else if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени", __LINE__);
 					}else if(string in = [&](string in = "0"){ for(auto itr:INDEX){ in += "," +itr.second; }return in; }(); in.empty()){ err("Уведомление");
 					}else if(string sql = "SELECT * ,index_md5 AS id ,id as uid FROM `" +table_vals +"` WHERE `dataset_id`='" +bmf::dataset.at("id") +"' AND `key`=" +to_string(key) +" AND index_md5 IN(" +in +");"; sql.empty()){ err("Запрос на выборку значений");
-					//}else if(mpre("Выборка значений " +sql, __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);	
 					}else if(_BMF_INDEX_VALS = bmf::List_mysql(table_vals ,{} ,sql ,__LINE__); false){ mpre("Список значений пуст sql=" +sql ,__LINE__);
-					//}else if(mpre(_BMF_INDEX_VALS ,"Значения из базы" ,__LINE__) ;false){ err("Уведомление");
-					//}else if(mpre(_INDEX ,"Расчетные морфы" ,__LINE__) ;false){ err("Уведомление");
-					//}else if(mpre(INDEX ,"Родители морфов" ,__LINE__) ;false){ err("Уведомление");
-					//}else if(mpre(BMF_INDEX ,"Справочник морфов" ,__LINE__) ;false){ err("Уведомление");
 					}else if(int verbose = atoi(bmf::ARGV.end() == bmf::ARGV.find("verbose") ? "" : bmf::ARGV.at("verbose").c_str()); bmf::ARGV.end() == bmf::ARGV.find("verbose")){ //mpre("Не отображаем время обучения", __LINE__);
 					}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Выборка значений" +(verbose ? " " +sql +" " : " ") +to_string(_BMF_INDEX_VALS.size()) +" INDEX.size()=" +to_string(INDEX.size()), __LINE__);
 					}return false; }(); false){ err("Расчетные значения");
