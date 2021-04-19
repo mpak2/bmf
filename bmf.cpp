@@ -1414,14 +1414,11 @@ int main(int argc, char **argv){
 				}return epoch; }(); epoch.empty()){ mpre("ОШИБКА расчета эпохи", __LINE__);
 			}else if(key = [&](int key){ // Установка зависимой позиции
 				if(string _key = (bmf::ARGV.end() == bmf::ARGV.find("key") ? "" : bmf::ARGV.at("key")); _key.empty()){ //mpre("Пропуск расчета" ,__LINE__);
-				//}else if(string::npos != _key.find_first_not_of("0123456789")){ mpre("Не сохраняем значение ключа и ошибок" ,__LINE__);
-				//}else if(mpre("Изменение позиции ключа" ,__LINE__); false){ err("Уведомление");
 				}else if(0 != _key.find_first_of("-+")){ mpre("Не установлен знак в ключе key=" +_key +" " ,__LINE__);
 				}else if(int _key_ = atoi(_key.c_str()); !_key_){ mpre("Значение для изменения не задано" ,__LINE__);
 				}else if(string dataset_id = (bmf::dataset.end() == bmf::dataset.find("id") ? "" : bmf::dataset.at("id")); dataset_id.empty()){ err("Идентификатор набора данных");
 				}else if(TMs dataset = bmf::Up(bmf::DATASET, {{"id", dataset_id}}, {}, {}, __LINE__); dataset.empty()){ err("Выборка набора данных");
 				}else if(key = (atoi(bmf::dataset.at("key").c_str()) +_key_) %dataset_count; false){ err("Изменение ключа");
-				//}else if(mpre("Ключ key_static=" +to_string(key_static) +" key=" +to_string(key) +" " ,__LINE__) ;false){ err("Уведомление");
 				}else{ //mpre("Изменение позиции ключа " +to_string(_key_) +" > " +to_string(key) ,__LINE__);
 				}return key; }(key); (0 > key >= dataset_count)){ err("Изменение позиции ключа");
 			}else if([&](int repeat = 1000){ // Прворка на повторы
@@ -1430,7 +1427,7 @@ int main(int argc, char **argv){
 				}else if(static int cnt = 0; false){ err("Количество повторений");
 				}else if(cnt += 1; false){ err("Расчет количества повторов");
 				}else if((key_static == key) && (repeat < cnt)){ mpre("ОШИБКА Остановка по зависимым повторам " +to_string(repeat) +" " ,__LINE__);
-				}else if(key_static == key){ std::cerr << "\x1b[37;41m " << cnt << " \x1b[0m"; //sleep(1); //system("sleep 3");
+				}else if(key_static == key){ key += cnt; std::cerr << "\x1b[37;41m " << cnt << " \x1b[0m"; //sleep(1); //system("sleep 3");
 				}else if(key_static = key; false){ err("Сохранение значения ключа для дальнейших сравнений");
 				}else if(cnt = 0; false){ err("Сохранение значения ключа для дальнейших сравнений");
 				}else{ //mpre("Не повтор");
