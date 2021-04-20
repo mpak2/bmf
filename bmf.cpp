@@ -794,8 +794,8 @@ int main(int argc, char **argv){
 			}return false; }()){ err("Очистка кеша");
 		}else if([&](string sql = ""){ // Создание таблиц 
 			if("mysql" != bmf::dbtype){ //mpre("Используем не mysql", __LINE__);
-			}else if(mysql_query(bmf::mysql, std::string("CREATE TABLE IF NOT EXISTS `index` (`id` INT AUTO_INCREMENT NOT NULL PRIMARY KEY, parent INT, addr TEXT, `timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, `itog_values_id` TEXT, `dano_id` TEXT, `itog_id` TEXT)").c_str())){ err("Список морфов"); 
-			}else if(mysql_query(bmf::mysql, std::string("CREATE TABLE IF NOT EXISTS `index_vals` (`id` INT AUTO_INCREMENT NOT NULL PRIMARY KEY ,dataset_id INT NOT NULL ,`index_md5` INT NOT NULL ,`key` INT NOT NULL ,`v1` INT(1) NOT NULL ,`v0` INT(1) NOT NULL, `grow_md5` INT NOT NULL, `g1` INT DEFAULT NULL, `g0` INT DEFAULT NULL, UNIQUE KEY `index_vals_unique` (`dataset_id` ,`index_md5` ,`key`))").c_str())){ err("Вставка данных"); 
+			}else if(mysql_query(bmf::mysql, std::string("CREATE TABLE IF NOT EXISTS `index` (`id` INT AUTO_INCREMENT NOT NULL PRIMARY KEY, parent INT, addr TEXT, grp INT NOT NULL ,`timestamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, `itog_values_id` TEXT, `dano_id` TEXT, `itog_id` TEXT)").c_str())){ err("Список морфов"); 
+			}else if(mysql_query(bmf::mysql, std::string("CREATE TABLE IF NOT EXISTS `index_vals` (`id` INT AUTO_INCREMENT NOT NULL PRIMARY KEY ,dataset_id INT NOT NULL ,`index_md5` INT NOT NULL ,`key` INT NOT NULL ,`v1` INT(1) DEFAULT NULL ,`v0` INT(1) DEFAULT NULL, `grow_md5` INT DEFAULT NULL, `g1` INT DEFAULT NULL, `g0` INT DEFAULT NULL, map BIT(64) DEFAULT NULL, test BOOLEAN DEFAULT FALSE, UNIQUE KEY `index_vals_unique` (`dataset_id` ,`index_md5` ,`key` ,`test`))").c_str())){ err("Вставка данных"); 
 			}else if(mysql_query(bmf::mysql, std::string("CREATE TABLE IF NOT EXISTS `dataset` (`id` INT AUTO_INCREMENT NOT NULL PRIMARY KEY, `name` TEXT, md5 VARCHAR(32) NOT NULL, `count` INT, `key` INT DEFAULT 0, `epoch` INT DEFAULT 0, `err` INT DEFAULT 0, `microtime` BIGINT(20) DEFAULT 0)").c_str())){ err("Вставка данных"); 
 			}else if(mysql_query(bmf::mysql, std::string("CREATE TABLE IF NOT EXISTS `dataset_map` (`id` VARCHAR(750) NOT NULL UNIQUE, `dataset_id` INT, `alias` VARCHAR(750), `alias_id` VARCHAR(750), `itog_id` VARCHAR(750), `map` TEXT, KEY `dataset_id`(`dataset_id`), KEY `alias`(`alias`))").c_str())){ err("Вставка данных"); 
 			}else if(mysql_query(bmf::mysql, std::string("CREATE TABLE IF NOT EXISTS `dano` (`id` VARCHAR(750) NOT NULL UNIQUE, `dano_values_id` VARCHAR(750), `name` VARCHAR(750), `val` VARCHAR(750))").c_str())){ err("Дано"); 
@@ -1338,7 +1338,7 @@ int main(int argc, char **argv){
 		}else if(int dataset_count = atoi(bmf::dataset["count"].c_str()); (0 >= dataset_count)){ mpre("ОШИБКА нулевое количество в наборе данных", __LINE__);
 		}else if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени", __LINE__);
 		}else if(TMMs DANO = bmf::List(bmf::DANO, {}, __LINE__); DANO.empty()){ err("Список итогов");
-		}else if(TMMb DANO_BITMAP = [&](TMMs DATASET_MAP, std::map<string,boost::dynamic_bitset<>> DANO_BITMAP = {}){ for(auto dano_itr:DANO){ // Список карт исходников
+		}else if(TMMb DANO_BITMAP = [&](TMMs DATASET_MAP, TMMb DANO_BITMAP = {}){ for(auto dano_itr:DANO){ // Список карт исходников
 			if(TMs dano = dano_itr.second; dano.empty()){ err("Выборка исходника");
 			}else if(std::string dataset_map_id = "dano," +dano.at("id") +"," +bmf::dataset.at("id"); dataset_map_id.empty()){ err("Составления идентификатора карты");
 			//}else if(TMs dataset_map = bmf::Up(bmf::DATASET_MAP, {{"id", dataset_map_id}}, {}, {}, __LINE__); false){ mpre("Выборка карты итога " +dataset_map_id, __LINE__); err("Выборка карты исходника");
@@ -1465,8 +1465,12 @@ int main(int argc, char **argv){
 				}else if(bmf::ARGV.end() == bmf::ARGV.find("verbose")){ //mpre("Не отображаем время обучения", __LINE__);
 				}else{ mpre("", __LINE__); mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Обновление модели " +to_string(_INDEX.size()) +" size=" +to_string(BMF_INDEX.size()) +" ", __LINE__);
 				}return false; }()){ err("Обновление модели");
-			}else if(string table_vals = "index_vals" /*+"_" +bmf::dataset.at("id")*/ +string("_") +to_string(key); table_vals.empty()){ err("ОШИБКА расчета имени таблицы");
-			}else if(mysql_query(bmf::mysql, std::string("CREATE TABLE IF NOT EXISTS `" +table_vals +"` LIKE `index_vals`;").c_str())){ mpre("Вставка данных " +string(mysql_error(bmf::mysql)) ,__LINE__); 
+			}else if(string table_vals = [&](string table_vals = ""){ // Создание таблицы значений
+				if(table_vals = "index_vals" /*+"_" +bmf::dataset.at("id") +string("_") +to_string(key)*/; table_vals.empty()){ err("Имя таблицы значений");
+				}else if("index_vals" == table_vals){ //mpre("Таблица уже создана в качестве образца" ,__LINE__);
+				}else if(mysql_query(bmf::mysql, std::string("CREATE TABLE IF NOT EXISTS `" +table_vals +"` LIKE `index_vals`;").c_str())){ mpre("Вставка данных " +string(mysql_error(bmf::mysql)) ,__LINE__);
+				}else{ mpre("Таблица для промежуточных данных" ,__LINE__);
+				}return table_vals; }(); table_vals.empty()){ err("Расчет имени таблицы значений");
 			}else if(TMMs _INDEX = [&](TMMs _INDEX = {}){ // Список новых морфов
 				if(string data = (bmf::ARGV.end() == bmf::ARGV.find("data") ? "all" : bmf::ARGV.at("data")); data.empty()){ _INDEX = BMF_INDEX; //mpre("Весь справочник морфов" ,__LINE__);
 				}else if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени", __LINE__);
@@ -1475,7 +1479,7 @@ int main(int argc, char **argv){
 				}else if(int verbose = atoi(bmf::ARGV.end() == bmf::ARGV.find("verbose") ? "" : bmf::ARGV.at("verbose").c_str()); bmf::ARGV.end() == bmf::ARGV.find("verbose")){ //mpre("Не отображаем время обучения", __LINE__);
 				}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Выборка обновлений морфов" +(verbose ? " " +sql : "") +" _INDEX.size()=" +to_string(_INDEX.size()), __LINE__);
 				}return _INDEX; }(); false){ err("Список новых морфов");
-			}else if(TMMs _BMF_INDEX_VALS = [&](TMMs _BMF_INDEX_VALS = {}){ //Список изменений
+			}else if(TMMs _BMF_INDEX_VALS = [&](TMMs _BMF_INDEX_VALS = {} ,TMs GRP = {}){ //Список изменений
 				if(TMs INDEX = [&](TMs INDEX = {}){ // Все прародители
 					if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени", __LINE__);
 					}else if([&](){ for(auto index_itr:_INDEX){ // Полный список необходимых значений
@@ -1498,31 +1502,57 @@ int main(int argc, char **argv){
 								}else{ //mpre("Морф добавленный между обновлением справочника и запросом значений" ,__LINE__);
 								}return _index_itr; }(BMF_INDEX.end()); BMF_INDEX.end() == _index_itr){ //mpre("Сам морф", __LINE__);
 							}else if(INDEX[_addr] = _index_itr->second.at("id"); INDEX.empty()){ err("Уведомление");
+							}else if(string grp = (_index_itr->second.end() == _index_itr->second.find("grp") ? grp : _index_itr->second.at("grp")); grp.empty()){ err("Группа не установлена");
+							}else if(GRP.end() != GRP.find(grp)){ //mpre("Группа уже в списке" ,__LINE__);
+							}else if(GRP.insert(make_pair(grp, to_string(GRP.size()))); GRP.empty()){ err("Добавление группы в список групп");
 							//}else{ mpre("Адреса adr=" +adr +" _addr=" +_addr ,__LINE__); //mpre("Формирование родителя i=" +to_string(i) +" adr=" +adr +" _addr=" +_addr +" " +addr ,__LINE__);
 							}}return false; }()){ err("Список родителей морфа");
 						}else{ //mpre(index ,"Изменившийся морф" ,__LINE__);
 						}}return false; }()){ err("Составление списк изменений");
-					//}else if(mpre(INDEX ,"Список морфов" ,__LINE__); false){ err("Уведомление");
 					}else if(int verbose = atoi(bmf::ARGV.end() == bmf::ARGV.find("verbose") ? "" : bmf::ARGV.at("verbose").c_str()); bmf::ARGV.end() == bmf::ARGV.find("verbose")){ //mpre("Не отображаем время обучения", __LINE__);
 					}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Расчет родителей INDEX.size()=" +to_string(INDEX.size()), __LINE__);
 					}return INDEX; }(); INDEX.empty()){ //mpre("Список родственной структуры пуст" ,__LINE__);
 				}else if([&](){ // Расчетные значения
-					if(false){ err("Уведомление");
-					}else if(string data = (bmf::ARGV.end() == bmf::ARGV.find("data") ? "all" : bmf::ARGV.at("data")); data.empty()){ //mpre("Только для укороченной схемы" ,__LINE__);
+					if(string data = (bmf::ARGV.end() == bmf::ARGV.find("data") ? "all" : bmf::ARGV.at("data")); data.empty()){ //mpre("Только для укороченной схемы" ,__LINE__);
 					}else if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени", __LINE__);
 					}else if(string in = [&](string in = "0"){ for(auto itr:INDEX){ in += "," +itr.second; }return in; }(); in.empty()){ err("Уведомление");
-					}else if(string sql = "SELECT * ,index_md5 AS id ,id as uid FROM `" +table_vals +"` WHERE `dataset_id`='" +bmf::dataset.at("id") +"' AND `key`=" +to_string(key) +" AND index_md5 IN(" +in +");"; sql.empty()){ err("Запрос на выборку значений");
+					}else if(string sql = "SELECT * ,index_md5 AS id ,id as uid FROM `" +table_vals +"` WHERE `dataset_id`='" +bmf::dataset.at("id") +"' AND `key`=" +to_string(key) +" AND map IS NULL AND index_md5 IN(" +in +");"; sql.empty()){ err("Запрос на выборку значений");
 					}else if(_BMF_INDEX_VALS = bmf::List_mysql(table_vals ,{} ,sql ,__LINE__); false){ mpre("Список значений пуст sql=" +sql ,__LINE__);
 					}else if(int verbose = atoi(bmf::ARGV.end() == bmf::ARGV.find("verbose") ? "" : bmf::ARGV.at("verbose").c_str()); bmf::ARGV.end() == bmf::ARGV.find("verbose")){ //mpre("Не отображаем время обучения", __LINE__);
 					}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Выборка значений" +(verbose ? " " +sql +" " : " ") +to_string(_BMF_INDEX_VALS.size()) +" INDEX.size()=" +to_string(INDEX.size()), __LINE__);
 					}return false; }(); false){ err("Расчетные значения");
-				}else if([&](){ // Выборка списка расчитанных ранее групп
+				}else if(TMMs _BMF_INDEX_GRP = [&](TMMs _BMF_INDEX_GRP = {}){ // Расчетные значения
+					if(string data = (bmf::ARGV.end() == bmf::ARGV.find("data") ? "all" : bmf::ARGV.at("data")); data.empty()){ //mpre("Только для укороченной схемы" ,__LINE__);
+					}else if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени", __LINE__);
+					}else if(string in = [&](string in = "0"){ for(auto itr:GRP){ in += "," +itr.first; }return in; }(); in.empty()){ err("Уведомление");
+					}else if(string sql = "SELECT * ,index_md5 AS id ,id AS uid ,CONV(hex(map), 16, 2) AS vals FROM `" +table_vals +"` WHERE `dataset_id`='" +bmf::dataset.at("id") +"' AND `key`=" +to_string(key) +" AND test IS TRUE AND index_md5 IN(" +in +");"; sql.empty()){ err("Запрос на выборку значений");
+					//}else if(mpre("Запрос на выборку списка гурпп " +sql ,__LINE__); false){ err("Уведмоление");
+					}else if(_BMF_INDEX_GRP = bmf::List_mysql(table_vals ,{} ,sql ,__LINE__); false){ mpre("Список значений пуст sql=" +sql ,__LINE__);
+					//}else if(mpre("Список значений " +sql ,__LINE__); false){ err("Уведомление");
+					//}else if(mpre(_BMF_INDEX_GRP ,"Список значений" ,__LINE__); false){ err("Уведомление");
+					}else if(int verbose = atoi(bmf::ARGV.end() == bmf::ARGV.find("verbose") ? "" : bmf::ARGV.at("verbose").c_str()); bmf::ARGV.end() == bmf::ARGV.find("verbose")){ //mpre("Не отображаем время обучения", __LINE__);
+					}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Выборка значений групп" +(verbose ? " " +sql +" " : " ") +to_string(_BMF_INDEX_GRP.size()) +" INDEX.size()=" +to_string(GRP.size()), __LINE__);
+					}return _BMF_INDEX_GRP; }(); false){ err("Расчетные значения");
+				}else if([&](TMMb GRP_BITMAP = {} ,TMMb GRP_DIZ = {} ,TMMb GRP_CON = {} ,TMs GROW = {}){ // Выборка списка расчитанных ранее групп
 					if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени", __LINE__);
 					}else if(TMMs UPDATE = [&](TMMs UPDATE = {}){ for(auto itr:INDEX){ // Расчет значений модели
 						if(auto index_itr = BMF_INDEX.find(itr.first); BMF_INDEX.end() == index_itr){ err("Морф не найден");
 						}else if(string addr = (index_itr->second.end() == index_itr->second.find("addr") ? "" : index_itr->second.at("addr")); addr.empty()){ err("Выборка адреса");
 						}else if(string index_id = (BMF_INDEX.at(addr).end() == BMF_INDEX.at(addr).find("id") ? "" : BMF_INDEX.at(addr).at("id")); index_id.empty()){ err("Идентификатор морфа");
 						}else if(TMs index_vals = (_BMF_INDEX_VALS.end() == _BMF_INDEX_VALS.find(index_itr->second.at("id")) ? index_vals : _BMF_INDEX_VALS.at(index_itr->second.at("id"))); false){ err("Выборка значения морфа");
+						}else if(TMs index_grp = [&](TMs index_grp = {}){ // Группа старшего потомка
+							if(BMF_INDEX.end() == BMF_INDEX.find(addr)){ //mpre("Морф старший потомок не найден " +addr +" " +addr_1 ,__LINE__);
+							}else if(index_grp = (_BMF_INDEX_GRP.end() == _BMF_INDEX_GRP.find(index_id) ? index_grp : _BMF_INDEX_GRP.at(index_id)); !index_grp.empty()){ //mpre("Значение группы найдено в списке групп" ,__LINE__);
+							}else if(string sql = "INSERT INTO " +table_vals +" (`dataset_id` ,`index_md5` ,`key` ,`map`, `test`) VALUES ('" +bmf::dataset.at("id") +"' ,'" +index_id +"' ,'" +to_string(key) +"' ,0x0, TRUE) ON DUPLICATE KEY UPDATE `key`=(`key`);"; sql.empty()){ err("Запрос на добавление значения карты");
+							}else if(mysql_query(bmf::mysql, sql.c_str())){ mpre("Вставка данных " +string(mysql_error(bmf::mysql)) +"\n" +sql ,__LINE__);
+							//}else if(mpre("Добавление значения " +sql + " >> " +to_string(mysql_insert_id(bmf::mysql)) ,__LINE__); false){ err("Уведомление");
+							}else if(string sql = "SELECT * ,CONV(hex(map), 16, 2) AS vals FROM " +table_vals +" WHERE dataset_id='" +bmf::dataset.at("id") +"' AND index_md5=" +index_id +" AND `key`=" +to_string(key) +" AND test IS TRUE;" ;sql.empty()){ err("Запрос на выборку карты");
+							}else if(TMMs INDEX_GRP = bmf::List_mysql(table_vals ,{} ,sql ,__LINE__); 1 != INDEX_GRP.size()){ mpre("Запрос на выборку значения группы " +sql ,__LINE__);
+							//}else if(mpre("Выборка значения " +sql)) ,__LINE__); false){ err("Уведомление");
+							}else if(index_grp = INDEX_GRP.begin()->second ;index_grp.empty()){ err("Выборка значения группы");
+							}else if(_BMF_INDEX_GRP[index_id] = index_grp; _BMF_INDEX_GRP.empty()){ err("Обновление значений групп");
+							}else{ //mpre(index_grp ,"Добавление значения " +index_id +" " ,__LINE__);
+							}return index_grp; }() ;index_grp.empty()){ mpre("ОШИБКА Значение группы основного морфа " +index_id ,__LINE__);
 						}else if(string addr_1 = "11" +addr.substr(1, addr.length()); addr_1.empty()){ err("Пропуск расчета старшей связи");
 						}else if(string addr_0 = "10" +addr.substr(1, addr.length()); addr_0.empty()){ err("Пропуск расчета младшей связи");
 						}else if(string dano_val = [&](string dano_val = ""){ // Значение исходника
@@ -1538,11 +1568,23 @@ int main(int argc, char **argv){
 							}else if(index_vals_1 = _BMF_INDEX_VALS.at(index_id); index_vals_1.empty()){ err("Выборка значения");
 							}else{ //mpre("Значение старшего морфа " +addr ,__LINE__);
 							}return index_vals_1; }(); false){ err("Значение старшего расчета");
+						}else if(TMs index_grp_1 = [&](TMs index_grp_1 = {}){ // Группа старшего потомка
+							if(BMF_INDEX.end() == BMF_INDEX.find(addr_1)){ //mpre("Морф старший потомок не найден " +addr +" " +addr_1 ,__LINE__);
+							}else if(string index_id = (BMF_INDEX.at(addr_1).end() == BMF_INDEX.at(addr_1).find("id") ? "" : BMF_INDEX.at(addr_1).at("id")); index_id.empty()){ err("Идентификатор морфа");
+							}else if(index_grp_1 = (_BMF_INDEX_GRP.end() == _BMF_INDEX_GRP.find(index_id) ? index_grp_1 : _BMF_INDEX_GRP.at(index_id)); !index_grp_1.empty()){ //mpre("Значение группы найдено в списке групп " +index_grp_1.at("id") ,__LINE__);
+							}else if(string sql = "INSERT INTO " +table_vals +" (`dataset_id` ,`index_md5` ,`key` ,`map` , `test`) VALUES ('" +bmf::dataset.at("id") +"' ,'" +index_id +"' ,'" +to_string(key) +"' ,0x0, TRUE) ON DUPLICATE KEY UPDATE `key`=(`key`);"; sql.empty()){ err("Запрос на добавление значения карты");
+							}else if(mysql_query(bmf::mysql, sql.c_str())){ mpre("Вставка данных " +string(mysql_error(bmf::mysql)) +"\n" +sql ,__LINE__);
+							//}else if(mpre("Добавление значения " +sql + " >> " +to_string(mysql_insert_id(bmf::mysql)) ,__LINE__); false){ err("Уведомление");
+							}else if(string sql = "SELECT * ,CONV(hex(map), 16, 2) AS vals FROM " +table_vals +" WHERE dataset_id='" +bmf::dataset.at("id") +"' AND index_md5=" +index_id +" AND `key`=" +to_string(key) +" AND test IS TRUE;" ;sql.empty()){ err("Запрос на выборку карты");
+							}else if(TMMs INDEX_GRP = bmf::List_mysql(table_vals ,{} ,sql ,__LINE__); 1 != INDEX_GRP.size()){ err("Запрос на выборку значения группы");
+							}else if(index_grp_1 = INDEX_GRP.begin()->second ;index_grp_1.empty()){ err("Выборка значения группы");
+							}else if(string map = (index_grp_1.end() == index_grp_1.find("vals") ? "" : index_grp_1.at("vals")); map.empty()){ mpre(index_grp_1 ,"ОШИБКА Значение карты" ,__LINE__);
+							}else{ //mpre("Новая карта " +index_grp_1.at("id") +" >> " +to_string(mysql_insert_id(bmf::mysql)) ,__LINE__);
+							}return index_grp_1; }() ;false){ err("Значение группы старшего потомка");
 						}else if(string v1 = [&](string v1){ // Значение старшей связи
 							if(BMF_INDEX.end() == BMF_INDEX.find(addr_1)){ //mpre("Морф не создан v1=" +v1 +" " +addr_1 ,__LINE__);
 							}else if(v1 = (index_vals.end() == index_vals.find("v1") ? dano_val : index_vals.at("v1")); v1.empty()){ err("Текущее значение поля");
 							}else if(string _v0_ = (index_vals.end() == index_vals.find("v0") ? dano_val : index_vals.at("v0")); _v0_.empty()){ err("Текущее значение поля");
-							//}else if(mpre("Значение без нижестоящих расчетов _v1_=" + v1 +" _v0_=" +_v0_ +" " +addr +" " ,__LINE__); false){ err("Уведомление");
 							}else if(index_vals_1.empty()){ //mpre("Берем значение расчитанное ранее" ,__LINE__);
 							}else if(string _v1 = (index_vals_1.end() == index_vals_1.find("v1") ? v1 : index_vals_1.at("v1")); _v1.empty()){ err("Значение нижестоящего морфа");
 							}else if(string _v0 = (index_vals_1.end() == index_vals_1.find("v0") ? _v0_ : index_vals_1.at("v0")); _v0.empty()){ err("Значение нижестоящего морфа");
@@ -1550,12 +1592,34 @@ int main(int argc, char **argv){
 							}else if(v1 = ("01" == grp ? "1" : "0"); v1.empty()){ err("Значение расчитанное ранее");
 							}else{ //mpre("Расчет значения старшей связи index_id=" +index_id, __LINE__);
 							}return v1; }(dano_val); 1 != v1.length()){ err("Значение старшей связи");
+						}else if(string v1_grp = [&](string v1_grp){ // Значение группы младшего потомка
+							if(BMF_INDEX.end() == BMF_INDEX.find(addr_1)){ //mpre("Морф не создан v1=" +v1 +" " +addr_1 ,__LINE__);
+							}else if(string map = (index_grp_1.end() == index_grp_1.find("vals") ? "" : index_grp_1.at("vals")); map.empty()){ mpre(_BMF_INDEX_GRP ,"Список групп" ,__LINE__); mpre(index_grp_1 ,"ОШИБКА Значение карты" ,__LINE__);
+							}else if(string index_md5 = (index_grp_1.end() == index_grp_1.find("index_md5") ? "" : index_grp_1.at("index_md5")); index_md5.empty()){ err("Идентификатор морфа");
+							}else if(map = (64 <= map.length() ? map : string(64 -map.length() ,'0') +map); 64 < map.length()){ err("Дополняем строку нулями");
+							}else if(boost::dynamic_bitset<> bitset = (GRP_BITMAP.end() == GRP_BITMAP.find(index_md5) ? boost::dynamic_bitset<>(map) : GRP_BITMAP.at(index_md5)); 64 < bitset.size() > 192){ mpre("ОШИБКА Значения групп " +map +" " +to_string(bitset.size()) ,__LINE__);
+							}else if(size_t npos = addr_1.find_first_of("-"); string::npos == npos){ err("Разделитель в адресе не найден");
+							}else if(int to = ((npos -1) %6) +1; false){ err("Значение начальной позиции адреса");
+							}else if(string adr = addr_1.substr(0, to); adr.empty()){ err("Адрес сигнала в карте");
+							}else if(int pos = bmf::Bin2dec(adr); 64 <= pos){ mpre("ОШИБКА Максимальная позиция равна " +addr +" > " +adr +" 64 to=" +to_string(to) ,__LINE__);
+							}else if(v1_grp = (bitset.test(pos) ? "1" : "0"); v1_grp.empty()){ err("Значение потомка из карты");
+							}else if(v1_grp != v1){ mpre("ОШИБКА Значение карты не совпадает с расчетным index_md5=" +index_md5 +" v1=" +v1 +" v1_grp=" +v1_grp +" " ,__LINE__);
+							}else{ //mpre("Значение группы старшего потомка " +addr +" > " +adr +"(" +to_string(pos) +") " +map +" " ,__LINE__);
+							}return v1_grp; }(dano_val); 1 != v1_grp.length()){ err("Значение из группы старшего потомка");
 						}else if(string g1 = [&](string g1){ // Значение роста старшего морфа
 							if(BMF_INDEX.end() == BMF_INDEX.find(addr_1)){ //mpre("Морф не создан g1=" +g1 +" " +addr ,__LINE__);
 							}else if(g1 = (index_vals.end() == index_vals.find("g1") ? g1 : index_vals.at("g1")); g1.empty()){ mpre("Значение не создано" ,__LINE__);
 							}else if(g1 = (index_vals_1.end() == index_vals_1.find("grow_md5") ? g1 : index_vals_1.at("grow_md5")); g1.empty()){ err("Выборка значения из нижестоящего");
 							}else{ //mpre("Загрузка значения от нижестоящего" ,__LINE__);
 							}return g1; }(index_id); g1.empty()){ mpre("Морф " +index_id ,__LINE__); err("Значение роста старшего морфа");
+						}else if(string g1_grp = [&](string g1_grp){ // Старший рост
+							if(BMF_INDEX.end() == BMF_INDEX.find(addr_1)){ //mpre("Морф не создан g1=" +g1 +" " +addr ,__LINE__);
+							}else if(index_grp_1.empty()){ err("Значения старшего морфа не найдены");
+							}else if(string index_md5 = (index_grp_1.end() == index_grp_1.find("index_md5") ? "" : index_grp_1.at("index_md5")); index_md5.empty()){ err("Идентификатор морфа");
+							}else if(g1_grp = (GROW.end() == GROW.find(index_md5) ? index_grp["g1"] : GROW.at(index_md5)); g1_grp.empty()){ mpre(index_grp ,"Значение роста старшего потомка " ,__LINE__);
+							}else if(g1 != g1_grp){ err("Значение старшего роста расчитано не праивльно");
+							}else{ //mpre("Расчет роста старшего морфа" ,__LINE__);
+							}return g1_grp; }(index_id); g1_grp.empty()){ err("Расчет старшего роста");
 						}else if(TMs index_vals_0 = [&](TMs index_vals_0 = {}){ // Значение старшего расчета
 							if(BMF_INDEX.end() == BMF_INDEX.find(addr_0)){ //mpre("Морф младший не найден " +addr_0 ,__LINE__);
 							}else if(string index_id = (BMF_INDEX.at(addr_0).end() == BMF_INDEX.at(addr_0).find("id") ? "" : BMF_INDEX.at(addr_0).at("id")); index_id.empty()){ err("Идентификатор морфа");
@@ -1563,6 +1627,19 @@ int main(int argc, char **argv){
 							}else if(index_vals_0 = _BMF_INDEX_VALS.at(index_id); index_vals_0.empty()){ err("Выборка значения");
 							}else{ //mpre("Значение младшего морфа " +addr ,__LINE__);
 							}return index_vals_0; }(); false){ err("Значение старшего расчета");
+						}else if(TMs index_grp_0 = [&](TMs index_grp_0 = {}){ // Группа старшего потомка
+							if(BMF_INDEX.end() == BMF_INDEX.find(addr_0)){ //mpre("Морф старший потомок не найден " +addr +" " +addr_1 ,__LINE__);
+							}else if(string index_id = (BMF_INDEX.at(addr_0).end() == BMF_INDEX.at(addr_0).find("id") ? "" : BMF_INDEX.at(addr_0).at("id")); index_id.empty()){ err("Идентификатор морфа");
+							}else if(index_grp_0 = (_BMF_INDEX_GRP.end() == _BMF_INDEX_GRP.find(index_id) ? index_grp_0 : _BMF_INDEX_GRP.at(index_id)); !index_grp_0.empty()){ //mpre("Значение группы найдено в списке групп" ,__LINE__);
+							}else if(string sql = "INSERT INTO " +table_vals +" (`dataset_id` ,`index_md5` ,`key` ,`map`, `test`) VALUES ('" +bmf::dataset.at("id") +"' ,'" +index_id +"' ,'" +to_string(key) +"', 0x0, TRUE) ON DUPLICATE KEY UPDATE `key`=(`key`);"; sql.empty()){ err("Запрос на добавление значения карты");
+							}else if(mysql_query(bmf::mysql, sql.c_str())){ mpre("Вставка данных " +string(mysql_error(bmf::mysql)) +"\n" +sql ,__LINE__);
+							//}else if(mpre("Добавление значения " +sql + " >> " +to_string(mysql_insert_id(bmf::mysql)) ,__LINE__); false){ err("Уведомление");
+							}else if(string sql = "SELECT * ,CONV(hex(map), 16, 2) AS vals FROM " +table_vals +" WHERE dataset_id='" +bmf::dataset.at("id") +"' AND index_md5=" +index_id +" AND `key`=" +to_string(key) +" AND test IS TRUE;" ;sql.empty()){ err("Запрос на выборку карты");
+							}else if(TMMs INDEX_GRP = bmf::List_mysql(table_vals ,{} ,sql ,__LINE__); 1 != INDEX_GRP.size()){ err("Запрос на выборку значения группы");
+							}else if(index_grp_0 = INDEX_GRP.begin()->second ;index_grp_0.empty()){ err("Выборка значения группы");
+							//}else if(TMs where = {{"dataset_id", bmf::dataset.at("id")} ,{"index_md5", index_id}, {"key" ,to_string("key")}}; where.empty()){ err("Условия выборки");
+							}else{ //mpre(INDEX_GRP ,"Добавление карты " +sql ,__LINE__);
+							}return index_grp_0; }() ;false){ err("Значение группы старшего потомка");
 						}else if(string v0 = [&](string v0){ // Значение старшей связи
 							if(BMF_INDEX.end() == BMF_INDEX.find(addr_0)){ //mpre("Морф не создан g1=" +v0 +" " +addr ,__LINE__);
 							}else if(string _v1_ = (index_vals.end() == index_vals.find("v1") ? dano_val : index_vals.at("v1")); _v1_.empty()){ mpre(index_vals ,"Значения dano_val=" +dano_val ,__LINE__); err("Текущее значение поля");
@@ -1574,12 +1651,37 @@ int main(int argc, char **argv){
 							}else if(v0 = ("01" == grp ? "0" : "1"); v0.empty()){ err("Значение расчитанное ранее");
 							}else{ //mpre("Расчет значения младшей связи v0=" +v0 +" index_id=" +index_id, __LINE__);
 							}return v0; }(dano_val); 1 != v0.length()){ err("Значение младшей связи");
+						}else if(string v0_grp = [&](string v0_grp){ // Значение группы младшего потомка
+							if(BMF_INDEX.end() == BMF_INDEX.find(addr_0)){ //mpre("Морф не создан v1=" +v1 +" " +addr_1 ,__LINE__);
+							}else if(string map = (index_grp_0.end() == index_grp_0.find("vals") ? "" : index_grp_0.at("vals")); map.empty()){ mpre(_BMF_INDEX_GRP ,"Список групп" ,__LINE__); mpre(index_grp_0 ,"ОШИБКА Значение карты" ,__LINE__);
+							}else if(string index_md5 = (index_grp_0.end() == index_grp_0.find("index_md5") ? "" : index_grp_0.at("index_md5")); index_md5.empty()){ err("Идентификатор морфа");
+							//}else if(mpre("Значение из базы index_md5=" +index_md5 +" map=" +map ,__LINE__) ;false){ err("Уведомление");
+							}else if(map = string(64 -map.length() ,'0') +map; 64 != map.length()){ err("Дополняем строку нулями");
+							}else if(boost::dynamic_bitset<> bitset = (GRP_BITMAP.end() == GRP_BITMAP.find(index_md5) ? boost::dynamic_bitset<>(map) : GRP_BITMAP.at(index_md5)); 64 < bitset.size() > 192){ mpre("ОШИБКА Значения групп " +map +" " +to_string(bitset.size()) ,__LINE__);
+							}else if(size_t npos = addr_0.find_first_of("-"); string::npos == npos){ err("Разделитель в адресе не найден");
+							}else if(int to = ((npos -1) %6) +1; false){ err("Значение начальной позиции адреса");
+							}else if(string adr = addr_0.substr(0, to); adr.empty()){ err("Адрес сигнала в карте");
+							}else if(int pos = bmf::Bin2dec(adr); 64 <= pos){ mpre("ОШИБКА Максимальная позиция равна " +addr +" > " +adr +" 64 to=" +to_string(to) ,__LINE__);
+							}else if(v0_grp = (bitset.test(pos) ? "1" : "0"); v0_grp.empty()){ err("Значение потомка из карты");
+							}else if(std::string bmap = [&](std::string map = ""){ boost::to_string(bitset, map); return map; }(); (bmap.length() != bitset.size())){ mpre("ОШИБКА установки карты итога", __LINE__);
+							//}else if(mpre("Проверка значения младшео потомка index_vals=" +index_md5 +"[" +to_string(pos) +"] " +bmap ,__LINE__) ;false){ err("Уведомление");
+							}else if(v0_grp != v0){ mpre(index_vals ,"Расчеты" ,__LINE__); mpre("ОШИБКА Младшего морфа не совпадает с расчетным key=" +to_string(key) +" index_md5=" +index_md5 +" pos=" +to_string(pos) +" addr_0=" +addr_0 +" v0=" +v0 +" v0_grp=" +v0_grp +" map=" +map ,__LINE__);
+							}else{ //mpre("Значение группы старшего потомка " +addr +" > " +adr +"(" +to_string(pos) +") " +map +" " ,__LINE__);
+							}return v0_grp; }(dano_val); 1 != v0_grp.length()){ err("Значение из группы старшего потомка");
 						}else if(string g0 = [&](string g0){ // Значение роста старшего морфа
 							if(BMF_INDEX.end() == BMF_INDEX.find(addr_0)){ //mpre("Морф не создан g0=" + g0 +" " +addr ,__LINE__);
 							}else if(g0 = (index_vals.end() == index_vals.find("g0") ? g0 : index_vals.at("g0")); g0.empty()){ mpre("Значение не создано" ,__LINE__);
 							}else if(g0 = (index_vals_0.end() == index_vals_0.find("grow_md5") ? g0 : index_vals_0.at("grow_md5")); g0.empty()){ err("Выборка значения из нижестоящего");
 							}else{ //mpre("Загрузка расширения от нижестоящего" ,__LINE__);
 							}return g0; }(index_id); g0.empty()){ mpre("Морф " +index_id ,__LINE__); err("Значение роста младшего морфа");
+						}else if(string g0_grp = [&](string g0_grp){ // Старший рост
+							if(BMF_INDEX.end() == BMF_INDEX.find(addr_0)){ //mpre("Морф не создан g1=" +g1 +" " +addr ,__LINE__);
+							}else if(index_grp_0.empty()){ err("Значения младшего морфа не найдены");
+							}else if(string index_md5 = (index_grp_0.end() == index_grp_0.find("index_md5") ? "" : index_grp_0.at("index_md5")); index_md5.empty()){ err("Идентификатор морфа");
+							}else if(g0_grp = (GROW.end() == GROW.find(index_md5) ? index_grp["g0"] : GROW.at(index_md5)); g0_grp.empty()){ err("Значение роста младшего потомка");
+							}else if(g0 != g0_grp){ err("Значение младшего роста расчитано не праивльно");
+							}else{ //mpre("Расчет роста старшего морфа" ,__LINE__);
+							}return g0_grp; }(index_id); g0_grp.empty()){ err("Расчет старшего роста");
 						}else if(string grow_md5 = [&](string grow_md5){ // Значение роста
 							if(string grp = v1 +v0; 2 != grp.length()){ err("Значение группы");
 							}else if(string link_grow = grp.substr(atoi(dano_val.c_str()), 1); 1 != link_grow.length()){ err("Ссылка расширяемого морфа");
@@ -1587,6 +1689,40 @@ int main(int argc, char **argv){
 							//}else if(string _addr = (index_vals.end() == index_vals.find("addr") ? "" : index_vals.at("addr")); "110-Два-1" != _addr){ //mpre("Прпоускаем все кроме указанного" ,__LINE__);
 							}else{ //mpre("Расчет значения роста g1=" +g1 +" g0=" +g0 +" link_grow=" +link_grow +" dano_val=" +dano_val +" grp=" +grp +" grow_md5=" +grow_md5 +" " +addr +" " +index_itr->second.at("id") ,__LINE__);
 							}return grow_md5; }(index_itr->second.at("id")); grow_md5.empty()){ err("Значение роста");
+						}else if([&](){ // Расчет значения группы
+							if(string map = (index_grp.end() == index_grp.find("vals") ? "" : index_grp.at("vals")); map.empty()){ mpre(_BMF_INDEX_GRP ,"Список групп" ,__LINE__); mpre(index_grp ,"ОШИБКА Значение карты" ,__LINE__);
+							}else if(string index_md5 = (index_grp.end() == index_grp.find("index_md5") ? "" : index_grp.at("index_md5")); index_md5.empty()){ err("Идентификатор морфа");
+							}else if(map = (64 == map.length() ? map : string(64 -map.length() ,'0') +map); 64 != map.length()){ mpre("Длинна строки значений " +to_string(map.length()) +" " ,__LINE__);
+							}else if(string _map = string(64 ,'0') +string(64, '1') +map ;192 !=_map.length()){ err("Полный формат строки");
+							}else if(boost::dynamic_bitset<> bitset = (GRP_BITMAP.end() == GRP_BITMAP.find(index_md5) ? boost::dynamic_bitset<>(_map) : GRP_BITMAP.at(index_md5));  192 != bitset.size()){ mpre("ОШИБКА Значения групп " +map +" size=" +to_string(bitset.size()) ,__LINE__);
+							}else if(size_t npos = addr.find_first_of("-"); string::npos == npos){ err("Разделитель в адресе не найден");
+							}else if(int to = ((npos -1) %6) +1; false){ err("Значение начальной позиции адреса");
+							}else if(string adr = addr.substr(0, to); adr.empty()){ err("Адрес сигнала в карте");
+							}else if(int pos = bmf::Bin2dec(adr); 64 < pos){ mpre("ОШИБКА Максимальная позиция равна " +addr +" > " +adr +" 64 to=" +to_string(to) ,__LINE__);
+							}else if(string grp = v1_grp +v0_grp; 2 != grp.length()){ err("Значение группы");
+							}else if(string link = (1 >= npos ? "0" : addr.substr(1, 1)); 1 != link.length()){ err("Установка связи морфа");
+							}else if(string _val = ("0" == link ? "1" : "0"); 1 != _val.length()){ err("Исключительное значение");
+							}else if(string val = ("01" == grp ? link : _val); 1 != val.length()){ err("Расчет значения связи");
+							}else if(bitset.size() <= pos){ mpre("ОШИБКА размера позиции size=" +to_string(bitset.size()) +" pos="+ to_string(pos), __LINE__);
+							}else if("0" == val ? bitset.reset(pos) : bitset.set(pos); false){ err("Установка бита");
+							}else if(int _pos = ("0" == val ? pos +64 : pos +128); !_pos){ err("Установка изменения в базе");
+							}else if("0" == val ? bitset.reset(_pos) : bitset.set(_pos); false){ err("Установка бита");
+							}else if(GRP_BITMAP[index_md5] = bitset; GRP_BITMAP.empty()){ err("Обновление значения карт");
+							}else if(std::string bmap = [&](std::string map = ""){ boost::to_string(bitset, map); return map; }(); (bmap.length() != bitset.size())){ mpre("ОШИБКА установки карты итога", __LINE__);
+							}else{ //mpre("Установка карт key=" +to_string(key) +" index_md5=" +index_md5 +" pos=" +to_string(pos) +" _pos=" +to_string(_pos) +" val=" +val +" ",__LINE__); //mpre("Установка значения карты " +index_md5 +"[" +to_string(pos) +"]=" +val +" " ,__LINE__); //mpre("Сохранение значения addr=" +addr +" index_md5=" +index_md5 +" npos=" +to_string(npos) +" pos=" +to_string(pos) +" link=" +link +" v1=" +v1 +" v1_grp=" +v1_grp +" v0=" +v0 +" v0_grp=" +v0_grp +" val=" +val ,__LINE__);
+							}return false; }()){ err("Сохранение значения группы");
+						}else if([&](){ // Расчет роста
+							if(string link = ("0" == dano_val ? v1_grp : v0_grp); 1 != link.length()){ err("Направление роста");
+							}else if(string index_md5 = (index_grp.end() == index_grp.find("index_md5") ? "" : index_grp.at("index_md5")); index_md5.empty()){ err("Идентификатор морфа");
+							}else if(string grow = GROW[index_md5] = ("0" == link ? g0_grp : g1_grp); GROW.empty()){ err("Основное направление");
+							}else if(grow_md5 != grow){ mpre("ОШИБКА значение роста расчитано не правильно g1=" +g1 +" g0=" +g0 +" g1_grp=" +g1_grp +" g0_grp=" +g0_grp +" grow_md5=" +grow_md5 +" grow=" +grow ,__LINE__);
+							//}else if(string grp = (index_itr->second.end() == index_itr->second.find("grp") ? "" : index_itr->second.at("grp")); "0" != grp){ //mpre("Не основной морф для установки роста");
+							}else if(index_grp["g1"] = g1_grp; index_grp.empty()){ err("Рост старшего морфа");
+							}else if(index_grp["g0"] = g0_grp; index_grp.empty()){ err("Рост младшего морфа");
+							}else if(index_grp["grow_md5"] = grow; index_grp.empty()){ err("Основной рост");
+							}else if(_BMF_INDEX_GRP[index_md5] = index_grp; _BMF_INDEX_GRP.empty()){ err("Сохранение результатов роста");
+							}else{ //mpre(index_grp ,"Расчет основного роста index_id=" +index_id +" dano_val=" +dano_val +" v1_grp=" +v1_grp +" v0_grp=" +v0_grp +" " ,__LINE__);
+							}return false; }()){ err("Расчет роста морфа");
 						}else if([&](){ // Сохранение значения
 							if(index_vals.empty()){ //mpre("Расчет еще не создан", __LINE__);
 							}else if(string grp = v1 +v0; 2 != grp.length()){ err("Сохранение значения морфа");
@@ -1601,13 +1737,12 @@ int main(int argc, char **argv){
 							}else if(_BMF_INDEX_VALS[index_vals.at("index_md5")] = index_vals; _BMF_INDEX_VALS.empty()){ err("Обновление значения в списке значений");
 							}else if(string data = (bmf::ARGV.end() == bmf::ARGV.find("data") ? "all" : bmf::ARGV.at("data")); data.empty()){ //mpre("Только для укороченной схемы" ,__LINE__);
 							}else if(UPDATE.insert(make_pair(uid, index_vals)); UPDATE.empty()){ err("Изменяемое значение");
-							}else{ //mpre(index_vals ,"Сохранение значения в расчет " +addr ,__LINE__);
+							}else{ //mpre("Сохранение значения в расчет index_md5=" +index_vals.at("index_md5") +" grp=" +grp +" " +addr ,__LINE__);
 							}return false; }()){ err("Сохранение значения в уже установленный расчет");
 						}else if([&](){ // Добавление значения
 							if(!index_vals.empty()){ //mpre("Расчет уже создан", __LINE__);
 							}else if(string grp = v1 +v0; 2 != grp.length()){ err("Значение группы");
-							}else if(TMs _index_vals = {{"index_md5", index_itr->second.at("id")} ,{"v1" ,v1} ,{"v0" ,v0} ,{"dataset_id", bmf::dataset.at("id")}, {"key", to_string(key)}, {"grow_md5", grow_md5} ,{"g1" ,g1} ,{"g0" ,g0}}; _index_vals.empty()){ err("Группа морфа");
-							//}else if(TMs update = {{"index_md5", index_itr->second.at("id")}, {"addr", addr}, {"grp", grp} ,{"v1" ,v1} ,{"v0" ,v0} ,{"dataset_id", bmf::dataset.at("id")}, {"key", to_string(key)}, {"grow_md5", grow_md5} ,{"g1" ,g1} ,{"g0" ,g0}}; update.empty()){ err("Значение обновления");
+							}else if(TMs _index_vals = {{"map", ""} ,{"test", "FALSE"}, {"index_md5", index_itr->second.at("id")} ,{"v1" ,v1} ,{"v0" ,v0} ,{"dataset_id", bmf::dataset.at("id")}, {"key", to_string(key)}, {"grow_md5", grow_md5} ,{"g1" ,g1} ,{"g0" ,g0}}; _index_vals.empty()){ err("Группа морфа");
 							}else if(string uid = md5(addr +"-" +bmf::dataset.at("id") +"-" +to_string(key)); uid.empty()){ err("Расчет идентификатора");
 							}else if(_BMF_INDEX_VALS.insert(make_pair(_index_vals.at("index_md5"), _index_vals)); _BMF_INDEX_VALS.empty()){ err("Обновление текущих значений");
 							}else if(string data = (bmf::ARGV.end() == bmf::ARGV.find("data") ? "all" : bmf::ARGV.at("data")); data.empty()){ //mpre("Только для укороченной схемы" ,__LINE__);
@@ -1621,13 +1756,12 @@ int main(int argc, char **argv){
 						}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Расчет модели " +to_string(INDEX.size()) +" ", __LINE__);
 						}return false; }()){ err("Уведомление");
 					}else if([&](){ // Сохранение значений
-						if(false){ err("Уведомление");
-						}else if(UPDATE.empty()){ //mpre("Нечего сохранять" ,__LINE__);
+						if(UPDATE.empty()){ //mpre("Нечего сохранять" ,__LINE__);
 						}else if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени", __LINE__);
 						}else if(TMs titles = UPDATE.begin()->second; titles.empty()){ err("Заголовки не найдены");
 						}else if(string names = [&](string names = ""){ for(auto titles_itr:titles){ names += ", `" +titles_itr.first +"`"; }return names.substr(2, -1); }(); names.empty()){ err("Имена полей");
 						}else if(string VALUES = [&](string VALUES = ""){ for(auto update_itr:UPDATE){
-							if(string values = [&](string values = ""){ for(auto values_itr:update_itr.second){ values += "," +("grp" == values_itr.first ? "'" +values_itr.second +"'" : values_itr.second); }return values.substr(1, -1); }(); values.empty()){ err("Значения полей");
+							if(string values = [&](string values = ""){ for(auto values_itr:update_itr.second){ values += "," +("map" == values_itr.first ? "NULL" : values_itr.second); }return values.substr(1, -1); }(); values.empty()){ err("Значения полей");
 							}else{ VALUES += "\n(" +values +"),";
 							}}return VALUES.substr(0, VALUES.length() -1); }(); VALUES.empty()){ err("Добавление значений");
 						}else if(string sql = "INSERT INTO `" +table_vals +"` (" +names +") VALUES " +VALUES +" ON DUPLICATE KEY UPDATE `v1`=VALUES(v1) ,`v0`=VALUES(v0) ,`grow_md5`=VALUES(grow_md5) ,`g1`=VALUES(g1) ,`g0`=VALUES(g0);"; sql.empty()){ err("Начало запроса");
@@ -1636,6 +1770,22 @@ int main(int argc, char **argv){
 						}else if(int verbose = atoi(bmf::ARGV.end() == bmf::ARGV.find("verbose") ? "" : bmf::ARGV.at("verbose").c_str()); bmf::ARGV.end() == bmf::ARGV.find("verbose")){ //mpre("Не отображаем время обучения", __LINE__);
 						}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Сохранение модели" +(3 <= verbose ? " " +sql : "") +" UPDATE.size()=" +to_string(UPDATE.size()) +" ", __LINE__);
 						}return false; }()){ err("Сохранение значений");
+					}else if(string sql = [&](string sql = ""){ for(auto [index_md5 ,bitmap]:GRP_BITMAP){ // Сохранение значений групп
+						if(std::string map = [&](std::string map = ""){ boost::to_string(bitmap, map); return map; }(); (map.length() != bitmap.size())){ mpre("ОШИБКА установки карты итога", __LINE__);
+						}else if(string map3 = map.substr(0, 64); 64 != map3.length()){ err("Группа битов 3");
+						}else if(string map2 = map.substr(64, 64); 64 != map2.length()){ err("Группа битов 2");
+						}else if(string map1 = map.substr(128, -1); 64 != map1.length()){ err("Группа битов 1");
+						//}else if(string grow = (GROW.end() == GROW.find(index_md5) ? "" : GROW.at(index_md5)); grow.empty()){ err("Значение роста");
+						}else if(TMs index_grp = (_BMF_INDEX_GRP.end() == _BMF_INDEX_GRP.find(index_md5) ? index_grp : _BMF_INDEX_GRP.at(index_md5)); index_grp.empty()){ mpre("ОШИБКА Значения группы index_md5=" +index_md5 +" " ,__LINE__);
+						}else if(string grow_md5 = (index_grp.end() == index_grp.find("grow_md5") ? "" : index_grp.at("grow_md5")); grow_md5.empty()){ mpre("ОШИБКА Основное значение роста index_md5=" +index_md5 +" " ,__LINE__);
+						}else if(string g1 = (index_grp.end() == index_grp.find("g1") ? "" : index_grp.at("g1")); g1.empty()){ err("Старший рост");
+						}else if(string g0 = (index_grp.end() == index_grp.find("g0") ? "" : index_grp.at("g0")); g1.empty()){ err("Младший рост");
+						}else if(sql = "UPDATE " +table_vals +" SET grow_md5=" +grow_md5 +" ,g1=" +g1 +" ,g0=" +g0 +" ,map = map &0b" +map2 +" |0b" +map3 +" WHERE dataset_id=" +bmf::dataset.at("id") +" AND index_md5=" +index_md5 +" AND `key`=" +to_string(key) +" AND test IS TRUE;" ;sql.empty()){ err("Запрос на изменение");
+						}else if(mysql_query(bmf::mysql, sql.c_str())){ mpre("ОШИБКА " +string(mysql_error(bmf::mysql)) +" \n" +sql, __LINE__);
+						//}else{ mpre("Сохранение карты " +sql +" " +to_string(mysql_insert_id(bmf::mysql)),__LINE__); //mpre("map3=" +map3 ,__LINE__); mpre("map2=" +map2 ,__LINE__); mpre("map1=" +map1 ,__LINE__);
+						}}return sql; }(); sql.empty()){ err("Сохранение значений групп");
+					//}else if(mpre("Проверка \n" +sql, __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
+					//}else if(mysql_query(bmf::mysql, sql.c_str())){ mpre("ОШИБКА " +string(mysql_error(bmf::mysql)) +"\n" +sql, __LINE__);
 					}return false; }()){ err("Выборка всех нужных групп морфов");
 				}else{ //mpre(INDEX ,"Изменившиеся морфы" ,__LINE__); mpre(_BMF_INDEX_VALS ,"Список значений изменений " ,__LINE__);
 				}return _BMF_INDEX_VALS; }(); false){ err("Список изменений");
@@ -1647,7 +1797,7 @@ int main(int argc, char **argv){
 					if(std::string addr = "1-" +itog.at("id"); addr.empty()){ err("Идентификатор первоначального морфа");
 					}else if(index = (BMF_INDEX.end() == BMF_INDEX.find(addr) ? index : BMF_INDEX.at(addr)); !index.empty()){ //mpre("Морф уже в базе" ,__LINE__);
 					}else if(TMs dano = bmf::Choice("", key, DANO, DANO_BITMAP); dano.empty()){ err("Выборка первоначального исходника");
-					}else if(TMs _index = {{"itog_values_id", itog.at("itog_values_id")}, {"parent", "0"}, {"addr", addr}, {"dano_id", dano.at("id")}, {"itog_id", itog.at("id")}}; _index.empty()){ mpre("ОШИБКА формирования свойст нового морфа", __LINE__);
+					}else if(TMs _index = {{"itog_values_id", itog.at("itog_values_id")}, {"parent", "0"} ,{"grp" ,"0"} ,{"addr", addr}, {"dano_id", dano.at("id")}, {"itog_id", itog.at("id")}}; _index.empty()){ mpre("ОШИБКА формирования свойст нового морфа", __LINE__);
 					}else if((index = bmf::Up_mysql(bmf::INDEX, {/*{"id", md5(addr)}*/}, _index, {}, __LINE__)).empty()){ mpre("ОШИБКА добавления корневого морфа в базу", __LINE__);
 					}else if(itog["index_id"] = index.at("id"); itog.empty()){ mpre("ОШИБКА установки свойства связи итога с морфом", __LINE__);
 					}else if(TMs _itog = bmf::Up(bmf::ITOG, {{"id", itog.at("id")}}, {}, itog, __LINE__); _itog.empty()){ err("Обновление поля корневого морфа у итога");
@@ -1657,7 +1807,6 @@ int main(int argc, char **argv){
 					}return index; }(); index.empty()){ mpre("ОШИБКА морф связи не найден", __LINE__);
 				}else if(TMs index_vals = [&](TMs index_vals = {}){ // Выборка значения первоначального морфа из базы
 					if(string index_id = (index.end() == index.find("id") ? "" : index.at("id")); index_id.empty()){ err("Корневой идентификатор");
-					//}else if(index_vals = bmf::Up_mysql(table_vals, {{"dataset_id", bmf::dataset.at("id")} ,{"index_md5", index.at("id")}, {"key", to_string(key)}} ,{} ,{} ,__LINE__); !index_vals.empty()){ //mpre("Значение корневого морфа найдена" ,__LINE__);
 					}else if(index_vals = (_BMF_INDEX_VALS.end() == _BMF_INDEX_VALS.find(index_id) ? index_vals : _BMF_INDEX_VALS.at(index_id)); !index_vals.empty()){ //mpre("Значение корневого морфа" ,__LINE__);
 					}else if(string addr = (index.end() == index.find("addr") ? "" : index.at("addr")); addr.empty()){ err("Расчет адреса");
 					}else if(string dano_id = (index.end() == index.find("dano_id") ? "" : index.at("dano_id")); dano_id.empty()){ err("Идентификатор исходника");
@@ -1733,8 +1882,18 @@ int main(int argc, char **argv){
 						}else{ //mpre("Строка исключений list=" +list, __LINE__);
 						}return list; }(); false){ err("Список родителей");
 					}else if(TMs dano_grow = bmf::Choice(list, key, DANO, DANO_BITMAP); dano_grow.empty()){ err("Выбор исходного значения");
-					}else if(TMs _index = {{"itog_values_id", index_grow.at("itog_values_id")}, {"addr", index_id_grow}, {"dano_id", dano_grow.at("id")}, {"itog_id", index_grow.at("itog_id")}}; _index.empty()){ mpre("ОШИБКА формирования свойст нового морфа", __LINE__);
-					}else if(_index = bmf::Up_mysql("index", {/*{"id", md5(index_id_grow)}*/}, _index, {}, __LINE__); _index.empty()){ mpre("ОШИБКА добавления корневого морфа в базу", __LINE__);
+					}else if(string grp = [&](string grp = "0"){ // Группа морфа
+						if(size_t npos = index_id_grow.find_first_of("-"); string::npos == npos){ err("Разделитель в адресе не найден");
+						}else if(0 == npos){ err("Разделитель в нулевой позиции");
+						}else if(int size = (npos %6) ;1 == size){ //mpre("Морф сам является группой " +index_id_grow +" " ,__LINE__);
+						}else if(int from = (6 >= npos ? npos : ((npos-1)%6)+1); 0 > from){ mpre("ОШИБКА Позиция начала адреса группы index_id_grow=" +index_id_grow +" npos=" +to_string(npos) ,__LINE__);
+						}else if(string addr_grp = "1" +index_id_grow.substr(from, -1); addr_grp.empty()){ err("Адрес группы");
+						}else if(TMs index_grp = (BMF_INDEX.end() == BMF_INDEX.find(addr_grp) ? index_grp : BMF_INDEX.at(addr_grp)); index_grp.empty()){ mpre("ОШИБКА Родительская гурппа не найдена в справочнике " +index_id_grow +" > " +addr_grp ,__LINE__);
+						}else if(grp = (index_grp.end() == index_grp.find("id") ? "" : index_grp.at("id")); grp.empty()){ err("Идентификатор морфа группы");
+						}else{ //mpre("Адрес группы npos=" +to_string(npos) +" from=" +to_string(from) +" " +index_id_grow +" > " +addr_grp +" ", __LINE__);
+						}return grp; }(); grp.empty()){ err("Группа морфа");
+					}else if(TMs _index = {{"itog_values_id", index_grow.at("itog_values_id")}, {"grp", grp}, {"addr", index_id_grow}, {"dano_id", dano_grow.at("id")}, {"itog_id", index_grow.at("itog_id")}}; _index.empty()){ mpre("ОШИБКА формирования свойст нового морфа", __LINE__);
+					}else if(_index = bmf::Up_mysql("index", {}, _index, {}, __LINE__); _index.empty()){ mpre("ОШИБКА добавления корневого морфа в базу", __LINE__);
 					}else if(!(err += 1)){ err("Инкримент изменений");
 					}else if(bmf::ARGV.end() == bmf::ARGV.find("verbose")){ //mpre("Не отображаем время обучения", __LINE__);
 					}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Расширение модели " +index_id_grow +" ", __LINE__);
