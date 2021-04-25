@@ -1944,10 +1944,11 @@ int main(int argc, char **argv){
 				}}return VAL; }(); VAL.empty()){ err("Перебор значений исходников");
 			//}else if(mpre(VAL ,"Значения", __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
 			}else if(string sql = "SELECT *, value AS id FROM itog_titles"; sql.empty()){ err("Составление запроса на выборку групп итогов");
-			}else if(TMMs ITOG_TITLES = bmf::List_mysql("itog_titles", {} ,sql, __LINE__); ITOG_TITLES.empty()){ err("Список исходников");
+			}else if(TMMs ITOG_TITLES = bmf::List_mysql("itog_titles", {} ,sql, __LINE__); false){ err("Список исходников");
 			}else if([&](){ for(auto val_itr:VAL){ // Выводимые значения и группы
-				if(TMs itog_values = (ITOG_VALUES.end() == ITOG_VALUES.find(val_itr.first) ? itog_values : ITOG_VALUES.at(val_itr.first)); itog_values.empty()){ mpre("ОШИБКА Выборки значения итога " +val_itr.first +" " +val_itr.second ,__LINE__);
-				}else if(string value = [&](string value = ""){ char dig[100]; sprintf(dig,"%g", stod(val_itr.second)); return value = string(dig); }(); value.empty()){ mpre("ОШИБКА присвоения значения массиву", __LINE__);
+				if(string value = [&](string value = ""){ char dig[100]; sprintf(dig,"%g", stod(val_itr.second)); return value = string(dig); }(); value.empty()){ mpre("ОШИБКА присвоения значения массиву", __LINE__);
+				}else if(ITOG_TITLES.empty()){ j[key]["itog"][val_itr.first] = value;//mpre("Не категориальное значение" ,__LINE__);
+				}else if(TMs itog_values = (ITOG_VALUES.end() == ITOG_VALUES.find(val_itr.first) ? itog_values : ITOG_VALUES.at(val_itr.first)); itog_values.empty()){ mpre("ОШИБКА Выборки значения итога " +val_itr.first +" " +val_itr.second ,__LINE__);
 				}else if(TMs itog_titles = (ITOG_TITLES.end() == ITOG_TITLES.find(value) ? itog_titles : ITOG_TITLES.at(value)); false){ err("Заголовок итога");
 				}else if(j[key]["itog"][val_itr.first] = (itog_titles.end() == itog_titles.find("name") ? value : itog_titles.at("name")); j.empty()){ err("Формирование json");
 				}else{ //mpre(itog_titles ,"Установка значения " +val_itr.first +" " +val_itr.second ,__LINE__);
