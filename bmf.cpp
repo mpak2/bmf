@@ -1631,7 +1631,7 @@ int main(int argc, char **argv){
 							}else{ VALUES += "\n(" +values +"),";
 							}}return VALUES.substr(0, VALUES.length() -1); }(); VALUES.empty()){ err("Добавление значений");
 						}else if(string sql = "INSERT INTO `" +table_vals +"` (" +names +") VALUES " +VALUES +" ON DUPLICATE KEY UPDATE `v1`=VALUES(v1) ,`v0`=VALUES(v0) ,`grow_md5`=VALUES(grow_md5) ,`g1`=VALUES(g1) ,`g0`=VALUES(g0);"; sql.empty()){ err("Начало запроса");
-						}else if(mysql_query(bmf::mysql, sql.c_str())){ mpre("ОШИБКА " +string(mysql_error(bmf::mysql)) +"\n" +sql, __LINE__);
+						}else if(mysql_query(bmf::mysql, sql.c_str())){ mpre("ОШИБКА " +sql +"\n" +string(mysql_error(bmf::mysql)), __LINE__);
 						//}else if(mpre("Запрос на сохранение " +sql ,__LINE__) ;false){ err("Уведомление");
 						}else if(int verbose = atoi(bmf::ARGV.end() == bmf::ARGV.find("verbose") ? "" : bmf::ARGV.at("verbose").c_str()); bmf::ARGV.end() == bmf::ARGV.find("verbose")){ //mpre("Не отображаем время обучения", __LINE__);
 						}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Сохранение модели" +(3 <= verbose ? " " +sql : "") +" UPDATE.size()=" +to_string(UPDATE.size()) +" ", __LINE__);
