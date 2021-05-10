@@ -3,11 +3,11 @@
 ## sudo apt install libsqlite3-dev libdb5.3-stl-dev libdb5.3++-dev libacl1-dev # Устаревшие
 # sudo apt install libmariadb3 libmariadbd-dev libhiredis-dev libboost-all-dev # Установка
 
-cat clump/dva.json | ./bimorph mysql://dva:dva@192.168.1.6/dva -c -
-./bimorph mysql://dva:dva@192.168.1.6/dva ds=1 epoch=10 learn
+#cat clump/dva.json | ./bimorph mysql://dva:dva@192.168.1.6/dva -c -
+#./bimorph mysql://dva:dva@192.168.1.6/dva ds=1 epoch=10 learn
 
-#cat clump/tri.json | ./bimorph mysql://tri:tri@localhost/tri -c -
-#./bimorph mysql://tri:tri@localhost/tri ds=1 epoch=1000 learn
+cat clump/tri.json | ./bimorph mysql://tri:tri@192.168.1.6/tri -c -
+./bimorph mysql://tri:tri@192.168.1.6/tri ds=1 epoch=100 learn
 
 #cat clump/iris_1.json | ./bimorph mysql://localhost/iris - # ?cache=shared
 #cat clump/iris_2.json | ./bimorph mysql://localhost/iris - # ?cache=shared

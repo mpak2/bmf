@@ -1,5 +1,5 @@
 int mpre(string mess, int line, string comment = ""){
-	if(std::cerr << line << "." << mess << (comment.empty() ? "" : " `") << comment << (comment.empty() ? "" : "`") << endl; false){ mpre("ОШИБКА вывода уведомления", __LINE__);
+	if(std::cerr << line << "." << mess << " " << (comment.empty() ? "" : "`") << comment << (comment.empty() ? "" : "`") << endl; false){ mpre("ОШИБКА вывода уведомления", __LINE__);
 	}else if(int npos = mess.find("ОШИБКА"); (-1 == npos)){ //mpre("Вхождение ключевого слова", __LINE__);
 	}else if(std::cerr << line << ".^^^ Критическое сообщение ^^^ Остановка выполнения программы" << std::endl; false){ mpre("ОШИБКА отображения информации об ошибке", __LINE__);
 	}else if(int response = system("sleep 1"); true){ exit(mpre("Остановка выполнения программы", __LINE__));
