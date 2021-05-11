@@ -31,6 +31,22 @@ int mpre(TMs row, int line, string comment = "", string prefix = "", string key 
 	return mpre(row, line, comment);
 }
 
+
+int mpre(TMi row, string comment, int line){
+	if([&](){ // [37;41m ОШИБКА \x1b[0m
+		std::cerr << " => " << "( // __" << to_string(line) << "__ " << comment << "\n";
+		for(TMi::iterator itr = row.begin(); itr != row.end(); itr++){
+			int field = itr->first;
+			string val = (string) itr->second;
+			std::cerr << "\t[" << field << "]=>" << val << "," << endl;
+		}; std::cerr << ")\n"; return false; }()){ err("Вывод массива");
+	}else if(int npos = comment.find("ОШИБКА"); (-1 == npos)){ //mpre("Вхождение ключевого слова", __LINE__);
+	}else if(std::cerr << line << ".^^^ Критическое сообщение ^^^ Остановка выполнения программы" << std::endl; false){ mpre("ОШИБКА отображения информации об ошибке", __LINE__);
+	}else if(int response = system("sleep 1"); true){ exit(mpre("Остановка выполнения программы", __LINE__));
+	}else{
+	}return 1;
+}
+
 int mpre(TMMi& TAB, int line, string comment = ""){
 	std::cerr << "Array";
 	if(line > 0){
