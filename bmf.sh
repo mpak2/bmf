@@ -6,7 +6,7 @@
 #cat clump/dva.json | ./bimorph mysql://dva:dva@192.168.1.6/dva -c -
 #./bimorph mysql://dva:dva@192.168.1.6/dva ds=1 epoch=10 learn
 
-cat clump/tri2.json | ./bimorph mysql://tri:tri@192.168.1.6/tri -c -
+cat clump/tri.json | ./bimorph mysql://tri:tri@192.168.1.6/tri -c -
 ./bimorph mysql://tri:tri@192.168.1.6/tri ds=1 epoch=100 learn
 
 #cat clump/iris_1.json | ./bimorph mysql://localhost/iris - # ?cache=shared
