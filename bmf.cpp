@@ -1592,7 +1592,13 @@ int main(int argc, char **argv){
 								if(vals += bitset.test(key) ?"1" :"0"; vals.empty()){ err("Значение исходника");
 								}else{ //mpre("Формирование списка значений исходника " +vals ,__LINE__);
 								}}return vals; }(); vals.empty()){ err("Значения исходников");
-							}else{ mpre("Расчет key=" +to_string(key) +" vals=" +vals +" addr=" +addr +" dano_id=" +dano_id +" dv=" +dano_val +" v1=" +v1 +" v0=" +v0 +" ", __LINE__);
+							}else if(string grp = v1 +v0; 2 != grp.length()){ err("Значение группы");
+							}else if(auto npos = addr.find_first_of("-"); string::npos == npos){ err("Позиция разделителя");
+							}else if(string link = (1 >= npos ? "0" : addr.substr(npos -1, 1)); 1 != link.length()){ err("Ссылка");
+							}else if(string _val = ("0" == link ? "1" : "0"); 1 != _val.length()){ err("Основное значение связи");
+							}else if(string _val_ = ("0" == _val ? "1" : "0"); 1 != _val_.length()){ err("Исключительное значение связи");
+							}else if(string val = ("01" == grp ? _val_ : _val); val.empty()){ err("Расчет значения");
+							}else{ mpre("Расчет key=" +to_string(key) +" vals=" +vals +" addr=" +addr +" dano_id=" +dano_id +" dv=" +dano_val +" link=" +link +" v1=" +v1 +" v0=" +v0 +" val=" +val +" ", __LINE__);
 							}return false; }()){ err("Уведомление о результатах расчетов");
 						}else if([&](){ // Сохранение значения
 							if(index_vals.empty()){ //mpre("Расчет еще не создан", __LINE__);
