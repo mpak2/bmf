@@ -1477,13 +1477,13 @@ int main(int argc, char **argv){
 					}else if(index = (BMF_INDEX.end() == BMF_INDEX.find(index_md5) ? index : BMF_INDEX.at(index_md5)); !index.empty()){ //mpre("Морф уже в базе" ,__LINE__);
 					}else if(TMs dano = bmf::Choice("", key, DANO, DANO_BITMAP ,__LINE__); dano.empty()){ err("Выборка первоначального исходника");
 					}else if(TMs _index = {{"grp", "0"}, {"addr", "1"} ,{"md5" ,index_md5}, {"dano_id", dano.at("id")}, {"itog_id", itog.at("id")}}; _index.empty()){ mpre("ОШИБКА формирования свойст нового морфа", __LINE__);
-					}else if((index = bmf::Up_mysql(bmf::INDEX, {/*{"id", md5(addr)}*/}, _index, {}, __LINE__)).empty()){ mpre("ОШИБКА добавления корневого морфа в базу", __LINE__);
-					}else if(itog["index_id"] = index.at("id"); itog.empty()){ mpre("ОШИБКА установки свойства связи итога с морфом", __LINE__);
+					}else if(_index = bmf::Up_mysql(bmf::INDEX, {/*{"id", md5(addr)}*/}, _index, {}, __LINE__); _index.empty()){ mpre("ОШИБКА добавления корневого морфа в базу", __LINE__);
+					}else if(itog["index_id"] = _index.at("id"); itog.empty()){ mpre("ОШИБКА установки свойства связи итога с морфом", __LINE__);
 					}else if(TMs _itog = bmf::Up(bmf::ITOG, {{"id", itog.at("id")}}, {}, itog, __LINE__); _itog.empty()){ err("Обновление поля корневого морфа у итога");
-					}else if(BMF_INDEX[index_md5] = index; BMF_INDEX.empty()){ err("Добавление нового морфа в список");
+					}else if(BMF_INDEX[index_md5] = _index; BMF_INDEX.empty()){ err("Добавление нового морфа в список");
 					}else if(string dano_val = (DANO_BITMAP.at(dano.at("id")).test(key) ? "1" : "0"); dano_val.empty()){ err("Значение исходника");
-					}else{ //mpre(index, "Добавление первоначального морфа " +index.at("id"), __LINE__);
-					}return index; }(); index.empty()){ mpre("ОШИБКА морф связи не найден", __LINE__);
+					}else{ //mpre(_index, "Добавление первоначального морфа " +_index.at("id"), __LINE__);
+					}return index; }(); index.empty()){ mpre("Добавление корневого морфа addr=1", __LINE__);
 				}else if(TMs index_grp = [&](TMs index_grp = {}){ // Группа морфа
 					//if(string grp = (index.end() == index.find("grp") ? "" : index.at("grp")); grp.empty()){ err("Группа не установлена");
 					if(string index_id = (index.end() == index.find("id") ? "" : index.at("id")); index_id.empty()){ err("Идентификатор не установлена");
@@ -1642,7 +1642,11 @@ int main(int argc, char **argv){
 							}else if(val ? vals.set(nn) : vals.reset(nn); false){ err("Установка значения");
 							}else if(string str_exist = [&](std::string map = ""){ boost::to_string(exist, map); return map; }(); (str_exist.length() != exist.size())){ mpre("ОШИБКА установки карты итога", __LINE__);
 							}else if(string str_dano = [&](std::string map = ""){ boost::to_string(dano, map); return map; }(); (str_dano.length() != dano.size())){ mpre("ОШИБКА установки карты итога", __LINE__);
-							}else{ mpre("Расчет epoch=" +epoch +" key=" +to_string(key) +" itog_id=" +itog_id +" " +adr +" " +addr_grp +" link=" +link +" dv=" +string(dv ? "1" : "0") +" v1=" +string(v1 ? "1" : "0") +" v0=" +string(v0 ? "1" : "0") +" val=" +string(val ? "1" : "0") +" str_exist=" +str_exist +" str_dano=" +str_dano ,__LINE__);
+							}else if(string vals = [&](string vals = ""){ for(auto [dano_id ,bitset]:DANO_BITMAP){ // Значения исходников
+								if(vals += (bitset.test(key) ?"1" :"0"); vals.empty()){ err("Значения исходников");
+								}else{ //mpre("Формирование карты значений исходников ключа" ,__LINE__);
+								}}return vals; }(); vals.empty()){ err("Значения исходников");
+							}else{ mpre("Расчет vals=" + vals+" epoch=" +epoch +" key=" +to_string(key) +" itog_id=" +itog_id +" " +adr +" " +addr_grp +" link=" +link +" dv=" +string(dv ? "1" : "0") +" v1=" +string(v1 ? "1" : "0") +" v0=" +string(v0 ? "1" : "0") +" val=" +string(val ? "1" : "0") +" str_exist=" +str_exist +" str_dano=" +str_dano ,__LINE__);
 							}return false; }()){ err("Значение морфа");
 						}else if(exist.set(nn) ;false){ err("Установка морфа в ключевую группу");
 						}else{ //mpre("Расчет Группы adr=" +adr +" " ,__LINE__);
