@@ -1592,7 +1592,7 @@ int main(int argc, char **argv){
 								if(vals += bitset.test(key) ?"1" :"0"; vals.empty()){ err("Значение исходника");
 								}else{ //mpre("Формирование списка значений исходника " +vals ,__LINE__);
 								}}return vals; }(); vals.empty()){ err("Значения исходников");
-							}else{ mpre("Расчет vals=" +vals +" addr=" +addr +" dano_id=" +dano_id +" dv=" +dano_val +" v1=" +v1 +" v0=" +v0 +" ", __LINE__);
+							}else{ mpre("Расчет key=" +to_string(key) +" vals=" +vals +" addr=" +addr +" dano_id=" +dano_id +" dv=" +dano_val +" v1=" +v1 +" v0=" +v0 +" ", __LINE__);
 							}return false; }()){ err("Уведомление о результатах расчетов");
 						}else if([&](){ // Сохранение значения
 							if(index_vals.empty()){ //mpre("Расчет еще не создан", __LINE__);
@@ -1742,7 +1742,7 @@ int main(int argc, char **argv){
 					}else if(TMs _index = {{"itog_values_id", index_grow.at("itog_values_id")}, {"addr", index_id_grow}, {"dano_id", dano_grow.at("id")}, {"itog_id", index_grow.at("itog_id")}}; _index.empty()){ mpre("ОШИБКА формирования свойст нового морфа", __LINE__);
 					}else if([&](){ // Отображение расширения
 						if(string verbose = (bmf::ARGV.end() == bmf::ARGV.find("verbose") ?"" :bmf::ARGV.at("verbose")); 1 >= atoi(verbose.c_str())){ //mpre("Не отображаем подробностей" ,__LINE__);
-						}else{ mpre("Расширение calc=" +calc +" learn=" +learn +" addr_id_grow=" +index_id_grow, __LINE__);
+						}else{ mpre("Расширение key=" +to_string(key) +" calc=" +calc +" learn=" +learn +" addr_id_grow=" +index_id_grow, __LINE__);
 						}return false; }()){ err("Отображение расширения");
 					}else if(_index = bmf::Up_mysql("index", {/*{"id", md5(index_id_grow)}*/}, _index, {}, __LINE__); _index.empty()){ mpre("ОШИБКА добавления корневого морфа в базу", __LINE__);
 					}else if(!(err += 1)){ err("Инкримент изменений");
