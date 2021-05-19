@@ -6,6 +6,9 @@
 #cat clump/dva.json | ./bimorph mysql://dva:dva@192.168.1.6/dva -c -
 #./bimorph mysql://dva:dva@192.168.1.6/dva ds=1 epoch=100 learn #verbose=2
 
+#cat clump/tri.json | ./bimorph mysql://tri:tri@192.168.1.6/tri -c -
+#./bimorph mysql://tri:tri@192.168.1.6/tri ds=1 epoch=100 learn #verbose=2
+
 #cat clump/iris_1.json | ./bimorph mysql://iris:iris@192.168.1.6/iris -c - # ?cache=shared
 #cat clump/iris_2.json | ./bimorph mysql://iris:iris@192.168.1.6/iris -c - # ?cache=shared
 #cat clump/iris_3.json | ./bimorph mysql://iris:iris@192.168.1.6/iris -c - # ?cache=shared
@@ -27,4 +30,6 @@ cat clump/iris.json | ./bimorph mysql://iris:iris@192.168.1.6/iris -c - # ?cache
 #./bimorph mysql://iris:iris@192.168.1.6/iris dano='[{"dano":{"ДлинаЧашелистика":"6.3","ШиринаЧашелистика":"3.3","ДлинаЛепестка":"6.0","ШиринаЛепестка":"2.5"}},
 #											{"dano":{"ДлинаЧашелистика":"7.0","ШиринаЧашелистика":"3.2","ДлинаЛепестка":"4.7","ШиринаЛепестка":"1.4"}},
 #											{"dano":{"ДлинаЧашелистика":"5.0","ШиринаЧашелистика":"3.2","ДлинаЛепестка":"1.2","ШиринаЛепестка":"0.2"}}]'
+
+#./bimorph mysql://mnist:mnist@192.168.1.6/mnist ds=2 epoch=100 learn
 
