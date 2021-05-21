@@ -978,6 +978,7 @@ int main(int argc, char **argv){
 	}else if([&](){ // Основные функции
 		if(bmf::Choice = ([&](std::string list, int key, TMMs &DANO, TMMb &DANO_BITMAP ,int line){ //mpre("Выбор итога для расширения", __LINE__);
 			TMs _dano;
+
 			if(DANO_BITMAP.empty()){ err("Карта бит пуста");
 			//}else if(mpre(DANO ,"Исходный список", __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
 			}else if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени эпохи", __LINE__);
