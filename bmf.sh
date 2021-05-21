@@ -6,8 +6,11 @@
 #cat clump/dva.json | ./bimorph mysql://dva:dva@192.168.1.6/dva -c -
 #./bimorph mysql://dva:dva@192.168.1.6/dva ds=1 epoch=100 learn #verbose=2
 
-cat clump/tri.json | ./bimorph mysql://tri:tri@192.168.1.6/tri -c -
-./bimorph mysql://tri:tri@192.168.1.6/tri ds=1 epoch=100 learn #verbose
+#cat clump/tri.json | ./bimorph mysql://tri:tri@192.168.1.6/tri -c -
+#./bimorph mysql://tri:tri@192.168.1.6/tri ds=1 epoch=100 learn #verbose
+
+cat clump/chetire.json | ./bimorph mysql://chetire:chetire@192.168.1.6/chetire -c -
+./bimorph mysql://chetire:chetire@192.168.1.6/chetire ds=1 epoch=100 learn verbose
 
 #cat clump/iris_1.json | ./bimorph mysql://iris:iris@192.168.1.6/iris -c - # ?cache=shared
 #cat clump/iris_2.json | ./bimorph mysql://iris:iris@192.168.1.6/iris - # ?cache=shared

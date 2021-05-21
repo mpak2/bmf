@@ -978,7 +978,6 @@ int main(int argc, char **argv){
 	}else if([&](){ // Основные функции
 		if(bmf::Choice = ([&](std::string list, int key, TMMs &DANO, TMMb &DANO_BITMAP ,int line){ //mpre("Выбор итога для расширения", __LINE__);
 			TMs _dano;
-
 			if(DANO_BITMAP.empty()){ err("Карта бит пуста");
 			//}else if(mpre(DANO ,"Исходный список", __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
 			}else if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени эпохи", __LINE__);
@@ -1366,7 +1365,7 @@ int main(int argc, char **argv){
 			}else{ //mpre("Исходные сигналы dano_id=" +dano.at("id"), __LINE__);
 			}}return DANO_BITMAP; }(bmf::List(bmf::DATASET_MAP, {{"dataset_id", bmf::dataset.at("id")}, {"alias", "dano"}}, __LINE__)); DANO_BITMAP.empty()){ err("Список карт исходников");
 		}else if([&](){ // Отображение времени загрузки исходных сигналов
-			if(bmf::ARGV.end() == bmf::ARGV.find("verbose")){ //mpre("Не отображаем время обучения", __LINE__);
+			if(int verbose = atoi(bmf::ARGV.end() == bmf::ARGV.find("verbose") ?"" :bmf::ARGV.at("verbose").c_str()); !verbose){ //mpre("Не отображаем подробную информацию" ,__LINE__);
 			}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Загрузка исходных сигналов size=" +to_string(DANO_BITMAP.size()), __LINE__);
 			}return false; }()){ err("Время расчета");
 		}else if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени", __LINE__);
@@ -1392,7 +1391,7 @@ int main(int argc, char **argv){
 			}else{ //mpre("Итоговые сигналы dano_id=" +dano.at("id"), __LINE__);
 			}}return ITOG_BITMAP; }(bmf::List(bmf::DATASET_MAP, {{"dataset_id", bmf::dataset.at("id")}, {"alias", "itog"}}, __LINE__)); ITOG_BITMAP.empty()){ err("Список карт исходников");
 		}else if([&](){ // Отображение времени загрузки итоговых сигналов
-			if(bmf::ARGV.end() == bmf::ARGV.find("verbose")){ //mpre("Не отображаем время обучения", __LINE__);
+			if(int verbose = atoi(bmf::ARGV.end() == bmf::ARGV.find("verbose") ?"" :bmf::ARGV.at("verbose").c_str()); !verbose){ //mpre("Не отображаем подробную информацию" ,__LINE__);
 			}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Загрузка итоговых сигналов size=" +to_string(ITOG_BITMAP.size()), __LINE__);
 			}return false; }()){ err("Время расчета");
 		}else if(int key = [&](int key = 0){ // Позиция обучения
@@ -1455,7 +1454,7 @@ int main(int argc, char **argv){
 					}else if(BMF_INDEX.insert(make_pair(index_md5, index)); BMF_INDEX.empty()){ err("Обновление справочника");
 					}else{ //mpre(_INDEX ,"Обновление струкруты групп", __LINE__);
 					}}return false; }()){ err("Обновление структуры групп и списка морфов");
-				}else if(bmf::ARGV.end() == bmf::ARGV.find("verbose")){ //mpre("Не отображаем время обучения", __LINE__);
+				}else if(int verbose = atoi(bmf::ARGV.end() == bmf::ARGV.find("verbose") ?"" :bmf::ARGV.at("verbose").c_str()); !verbose){ //mpre("Не отображаем подробную информацию" ,__LINE__);
 				}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Обновление модели " +to_string(_INDEX.size()) +" size=" +to_string(BMF_INDEX.size()) +" ", __LINE__);
 				}return false; }()){ err("Обновление модели");
 			}else if(string table_vals = [&](string table_vals = ""){ // Создание таблицы значений
@@ -1557,7 +1556,7 @@ int main(int argc, char **argv){
 						}else if(INDEX_GRP[grp_id] = index_grp; INDEX_GRP.empty()){ err("Добавление значения");
 						}else{ //mpre(INDEX_GRP ,"Список групп" ,__LINE__);
 						}}return false; }()){ err("С числовым ключем");
-					}else if(bmf::ARGV.end() == bmf::ARGV.find("verbose")){ //mpre("Не отображаем подробную информацию" ,__LINE__);
+					}else if(int verbose = atoi(bmf::ARGV.end() == bmf::ARGV.find("verbose") ?"" :bmf::ARGV.at("verbose").c_str()); !verbose){ //mpre("Не отображаем подробную информацию" ,__LINE__);
 					}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Расчетный список " +(sql) ,__LINE__);
 					}return INDEX_GRP; }(); false){ err("Выборка расчетных групп");
 				}else if([&](){ do{ //for(auto index_grp_itr = INDEX_GRP.rbegin(); index_grp_itr != INDEX_GRP.rend(); index_grp_itr++){ //for(auto [index_grp_id ,index_grp]:INDEX_GRP){ // Расчет групп
@@ -1642,13 +1641,17 @@ int main(int argc, char **argv){
 								}return link; }() ;1 != link.length()){ err("Ссылка")
 							}else if(bool val = !v1 & v0 ^!("0" != link); false){ err("Значение");
 							}else if(val ? vals.set(nn) : vals.reset(nn); false){ err("Установка значения");
-							}else if(string str_exist = [&](std::string map = ""){ boost::to_string(exist, map); return map; }(); (str_exist.length() != exist.size())){ mpre("ОШИБКА установки карты итога", __LINE__);
-							}else if(string str_dano = [&](std::string map = ""){ boost::to_string(dano, map); return map; }(); (str_dano.length() != dano.size())){ mpre("ОШИБКА установки карты итога", __LINE__);
-							}else if(string vals = [&](string vals = ""){ for(auto [dano_id ,bitset]:DANO_BITMAP){ // Значения исходников
-								if(vals += (bitset.test(key) ?"1" :"0"); vals.empty()){ err("Значения исходников");
-								}else{ //mpre("Формирование карты значений исходников ключа" ,__LINE__);
-								}}return vals; }(); vals.empty()){ err("Значения исходников");
-							}else{ //mpre("Расчет vals=" + vals+" epoch=" +epoch +" key=" +to_string(key) +" itog_id=" +itog_id +" " +adr +" " +addr_grp +" link=" +link +" dv=" +string(dv ? "1" : "0") +" v1=" +string(v1 ? "1" : "0") +" v0=" +string(v0 ? "1" : "0") +" val=" +string(val ? "1" : "0") +" str_exist=" +str_exist +" str_dano=" +str_dano ,__LINE__);
+							}else if([&](){ // Отображение результатов расчета
+								if(int verbose = atoi(bmf::ARGV.end() == bmf::ARGV.find("verbose") ?"" :bmf::ARGV.at("verbose").c_str()); bmf::ARGV.end() == bmf::ARGV.find("verbose")){ //mpre("Не отображаем подробную информацию" ,__LINE__);
+								}else if(string str_exist = [&](std::string map = ""){ boost::to_string(exist, map); return map; }(); (str_exist.length() != exist.size())){ mpre("ОШИБКА установки карты итога", __LINE__);
+								}else if(string str_dano = [&](std::string map = ""){ boost::to_string(dano, map); return map; }(); (str_dano.length() != dano.size())){ mpre("ОШИБКА установки карты итога", __LINE__);
+								}else if(string vals = [&](string vals = ""){ for(auto [dano_id ,bitset]:DANO_BITMAP){ // Значения исходников
+									if(vals += (bitset.test(key) ?"1" :"0"); vals.empty()){ err("Значения исходников");
+									}else{ //mpre("Формирование карты значений исходников ключа" ,__LINE__);
+									}}return vals; }(); vals.empty()){ err("Значения исходников");
+								}else{ mpre("Расчет vals=" + vals+" epoch=" +epoch +" key=" +to_string(key) +" itog_id=" +itog_id +" " +adr +" " +addr_grp +" link=" +link +" dv=" +string(dv ? "1" : "0") +" v1=" +string(v1 ? "1" : "0") +" v0=" +string(v0 ? "1" : "0") +" val=" +string(val ? "1" : "0") +" " ,__LINE__);
+								}return false; }()){ err("Отображение результатов расчетов"); 
+							}else{ //mpre("Расчет морфа" ,__LINE__);
 							}return false; }()){ err("Значение морфа");
 						}else if(exist.set(nn) ;false){ err("Установка морфа в ключевую группу");
 						}else{ //mpre("Расчет Группы adr=" +adr +" " ,__LINE__);
@@ -1872,7 +1875,11 @@ int main(int argc, char **argv){
 							}else if(BMF_INDEX.insert(make_pair(index_md5 ,index_new)); BMF_INDEX.empty()){ err("Добавление морфа в справочник");
 							}else if(string vals = [&](string vals = ""){ for(auto [dano_id ,bitmap]:DANO_BITMAP){ vals += bitmap.test(key) ? "1" : "0"; }return vals; }(); vals.empty()){ err("Список значений исходника");
 							}else if(string dano_id =(index_new.end() ==index_new.find("dano_id") ?"" :index_new.at("dano_id")); dano_id.empty()){ err("Идентификатор исхоного значения");
-							}else{ //mpre("Добавление нового морфа epoch=" +epoch +" key=" +to_string(key) +" addr_grow=" +addr_grow +" vals=" +vals +" calc=" +calc +" learn=" +learn +" dano_id=" +dano_id +" link=" +link +" adr=" +adr +" addr_grp=" +addr_grp +" addr_new=" +addr_new +" " ,__LINE__);
+							}else if([&](){ // Уведомление
+								if(int verbose = atoi(bmf::ARGV.end() == bmf::ARGV.find("verbose") ?"" :bmf::ARGV.at("verbose").c_str()); bmf::ARGV.end() == bmf::ARGV.find("verbose")){ //mpre("Не отображаем подробную информацию" ,__LINE__);
+								}else{ mpre("Добавление нового морфа epoch=" +epoch +" key=" +to_string(key) +" addr_grow=" +addr_grow +" vals=" +vals +" calc=" +calc +" learn=" +learn +" dano_id=" +dano_id +" link=" +link +" adr=" +adr +" addr_grp=" +addr_grp +" addr_new=" +addr_new +" " ,__LINE__);
+								}return false; }()){ err("Уведомление");
+							}else{ //mpre("Расширение модели" ,__LINE__);
 							}return index_new; }(); index_new.empty()){ err("Добавление нового морфа");
 						}else if(TMs _index_grp = [&](TMs index_grp = {}){ // Общая группа расширяемого морфа
 							if(string index_md5 = md5(itog_id +":" +addr_grp); index_md5.empty()){ err("Хеш морфа");
