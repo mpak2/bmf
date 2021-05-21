@@ -9,7 +9,7 @@
 #cat clump/tri.json | ./bimorph mysql://tri:tri@localhost/tri -c -
 #./bimorph mysql://tri:tri@localhost/tri ds=1 epoch=1000 learn
 
-cat clump/tri.json | ./bimorph mysql://chetire:chetire@192.168.1.6/chetire -c -
+cat clump/chetire.json | ./bimorph mysql://chetire:chetire@192.168.1.6/chetire -c -
 ./bimorph mysql://chetire:chetire@192.168.1.6/chetire ds=1 epoch=1000 learn verbose
 
 #cat clump/iris_1.json | ./bimorph mysql://localhost/iris - # ?cache=shared
