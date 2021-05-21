@@ -9,13 +9,16 @@
 #cat clump/tri.json | ./bimorph mysql://tri:tri@localhost/tri -c -
 #./bimorph mysql://tri:tri@localhost/tri ds=1 epoch=1000 learn
 
+cat clump/tri.json | ./bimorph mysql://chetire:chetire@192.168.1.6/chetire -c -
+./bimorph mysql://chetire:chetire@192.168.1.6/chetire ds=1 epoch=1000 learn
+
 #cat clump/iris_1.json | ./bimorph mysql://localhost/iris - # ?cache=shared
 #cat clump/iris_2.json | ./bimorph mysql://localhost/iris - # ?cache=shared
 #cat clump/iris_3.json | ./bimorph mysql://localhost/iris - # ?cache=shared
 
-cat clump/iris.json | ./bimorph mysql://iris:iris@192.168.1.6/iris -c - # ?cache=shared
-./bimorph mysql://iris:iris@192.168.1.6/iris ds=1 epoch=100 learn #verbose #data #key=+10 #-microtime # ?cache=shared
-./bimorph mysql://iris:iris@192.168.1.6/iris
+#cat clump/iris.json | ./bimorph mysql://iris:iris@192.168.1.6/iris -c - # ?cache=shared
+#./bimorph mysql://iris:iris@192.168.1.6/iris ds=1 epoch=100 learn #verbose #data #key=+10 #-microtime # ?cache=shared
+#./bimorph mysql://iris:iris@192.168.1.6/iris
 
 #./bimorph mysql://mnist:mnist@192.168.1.6/mnist ds=1 epoch=10 key=+10
 

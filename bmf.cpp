@@ -150,7 +150,7 @@ namespace bmf{ // Глобальные переменные
 	std::function<std::string(TMs)> Calculate; // Расчет строки для расчета польской нотации
 	std::function<std::string(std::string,TM3i&)> Calc; // Расчет строки польской нотации
 	std::function<TMs(TMs)> Value; // История морфа
-	std::function<TMs(string,int,TMMs&,TMMb&)> Choice; // Расчет истории
+	std::function<TMs(string,int,TMMs&,TMMb&,int)> Choice; // Расчет истории
 	std::function<double(string)> Bin2dec; // Перерасчет размерности из двоичной в десятеричную
 	std::function<string(double)> Dec2bin; // Перерасчет размерности размерности из десятеричной в двоичную
 	std::function<string(TMs,string,int)> Learn; // Рерасчет морфа
@@ -976,7 +976,66 @@ int main(int argc, char **argv){
 		}else{ return false; //mpre("Функции успешно установлены", __LINE__);
 		}return true; }()){ mpre("Не выполнены все условия", __LINE__);
 	}else if([&](){ // Основные функции
-		if(bmf::Choice = ([&](std::string list, int key, TMMs &DANO, TMMb &DANO_BITMAP){ //mpre("Выбор итога для расширения", __LINE__);
+		if(bmf::Choice = ([&](std::string list, int key, TMMs &DANO, TMMb &DANO_BITMAP ,int line){ //mpre("Выбор итога для расширения", __LINE__);
+			TMs _dano;
+			if(DANO_BITMAP.empty()){ err("Карта бит пуста");
+			//}else if(mpre(DANO ,"Исходный список", __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
+			}else if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени эпохи", __LINE__);
+			}else if(TMMi COUNT = [&](){ // Расчет процентов разнообразия
+				static TMMi COUNT; // Считаем только один раз
+				if(!COUNT.empty()){ //mpre("Расчет разнообразия создан ранее" ,__LINE__);
+				}else if([&](){ for(auto dano_itr:DANO){ // Уровни разнообразия
+					if(auto dano_bitmap_itr = DANO_BITMAP.find(dano_itr.first); (DANO_BITMAP.end() == dano_bitmap_itr)){ err("Список значений исходника не найден");
+					}else if(int size = dano_bitmap_itr->second.size(); !size){ err("Количество наборов в примере");
+					}else if(int count = dano_bitmap_itr->second.count(); false){ err("Количество установленных бит исходника");
+					}else if(int res = (size > count *2 ? count : size-count) ; false){ err("Расчет результата");
+					}else if(COUNT[res] = [&](TMs cnt = {}){ // Значение в счетчик
+						if(cnt = (COUNT.end() == COUNT.find(res) ? TMs({{dano_itr.first ,"0"}}) : cnt); COUNT.end() == COUNT.find(res)){ //mpre("Первоначальное значение" ,__LINE__);
+						}else if(cnt = COUNT.at(res); cnt.empty()){ err("Значение списка");
+						}else if(cnt.insert(make_pair(dano_itr.first ,to_string(cnt.size()))); cnt.empty()){ err("Инкремент значения");
+						}else{ //mpre("Добавление нового значения res=" +to_string(res) ,__LINE__);
+						}return cnt; }(); COUNT.end() == COUNT.find(res)){ err("Добавление значения");
+					}else{ //mpre("Исходник " +dano_itr.first +" количество установленных бит " +to_string(count) +" размер " +to_string(dano_bitmap_itr->second.size()) +" результат " +to_string(res) ,__LINE__);
+					}}return false; }()){ err("Установка уровня разнообразия");
+				}else{ //mpre(COUNT ,"Расчет разнообразия" ,__LINE__);
+				}return COUNT; }(); COUNT.empty()){ err("Расчет разнообразия"); //}else if(mpre(COUNT ,"Список расчетов" ,__LINE__); false){ err("Уведомление");
+			}else if(TMs EPT =[&](string list ,TMs EPT ={} ,int pos =0 ,int loop =2e9){ while((string::npos != (pos = list.find_last_of(";"))) && (loop-- > 0)){ // Исключение повторяющихся исходников
+				if(std::string dano_id =list.substr(pos +1, list.length()); dano_id.empty()){ mpre("ОШИБКА получения идентификатор исходника " +list, __LINE__);
+				}else if(list =list.substr(0, pos); false){ mpre("ОШИБКА сокращение длинны списка", __LINE__);
+				}else if(EPT.size() +1 >= DANO.size()){ //mpre("Список исключений всегда меньше списка исходников" ,__LINE__);
+				}else if(EPT[dano_id] = to_string(EPT.size()); EPT.empty()){ err("Очередное исключение");
+				}else{ //mpre("Исключение " +dano_id ,__LINE__);
+				}}return EPT; }(list); false){ err("Формирование списка исключений"); //}else if(mpre(EPT ,"Список исключений" ,__LINE__); false){ err("Уведомление");
+			//}else if(mpre(EPT ,"Список исключений", __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
+			}else if(TMs RES = [&](auto count_itr, TMs RES = {}){ do{ // Выбор подходящей связи
+				if([&](){ for(auto cnt_itr:count_itr->second){ // Исходники разнообразия
+					if(EPT.end() != EPT.find(cnt_itr.first)){ //mpre("Исходника нет в списке исключений" ,__LINE__);
+					}else if(DANO_BITMAP.end() == DANO_BITMAP.find(cnt_itr.first)){ err("Исходник в списке биткарт не найден");
+					}else if(int key_prev = (key ? key -1 : DANO_BITMAP.at(cnt_itr.first).size() -1); 0 > key_prev){ mpre("ОШИБКА Предыдущее значение ключа key=" +to_string(key) +" key_prev=" +to_string(key_prev) ,__LINE__);
+					}else if(string val_cur = (DANO_BITMAP.at(cnt_itr.first).test(key) ? "1" : "0"); val_cur.empty()){ err("Текущее значение");
+					}else if(string val_prev = (DANO_BITMAP.at(cnt_itr.first).test(key_prev) ? "1" : "0"); val_prev.empty()){ err("Предыдущее значение");
+					}else if(string grp = (EPT.end() == EPT.find(cnt_itr.first) ? "" : "_") +val_prev +val_cur; grp.empty()){ err("Группа");
+					}else if(RES.end() != RES.find(grp)){ //mpre("Значение уже установлено [" +grp +"]" ,__LINE__);
+					}else if(RES[grp] = cnt_itr.first; RES.empty()){ err("Установка значения");
+					}else{ //mpre(RES ,"Выбор исходника grp=" +grp +" count=" +to_string(count_itr->first) +" key_prev=" +to_string(key_prev) +" " +cnt_itr.first ,__LINE__);
+					}}return false; }()){ err("Перебор исходников разнообразия");
+				}else{ //mpre("Обзор разнообразия " +to_string(count_itr->first) ,__LINE__);
+				}}while((COUNT.rend() != ++count_itr) && (RES.end() == RES.find("01"))); return RES; }(COUNT.rbegin()); RES.empty()){ err("Выбор подходящей связи");
+			//}else if(mpre(RES ,"Список подходящих " +list +" ", __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
+			}else if(_dano = [&](){ // Выборка подходящего исходника
+				if(string _dano_id = [&](string _dano_id = ""){ // Идентификатор исходника
+					if(_dano_id = (RES.end() == RES.find("01") ? _dano_id : RES.at("01")); !_dano_id.empty()){ //mpre("Выбор 01" ,__LINE__);
+					}else if(_dano_id = (RES.end() == RES.find("10") ? _dano_id : RES.at("10")); !_dano_id.empty()){ //mpre("Выбор 10" ,__LINE__);
+					}else if(_dano_id = (RES.end() == RES.find("11") ? _dano_id : RES.at("11")); !_dano_id.empty()){ //mpre("Выбор 11" ,__LINE__);
+					}else if(_dano_id = (RES.end() == RES.find("00") ? _dano_id : RES.at("00")); !_dano_id.empty()){ //mpre("Выбор 00" ,__LINE__);
+					}else if(_dano_id = RES.begin()->second; !_dano_id.empty()){ //mpre("Первое значение исключения из списка" ,__LINE__);
+					}else{ mpre("Изменившееся значение не найдено" ,__LINE__);
+					}return _dano_id; }(); _dano_id.empty()){ mpre(RES ,"ОШИБКА Идентификатор исходника" ,__LINE__);
+				}else if(_dano = (DANO.end() == DANO.find(_dano_id) ? _dano : DANO.at(_dano_id)); _dano.empty()){ err("ОШИБКА установки результата");
+				}else{ //mpre(_dano ,"Результат" ,__LINE__);
+				}return _dano; }(); _dano.empty()){ err("ОШИБКА выборки исходника");
+			}return _dano; }); false){ mpre("ОШИБКА установки функции выбора Исходного значения", __LINE__);
+		}else /*if(bmf::Choice = ([&](std::string list, int key, TMMs &DANO, TMMb &DANO_BITMAP){ //mpre("Выбор итога для расширения", __LINE__);
 			TMs _dano;
 			if(DANO_BITMAP.empty()){ err("Карта бит пуста");
 			}else if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени эпохи", __LINE__);
@@ -1036,7 +1095,7 @@ int main(int argc, char **argv){
 			//}else if(bmf::ARGV.end() == bmf::ARGV.find("verbose")){ //mpre("Не отображаем время обновления группы", __LINE__);
 			//}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Выбор подходящей связи list.length()=" +to_string(list.length()) +" ", __LINE__); //mpre("Сохрание значения INDEX_GROUP[" +group +"][" +to_string(key) +"]=" +GROUP.at(group).at(group), __LINE__); //mpre("Обновление " +sql, __LINE__);
 			}return _dano; }); false){ mpre("ОШИБКА установки функции выбора Исходного значения", __LINE__);
-		}else if(bmf::Vals = ([&](TMs VALUE, string alias, int key, std::string BMF_VALUES, std::string BMF_TITLES){ // Установка входных значений
+		}else*/ if(bmf::Vals = ([&](TMs VALUE, string alias, int key, std::string BMF_VALUES, std::string BMF_TITLES){ // Установка входных значений
 			TMMs VALS = {};
 			if([&](){ // Расчет знаков
 				for(auto &val_itr:VALUE){ //mpre("VALUE ", __LINE__);
@@ -1640,7 +1699,7 @@ int main(int argc, char **argv){
 				}else if(TMs index = [&](TMs index = {}){ // Добавление первоначального морфа
 					if(std::string addr = "1-" +itog.at("id"); addr.empty()){ err("Идентификатор первоначального морфа");
 					}else if(index = (BMF_INDEX.end() == BMF_INDEX.find(addr) ? index : BMF_INDEX.at(addr)); !index.empty()){ //mpre("Морф уже в базе" ,__LINE__);
-					}else if(TMs dano = bmf::Choice("", key, DANO, DANO_BITMAP); dano.empty()){ err("Выборка первоначального исходника");
+					}else if(TMs dano = bmf::Choice("", key, DANO, DANO_BITMAP ,__LINE__); dano.empty()){ err("Выборка первоначального исходника");
 					}else if(TMs _index = {{"itog_values_id", itog.at("itog_values_id")}, {"parent", "0"}, {"addr", addr}, {"dano_id", dano.at("id")}, {"itog_id", itog.at("id")}}; _index.empty()){ mpre("ОШИБКА формирования свойст нового морфа", __LINE__);
 					}else if((index = bmf::Up_mysql(bmf::INDEX, {/*{"id", md5(addr)}*/}, _index, {}, __LINE__)).empty()){ mpre("ОШИБКА добавления корневого морфа в базу", __LINE__);
 					}else if(itog["index_id"] = index.at("id"); itog.empty()){ mpre("ОШИБКА установки свойства связи итога с морфом", __LINE__);
@@ -1726,7 +1785,7 @@ int main(int argc, char **argv){
 							}}return false; }()){ err("Составление списка исходников");
 						}else{ //mpre("Строка исключений list=" +list, __LINE__);
 						}return list; }(); false){ err("Список родителей");
-					}else if(TMs dano_grow = bmf::Choice(list, key, DANO, DANO_BITMAP); dano_grow.empty()){ err("Выбор исходного значения");
+					}else if(TMs dano_grow = bmf::Choice(list, key, DANO, DANO_BITMAP ,__LINE__); dano_grow.empty()){ err("Выбор исходного значения");
 					}else if(TMs _index = {{"itog_values_id", index_grow.at("itog_values_id")}, {"addr", index_id_grow}, {"dano_id", dano_grow.at("id")}, {"itog_id", index_grow.at("itog_id")}}; _index.empty()){ mpre("ОШИБКА формирования свойст нового морфа", __LINE__);
 					}else if(_index = bmf::Up_mysql("index", {/*{"id", md5(index_id_grow)}*/}, _index, {}, __LINE__); _index.empty()){ mpre("ОШИБКА добавления корневого морфа в базу", __LINE__);
 					}else if(!(err += 1)){ err("Инкримент изменений");
