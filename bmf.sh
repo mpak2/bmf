@@ -24,7 +24,8 @@ cat clump/iris.json | ./bimorph mysql://iris:iris@192.168.1.6/iris -c - # ?cache
 ./bimorph mysql://iris:iris@192.168.1.6/iris ds=1 epoch=100 learn #verbose #key=+10 #-microtime # ?cache=shared
 ./bimorph mysql://iris:iris@192.168.1.6/iris
 
-#./bimorph mysql://mnist:mnist@192.168.1.6/mnist ds=1 epoch=10 key=+10
+#sudo mysql -u root mnist < ~/home/mpak/download/mnist/mnist.dump
+#./bimorph mysql://mnist:mnist@192.168.1.6/mnist ds=1 epoch=100 learn
 
 #./bimorph mysql://iris:iris@192.168.1.6/iris dano='[{"dano":{"ДлинаЧашелистика":"5.9","ШиринаЧашелистика":"3.0","ДлинаЛепестка":"5.1","ШиринаЛепестка":"1.8"}}]' #Iris-virginica
 #./bimorph mysql://iris:iris@192.168.1.6/iris dano='[{"dano":{"ДлинаЧашелистика":"6.3","ШиринаЧашелистика":"3.3","ДлинаЛепестка":"6.0","ШиринаЛепестка":"2.5"}}]' # Iris-virginica
