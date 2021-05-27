@@ -62,7 +62,6 @@ int mpre(TMMi& TAB, int line, string comment = ""){
 	return mpre(TAB, line, comment);
 }
 
-
 int mpre(TMMs& TAB, int line, string comment = ""){
 	std::cerr << "Array";
 	if(line > 0){
@@ -103,6 +102,29 @@ int mpre(TM3i& TABS, int line, string comment = ""){
 	return mpre(TABS, line, comment);
 }
 
+int mpre(TM3s& TABS, int line, string comment = ""){
+	std::cerr << "Array";
+	if(line > 0){
+		std::cerr << "__" << std::to_string(line) << "__";
+	}; std::cerr << "( // " << comment << "\n";
+	for(auto &tab_itr:TABS){
+		if(string keys = tab_itr.first; false){ mpre("ОШИБКА получения ключа очередного элемента", __LINE__);
+		}else{
+			std::cerr << "\tArray";
+			if(line > 0){
+				std::cerr << "\t" << keys << " => " ;
+			}; std::cerr << "( // " << comment << "\n";
+			for(auto itr = tab_itr.second.begin(); itr != tab_itr.second.end(); itr++){
+				string key = itr->first;
+				TMs row = itr->second;
+				mpre(row, line, comment, "\t\t", key);
+			} std::cerr << "\t)\n";
+		}
+	}; std::cerr << ")\n";
+	return 1;
+} int mpre(TM3s TABS, string comment, int line){
+	return mpre(TABS, line, comment);
+}
 
 
 TMMi rb(TMMi& TAB, TMs values, bool debug = false, TMMi LIST = {}){
