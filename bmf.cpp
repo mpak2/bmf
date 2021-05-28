@@ -1340,22 +1340,22 @@ int main(int argc, char **argv){
 				}else{ //mpre("Количество правильных ответов i=" +to_string(i) +" dataset_count=" +to_string(dataset_count) +" count=" +to_string(count) +" ers=" +to_string(ers), __LINE__);
 				}}return (float)(count*100)/dataset_count; }(); (0 > perc)){ mpre("ОШИБКА расчета процента полных совпадений по значениям", __LINE__);
 			}else if(DATASET[id]["perc"] = dataset["perc"] = [&](string _perc = ""){ char chr[10]; sprintf(chr ,"%.3f" ,perc); return string(chr); }(); dataset.end() ==dataset.find("perc")){ mpre("ОШИБКА расчета строки процента ошибки", __LINE__);
-			}else if(float epoch = [&](float epoch = 0){ // Расчет эпох
+			}else if(DATASET[id]["epoch"] = dataset["epoch"] = [&](float epoch = 0){ // Расчет эпох
 				if(dataset.end() == dataset.find("epoch")){ err("Поле эпох не задано");
 				}else if(epoch = atoi(dataset.at("epoch").c_str()); 0 > epoch){ err("Целое количество эпох");
 				}else if(dataset.end() == dataset.find("key")){ err("Поле позиции не задано");
 				}else if(epoch += ((float)atoi(dataset.at("key").c_str())/ dataset_count); 0 > epoch){ err("Дробное количество эпох");
 				}else{ //mpre("Эпох dataset.at(epoch)=" +dataset.at("epoch") +" dataset_count=" +to_string(dataset_count) +" key=" +dataset.at("key") +" epoch=" +to_string(epoch), __LINE__);
-				}return epoch; }(); false){ err("Расчет эпох");
-			}else{ mpre("Набор " +dataset["id"] +" количество:"+ dataset["count"] +" точность:"+ dataset["diff"] +" (" +dataset["perc"] +"%)" +(0 == epoch ? "" : " эпох:" +to_string(epoch)), __LINE__);
+				}return to_string(epoch); }(); false){ err("Расчет эпох");
+			}else{ mpre("Набор " +dataset["id"] +" количество:"+ dataset["count"] +" точность:"+ dataset["diff"] +" (" +dataset["perc"] +"%)" +dataset["epoch"], __LINE__);
 			}}return false; }()){ mpre("ОШИБКА отображения списка набора данных", __LINE__);
 		}else if([&](){ // Полная статистика
 			if(string count = [&](int count =0){ for(auto [id ,dataset]:DATASET){ count += atoi((dataset.end() ==dataset.find("count") ?"0" :dataset.at("count")).c_str()); }return to_string(count); }(); count.empty()){ err("Количество примеров в наборе");
 			}else if(string diff = [&](float diff =0){ for(auto [id ,dataset]:DATASET){ diff += atof((dataset.end() ==dataset.find("diff") ?"0" :dataset.at("diff")).c_str()); }return to_string((float)diff /DATASET.size()); }(); diff.empty()){ err("Количество двоичных совпадений в наборе");
 			}else if(float perc = [&](float perc =0){ for(auto [id ,dataset]:DATASET){ perc += atof((dataset.end() ==dataset.find("perc") ?"0" :dataset.at("perc")).c_str()); }return (float)perc /DATASET.size(); }(); !perc){ err("Количество полных совпадений в наборе");
 			}else if(string _perc = [&](string _perc = ""){ char chr[10]; sprintf(chr ,"%.3f" ,perc); return string(chr); }(); _perc.empty()){ mpre("ОШИБКА расчета строки процента ошибки", __LINE__);
-			}else if(string epoch = [&](float epoch =0){ for(auto [id ,dataset]:DATASET){ epoch += atof((dataset.end() ==dataset.find("epoch") ?"0" :dataset.at("epoch")).c_str()); }return to_string(epoch /DATASET.size()); }(); epoch.empty()){ err("Количество эпох в наборе");
-			}else{ mpre(string(65 ,'-') +"\nНаборов " +to_string(DATASET.size()) +" количество:" +count +" точность:" +diff +" (" +_perc +"%) эпох:" +epoch +" " ,__LINE__);
+			}else if(string epoch = [&](float epoch =0){ for(auto [id ,dataset]:DATASET){ epoch += atof((dataset.end() ==dataset.find("epoch") ?"0" :dataset.at("epoch")).c_str()); }return to_string(epoch); }(); epoch.empty()){ err("Количество эпох в наборе");
+			}else{ mpre(string(62 ,'-') +"\nНаборов " +to_string(DATASET.size()) +" количество:" +count +" точность:" +diff +" (" +_perc +"%) эпох:" +epoch +" " ,__LINE__);
 			}return false; }()){ err("Полная статистика");
 		}else{ //mpre("Размер модели ", __LINE__);
 		}return bmf::dataset; }(); false){ err("Набор данных не установлен");
