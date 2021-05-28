@@ -1300,12 +1300,13 @@ int main(int argc, char **argv){
 		}else if(!ds.empty()){ mpre("Набора данных не найден в базе "+ ds, __LINE__);
 		}else if(std::map<string, boost::dynamic_bitset<>> ITOG; false){ mpre("Справочник карт", __LINE__);
 		}else if(std::map<string, boost::dynamic_bitset<>> INDEX; false){ mpre("Справочник карт", __LINE__);
-		}else if([&](){ for(auto& dataset_itr:bmf::List(bmf::DATASET, {}, __LINE__)){ // Вывод списка набора данных
-			if(TMs dataset = dataset_itr.second; dataset.empty()){ mpre("ОШИБКА выборки набора данных", __LINE__);
-			}else if(dataset.end() == dataset.find("count")){ mpre("ОШИБКА поле количества примеров не установлено", __LINE__);
+		}else if(TMMs DATASET = bmf::List(bmf::DATASET, {}, __LINE__); DATASET.empty()){ mpre("Наборов не найдено" ,__LINE__);
+		}else if([&](){ for(auto [id ,dataset]:DATASET){ // Вывод списка набора данных
+			//if(TMs dataset = dataset_itr.second; dataset.empty()){ mpre("ОШИБКА выборки набора данных", __LINE__);
+			if(dataset.end() == dataset.find("count")){ mpre("ОШИБКА поле количества примеров не установлено", __LINE__);
 			}else if(int dataset_count = atoi(dataset.at("count").c_str()); !dataset_count){ mpre("ОШИБКА расчета количества примеров в наборе данных", __LINE__);
 			}else if(TMMs _ITOG_ = bmf::List(bmf::ITOG, {}, __LINE__); _ITOG_.empty()){ err("Выборка списка итогов");
-			}else if(float diff = [&](int ers = 0, int count = 0){ for(auto itog_itr:_ITOG_){ // Расчет результата поитогово
+			}else if(DATASET[id]["diff"] = dataset["diff"] = [&](int ers = 0, int count = 0){ for(auto itog_itr:_ITOG_){ // Расчет результата поитогово
 				if(TMs itog = itog_itr.second; itog.empty()){ mpre("ОШИБКА выборки итога", __LINE__);
 				}else if(std::string dataset_map_id = "itog," +itog.at("id") +"," +dataset.at("id"); dataset_map_id.empty()){ mpre("ОШИБКА составления идентификатора карты", __LINE__);
 				}else if(TMs itog_map = bmf::Up(bmf::DATASET_MAP, {{"id", dataset_map_id}}, {}, {}, __LINE__); itog_map.empty()){ mpre("ОШИБКА обнолвения карты исходника", __LINE__);
@@ -1322,7 +1323,7 @@ int main(int argc, char **argv){
 				}else if(ers += temp.count(); (0 > ers)){ mpre("ОШИБКА инкремента разницы", __LINE__);
 				}else if(count += dataset_count; (0 > count)){ mpre("ОШИБКА расчета количества сигналов", __LINE__);
 				}else{ //mpre("Карта itog " +itog_map.at("map"), __LINE__); mpre("Карта index " +index_map.at("map"), __LINE__); mpre("Разница count=" +to_string(count) +" ers=" +to_string(ers), __LINE__);
-				}}return (!ers ? 1 : (float)(count-ers)/count); }(); (0 > diff)){ mpre("ОШИБКА расчета результата набора данных", __LINE__);
+				}}return to_string(!ers ? 1 : (float)(count-ers)/count); }(); dataset.end() == dataset.find("diff")){ mpre("ОШИБКА расчета результата набора данных", __LINE__);
 			}else if(float perc = [&](int count = 0){ for(int i = 0; i < dataset_count; i++){ // Совпадение по значениям
 				if(int ers = [&](int ers = 0){ for( auto itog_itr:_ITOG_){ // Проверка всех итогов
 					if(TMs itog = itog_itr.second; itog.empty()){ mpre("ОШИБКА выборки итога", __LINE__);
@@ -1338,7 +1339,7 @@ int main(int argc, char **argv){
 				}else if(count += (ers ? 0 : 1); (0 > count)){ mpre("ОШИБКА количество правильных ответов", __LINE__);
 				}else{ //mpre("Количество правильных ответов i=" +to_string(i) +" dataset_count=" +to_string(dataset_count) +" count=" +to_string(count) +" ers=" +to_string(ers), __LINE__);
 				}}return (float)(count*100)/dataset_count; }(); (0 > perc)){ mpre("ОШИБКА расчета процента полных совпадений по значениям", __LINE__);
-			}else if(string _perc = [&](string _perc = ""){ char chr[10]; sprintf(chr ,"%.3f" ,perc); return string(chr); }(); _perc.empty()){ mpre("ОШИБКА расчета строки процента ошибки", __LINE__);
+			}else if(DATASET[id]["perc"] = dataset["perc"] = [&](string _perc = ""){ char chr[10]; sprintf(chr ,"%.3f" ,perc); return string(chr); }(); dataset.end() ==dataset.find("perc")){ mpre("ОШИБКА расчета строки процента ошибки", __LINE__);
 			}else if(float epoch = [&](float epoch = 0){ // Расчет эпох
 				if(dataset.end() == dataset.find("epoch")){ err("Поле эпох не задано");
 				}else if(epoch = atoi(dataset.at("epoch").c_str()); 0 > epoch){ err("Целое количество эпох");
@@ -1346,8 +1347,16 @@ int main(int argc, char **argv){
 				}else if(epoch += ((float)atoi(dataset.at("key").c_str())/ dataset_count); 0 > epoch){ err("Дробное количество эпох");
 				}else{ //mpre("Эпох dataset.at(epoch)=" +dataset.at("epoch") +" dataset_count=" +to_string(dataset_count) +" key=" +dataset.at("key") +" epoch=" +to_string(epoch), __LINE__);
 				}return epoch; }(); false){ err("Расчет эпох");
-			}else{ mpre("Набор " +dataset["id"] +" количество:"+ dataset["count"] +" точность:"+ to_string(diff) +" (" +_perc +"%)" +(0 == epoch ? "" : " эпох:" +to_string(epoch)), __LINE__);
+			}else{ mpre("Набор " +dataset["id"] +" количество:"+ dataset["count"] +" точность:"+ dataset["diff"] +" (" +dataset["perc"] +"%)" +(0 == epoch ? "" : " эпох:" +to_string(epoch)), __LINE__);
 			}}return false; }()){ mpre("ОШИБКА отображения списка набора данных", __LINE__);
+		}else if([&](){ // Полная статистика
+			if(string count = [&](int count =0){ for(auto [id ,dataset]:DATASET){ count += atoi((dataset.end() ==dataset.find("count") ?"0" :dataset.at("count")).c_str()); }return to_string(count); }(); count.empty()){ err("Количество примеров в наборе");
+			}else if(string diff = [&](float diff =0){ for(auto [id ,dataset]:DATASET){ diff += atof((dataset.end() ==dataset.find("diff") ?"0" :dataset.at("diff")).c_str()); }return to_string((float)diff /DATASET.size()); }(); diff.empty()){ err("Количество двоичных совпадений в наборе");
+			}else if(float perc = [&](float perc =0){ for(auto [id ,dataset]:DATASET){ perc += atof((dataset.end() ==dataset.find("perc") ?"0" :dataset.at("perc")).c_str()); }return (float)perc /DATASET.size(); }(); !perc){ err("Количество полных совпадений в наборе");
+			}else if(string _perc = [&](string _perc = ""){ char chr[10]; sprintf(chr ,"%.3f" ,perc); return string(chr); }(); _perc.empty()){ mpre("ОШИБКА расчета строки процента ошибки", __LINE__);
+			}else if(string epoch = [&](float epoch =0){ for(auto [id ,dataset]:DATASET){ epoch += atof((dataset.end() ==dataset.find("epoch") ?"0" :dataset.at("epoch")).c_str()); }return to_string(epoch /DATASET.size()); }(); epoch.empty()){ err("Количество эпох в наборе");
+			}else{ mpre(string(65 ,'-') +"\nНаборов " +to_string(DATASET.size()) +" количество:" +count +" точность:" +diff +" (" +_perc +"%) эпох:" +epoch +" " ,__LINE__);
+			}return false; }()){ err("Полная статистика");
 		}else{ //mpre("Размер модели ", __LINE__);
 		}return bmf::dataset; }(); false){ err("Набор данных не установлен");
 	}else if(int loop = [&](int loop = 0){ // Количетсво повторов
@@ -1750,7 +1759,7 @@ int main(int argc, char **argv){
 								}else if(index = bmf::Up_mysql("index" ,{{"md5" ,index_md5}} ,{} ,{} ,__LINE__); index.empty()){ err("Морф развития не найден");
 								}else{ //mpre("Выборка морфа index_md5=" +index_md5 ,__LINE__);
 								}return index; }(); index.empty()){ err("Выборка морфа");
-							}else if(string _grow = (index.end() == index.find("id") ? "" : index.at("id")); _grow.empty()){ mpre("ОШИБКА Идентификатор морфа роста addr_grow=" +addr_grow ,__LINE__);
+							}else if(string _grow = (index.end() == index.find("id") ? "" : index.at("id")); _grow.empty()){ mpre(index ,"Морф" ,__LINE__); mpre("ОШИБКА Идентификатор морфа роста addr_grow=" +addr_grow ,__LINE__);
 							}else if(grow = string("-" == dano_id.substr(0 ,1) ?"-" :"") +_grow; grow.empty()){ err("Значение роста с учетом направления");
 							}else if(32 > nn){ //mpre("Значение роста из локальной группы key=" +to_string(key) +" itog_id=" +itog_id +" addr_grp=" +addr_grp +" grow=" +grow +" adr=" +bmf::Dec2bin(nn) +" list=" +list +" " ,__LINE__);
 							}else if(string adr_next = bmf::Dec2bin(next); adr_next.empty()){ err("Расчет адреса морфа нижестоящей группы");
