@@ -1427,10 +1427,11 @@ int main(int argc, char **argv){
 			}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Загрузка итоговых сигналов size=" +to_string(ITOG_BITMAP.size()), __LINE__);
 			}return false; }()){ err("Время расчета");
 		}else if(int key = [&](int key = 0){ // Позиция обучения
-			if(bmf::ARGV.end() == bmf::ARGV.find("learn")){ //mpre("Не установлено обучение" ,__LINE__);
-			}else if(bmf::dataset.end() == bmf::dataset.find("key")){ err("Поле ключа не найдено в базе");
+			//if(bmf::ARGV.end() == bmf::ARGV.find("learn")){ //mpre("Не установлено обучение" ,__LINE__);
+			if(bmf::dataset.end() == bmf::dataset.find("key")){ err("Поле ключа не найдено в базе");
 			}else if(int epoch = (bmf::ARGV.end() == bmf::ARGV.find("epoch") ? 0 : atoi(bmf::ARGV.at("epoch").c_str())); !epoch){ //mpre("Локальный ключ" ,__LINE__);
-			}else if(key = atoi(bmf::dataset.at("key").c_str()); 0 > key){ err("Расчет значения последнего ключа");
+			}else if(string _key = (bmf::ARGV.end() ==bmf::ARGV.find("key") ?bmf::dataset.at("key") :bmf::ARGV.at("key")) ;false){ err("Строка ключа");
+			}else if(key = atoi(_key.c_str()); 0 > key){ err("Расчет значения последнего ключа");
 			}else{ //mpre("Текущее состояние ключа key=" +to_string(key), __LINE__);
 			}return key; }(); (key >= dataset_count)){ mpre("Выход за пределы значений dataset_count=" +to_string(dataset_count) +" key=" +to_string(key) ,__LINE__);
 		}else if(int err = [&](int err = 0){ // Позиция обучения
@@ -1457,7 +1458,7 @@ int main(int argc, char **argv){
 				}else if(key = (atoi(bmf::dataset.at("key").c_str()) +_key_) %dataset_count; false){ err("Изменение ключа");
 				}else{ //mpre("Изменение позиции ключа " +to_string(_key_) +" > " +to_string(key) ,__LINE__);
 				}return key; }(key); (0 > key >= dataset_count)){ err("Изменение позиции ключа");
-			}else if([&](int repeat = 100){ // Прворка на повторы
+			}else if([&](int repeat = 100){ // Проверка на повторы
 				if(string _key = (bmf::ARGV.end() == bmf::ARGV.find("key") ? "" : bmf::ARGV.at("key")); _key.empty()){ //mpre("Пропуск расчета" ,__LINE__);
 				}else if(static int key_static =-1 ;false){ err("Установка статического значения");
 				}else if(static int cnt =0 ;false){ err("Количество повторений");
@@ -1601,7 +1602,7 @@ int main(int argc, char **argv){
 							}}return _GRP; }(); false){ err("Список групп");
 						}else if([&](){ // Уведомление
 							if(int verbose = atoi(bmf::ARGV.end() == bmf::ARGV.find("verbose") ?"" :bmf::ARGV.at("verbose").c_str()); 3 != verbose){ //mpre("Не отображаем подробную информацию" ,__LINE__);
-							}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Расчетный список itog_id=" +itog_id +" " +to_string(INDEX_GRP.size()) +" " ,__LINE__);
+							}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Расчетный список key=" +to_string(key) +" itog_id=" +itog_id +" " +to_string(INDEX_GRP.size()) +" " ,__LINE__);
 							}return false; }()){ err("Уведомление");
 						}else if(auto _microtime = (std::chrono::system_clock::now().time_since_epoch()).count()/1e9; false){ mpre("ОШИБКА расчета времени эпохи", __LINE__);
 						}else if([&](){ // Список сигналов групп
@@ -1654,6 +1655,7 @@ int main(int argc, char **argv){
 						if(string str = (index_grp.end() == index_grp.find("exist1") ? "" : index_grp.at("exist1")); false){ mpre("ОШИБКА Значение общей карты наличия" ,__LINE__);
 						}else if(string map = (string(64 -str.length() ,'0') +str); 64 != map.length()){ err("Полная строка карты");
 						}else if(exist = boost::dynamic_bitset(map); 64 != exist.size()){ err("Битовая карта общего налия");
+						}else if(exist0.test(0) ?exist.set(0) :exist.reset(0); false){ err("Установка крайнего бита");
 						}else{ //mpre("Карта ключ exist=" +map ,__LINE__);
 						}return exist; }(); exist.empty()){ err("Общая карта наличия");
 					}else if(boost::dynamic_bitset<> dano = [&](boost::dynamic_bitset<> dano = {}){ //Карта наличия
@@ -1804,10 +1806,8 @@ int main(int argc, char **argv){
 							if(boost::to_string(exist, map); map.empty()){ err("Конвертация в строку");
 							}else if(auto npos = map.find_first_of("1"); npos == string::npos){ mpre("Нулевое значение наличия" ,__LINE__);
 							}else if(map = map.substr(npos ,-1); map.empty()){ err("Оптимизация строки карты");
-							}else if(exist.test(0) == exist0.test(0)){ //mpre("Крайние символы равны" ,__LINE__);
-							}else if(string val = (exist0.test(0) ?"1" :"1"); 1 != val.length()){ err("Размер крайнего значения");
-							}else if(map = map.substr(0 ,map.length()-1) +val; map.empty()){ err("Установка крайнего значения");
-							}else{ //mpre("Обновление крайних символов" ,__LINE__); //mpre("Составление строки карты наличия str_exist=" +map ,__LINE__);
+							}else if(exist.test(0) != exist0.test(0)){ err("Крайние символы");
+							}else{ //mpre("Составление строки карты наличия str_exist=" +map ,__LINE__);
 							}return map; }(); str_exist.empty()){ mpre("ОШИБКА установки карты", __LINE__);
 						}else if(string str_dano = [&](std::string map = ""){ // Карта исходника
 							if(boost::to_string(dano, map); map.empty()){ err("Конвертация в строку");
