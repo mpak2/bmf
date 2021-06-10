@@ -1981,7 +1981,7 @@ int main(int argc, char **argv){
 								}return index_id; }(); index_id.empty()){ err("Морф группы");
 							}else if(TMs _index_new = {{"grp", index_id}, {"addr", addr_new} ,{"md5" ,index_md5}, {"dano_id", dano.at("id")}, {"itog_id", itog.at("id")}}; _index_new.empty()){ mpre("ОШИБКА формирования свойст нового морфа", __LINE__);
 							}else if(string index_md5 = md5(itog_id +":" +addr_new); index_md5.empty()){ err("Хеш морфа");
-							}else if(index_new = bmf::Up_mysql("index" ,{{"md5", index_md5}} ,_index_new ,{} ,__LINE__); index_new.empty()){ err("Добавление нового морфа");
+							}else if(index_new = bmf::Up_mysql("index" ,{{"md5", index_md5}} ,_index_new ,_index_new ,__LINE__); index_new.empty()){ err("Добавление нового морфа");
 							}else if(BMF_INDEX.insert(make_pair(index_md5 ,index_new)); BMF_INDEX.empty()){ err("Добавление морфа в справочник");
 							}else if([&](){ // Уведомление
 								if(int verbose = atoi(bmf::ARGV.end() == bmf::ARGV.find("verbose") ?"" :bmf::ARGV.at("verbose").c_str()); 1 != verbose){ //mpre("Не отображаем подробную информацию" ,__LINE__);
