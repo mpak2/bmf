@@ -453,15 +453,24 @@ int main(int argc, char **argv){
 			}else if([&](){ // Редактирование
 				if(update.empty()){ //mpre("Не обновляем значение", __LINE__);
 				}else if(_row.empty()){ //mpre("Элемент по условию не найден", __LINE__);
-				}else if(where.end() == where.find("id")){ err("Не заданы условия");
-				}else if(update["id"] = where.at("id"); false){ err("Установка идентификатора");
+				}else if([&](){ // Установка идентификатора
+					if(where.end() == where.find("id")){ //mpre("Не заданы условия" ,__LINE__);
+					}else if(update["id"] = where.at("id"); false){ err("Установка идентификатора");
+					}else{ //mpre("Установка идентификатора");
+					}return false; }()){ err("Установка идентификатора");
 				}else if(update == _row){ //mpre("При редактировании значения совпали", __LINE__);
 				}else if(std::string values = [&](std::string values = ""){ for(auto update_itr:update){ // Составление запроса
 					if("id" == update_itr.first){ //mpre("Не редактируем идентификатор", __LINE__);
 					}else if(values += string(values.empty() ? "" : ", ") +"`" +update_itr.first + "`='" +update_itr.second +"'"; values.empty()){ err("Подстановка значения");
 					}else{ //mpre("Список значений " +values, __LINE__);
 					}}return values; }(); values.empty()){ err("Установка значений");
-				}else if(std::string sql = "UPDATE `" +table + "` SET " +values +" WHERE `id`='" +where["id"] +"'"; sql.empty()){ err("Составление запроса");
+				}else if(std::string _where = [&](std::string _where = ""){ // Условия выборки
+					if([&](){ for(auto where_itr:where){ // Строка условий
+						_where += string(_where.empty() ? "" : " AND ") +"`" +where_itr.first +"`='" +where_itr.second +"'";
+						}return false; }()){ err("Строка условий");
+					}else{ //mpre("Условия выборки "+ _where, __LINE__);
+					}return _where; }(); false){ err("Составления условий выборки");
+				}else if(std::string sql = "UPDATE `" +table + "` SET " +values +" WHERE " +_where; sql.empty()){ err("Составление запроса");
 				}else if(mysql_query(bmf::mysql, sql.c_str())){ mpre("Выборка из таблицы " +sql, __LINE__); mpre("ОШИБКА " +string(mysql_error(bmf::mysql)), __LINE__);
 				}else if(_row = update; false){ mpre("ОШИБКА установки результата", __LINE__);
 				}else{ //mpre(where, "Условие", __LINE__); mpre(insert, "Вставка", __LINE__); mpre(update, "Обновление", __LINE__); mpre("ОШИБКА Обновление значения " +sql, __LINE__);
