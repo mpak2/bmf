@@ -1566,9 +1566,9 @@ int main(int argc, char **argv){
 						if(nullptr == GRP){ //mpre("Список не указан __" +to_string(line) +"__" ,__LINE__);
 						}else if([&](){ // Группа в списке
 							if(GRP->empty()){ err("Список пуст");
-							}else if(GRP->end() == GRP->find(index_id)){ mpre("ОШИБКА Группа в списке дочерних не найдена addr=" +addr +" index_id=" +index_id ,__LINE__);
+							}else if(GRP->end() == GRP->find(index_id)){ //mpre("ОШИБКА Группа в списке дочерних не найдена addr=" +addr +" index_id=" +index_id ,__LINE__);
 							}else if(index_grp = GRP->at(index_id); !index_grp.empty()){ //mpre("Группа найдена в списке дочерних" ,__LINE__);
-							}else{ mpre("Группа найдена в списке локальных значений" ,__LINE__);
+							}else{ //mpre("Группа найдена в списке локальных значений" ,__LINE__);
 							}return !index_grp.empty(); }()){ //mpre("Группа из списка" ,__LINE__);
 						}else if([&](){ // Значение группы
 							if(string sql = "SELECT * ,CONV(hex(exist), 16, 2) AS exist ,CONV(hex(vals), 16, 2) AS vals FROM " +table_grp +" WHERE itog_id=" +itog_id +" AND dataset_id=" +bmf::dataset.at("id") +" AND index_id=" +index_id + " AND `key`=" + to_string(key)+";"; sql.empty()){ err("Запрос на выборку значения группы");
@@ -1970,7 +1970,7 @@ int main(int argc, char **argv){
 						if(string addr_new = adr +addr_grp.substr(1, -1); addr_new.empty()){ err("Расчет нового адреса");
 						}else if(index_new = [&](TMs index_new = {}){ // Добавление нового морфа
 							if(string index_md5 = md5(itog_id +":" +addr_new); index_md5.empty()){ err("Идентификатор морфа");
-							}else if(index_new = (BMF_INDEX.end() ==BMF_INDEX.find(index_md5) ?index_new :BMF_INDEX.at(index_md5)); !index_new.empty()){ mpre("Новый морф уже в базе key=" +to_string(key) +" grow=" +grow +" itog_id=" +itog_id +" addr_grp=" +addr_grp +" link=" +link +" addr_new=" +addr_new ,__LINE__);
+							}else if(index_new = (BMF_INDEX.end() ==BMF_INDEX.find(index_md5) ?index_new :BMF_INDEX.at(index_md5)); !index_new.empty()){ //mpre("Новый морф уже в базе key=" +to_string(key) +" grow=" +grow +" itog_id=" +itog_id +" addr_grp=" +addr_grp +" link=" +link +" addr_new=" +addr_new ,__LINE__);
 							//}else if(string index_md5 = md5(itog_id +":" +addr_new); index_md5.empty()){ err("Хеш адреса");
 							}else if(string bmf_dano_id =(index_grow.end() ==index_grow.find("dano_id") ?"" :index_grow.at("dano_id")); bmf_dano_id.empty()){ err("Исходник расширяемого морфа");
 							}else if(TMs dano = bmf::Choice(list ,bmf_dano_id ,key ,itog_id, DANO, DANO_BITMAP ,__LINE__); dano.empty()){ err("Выборка первоначального исходника");
