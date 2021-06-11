@@ -425,16 +425,15 @@ int main(int argc, char **argv){
 			if(!bmf::mysql){ err("Соединение БД");
 			}else if([&](){ // Выборка
 				if(where.empty()){ //mpre("Не заданы условия выборки", __LINE__);
-				//}else if(!update.empty()){ mpre("Обновление", __LINE__);
 				}else if(std::string _where = [&](std::string _where = ""){ // Условия выборки
 					if([&](){ for(auto where_itr:where){ // Строка условий
 						_where += string(_where.empty() ? "" : " AND ") +"`" +where_itr.first +"`='" +where_itr.second +"'";
 						}return false; }()){ err("Строка условий");
 					}else{ //mpre("Условия выборки "+ _where, __LINE__);
 					}return _where; }(); false){ err("Составления условий выборки");
-				}else if(std::string sql = "SELECT * FROM `" + table+"` WHERE " +_where +";"; sql.empty()){ err("Запрос к БД");
 				}else if(_row = [&](TMs _row = {}){ // Получение значения
-					if(mysql_query(bmf::mysql, sql.c_str()); !bmf::mysql){ mpre("Выбор данных из таблицы " +sql, __LINE__);
+					if(std::string sql = "SELECT * FROM `" + table+"` WHERE " +_where +";"; sql.empty()){ err("Запрос к БД");
+					}else if(mysql_query(bmf::mysql, sql.c_str()); !bmf::mysql){ mpre("Выбор данных из таблицы " +sql, __LINE__);
 					}else if(MYSQL_RES *result = mysql_store_result(bmf::mysql); !result){ mpre("ОШИБКА выполнения запроса\n" +sql +"\n" +string(mysql_error(bmf::mysql)) ,__LINE__);
 					}else if(int count = mysql_num_fields(result); !count){ err("Получение количества полей");
 					}else if(std::string FIELDS[count]; false){ err("Массив списка полей");
@@ -472,7 +471,27 @@ int main(int argc, char **argv){
 					}return _where; }(); false){ err("Составления условий выборки");
 				}else if(std::string sql = "UPDATE `" +table + "` SET " +values +" WHERE " +_where; sql.empty()){ err("Составление запроса");
 				}else if(mysql_query(bmf::mysql, sql.c_str())){ mpre("Выборка из таблицы " +sql, __LINE__); mpre("ОШИБКА " +string(mysql_error(bmf::mysql)), __LINE__);
-				}else if(_row = update; false){ mpre("ОШИБКА установки результата", __LINE__);
+				}else if(_row = [&](TMs _row = {}){ // Получение значения
+					if([&](){ // Быстрый расчёт значения
+						if(update.end() == update.find("id")){ //mpre("Идентификатор не задан" ,__LINE__);
+						}else if(_row = update; false){ mpre("ОШИБКА установки результата", __LINE__);
+						}else{ //mpre(_row ,"Быстрый расчет обновленяемого значения" ,__LINE__);
+						}return false; }() ;!_row.empty()){ //mpre("Расчет значения из обновления и идентификатора" ,__LINE__);
+					}else if(std::string sql = "SELECT * FROM `" + table+"` WHERE " +_where +";"; sql.empty()){ err("Запрос к БД");
+					}else if(mysql_query(bmf::mysql, sql.c_str()); !bmf::mysql){ mpre("Выбор данных из таблицы " +sql, __LINE__);
+					}else if(MYSQL_RES *result = mysql_store_result(bmf::mysql); !result){ mpre("ОШИБКА выполнения запроса\n" +sql +"\n" +string(mysql_error(bmf::mysql)) ,__LINE__);
+					}else if(int count = mysql_num_fields(result); !count){ err("Получение количества полей");
+					}else if(std::string FIELDS[count]; false){ err("Массив списка полей");
+					}else if([&](int i = 0){ while(MYSQL_FIELD *field = mysql_fetch_field(result)){ FIELDS[i++] = field->name; }return false; }()){ mpre("ОШИБКА получения полей", __LINE__);
+					}else if([&](){ while(MYSQL_ROW row = mysql_fetch_row(result)){ for(int i = 0; i < count; i++){ //printf("%s  ", row[i] ? row[i] : "NULL");
+						if(std::string field = FIELDS[i]; field.empty()){ err("Выборки имени поля");
+						}else if(std::string value = (row[i] ? row[i] : ""); false){ err("Получение значения поля");
+						}else if(_row.insert(make_pair(field, value)); _row.empty()){ err("Добавление значение в список");
+						}else{ //mpre("Поле значение " +field +" => " +value, __LINE__);
+						}}}return _row; }(); false){ err("Получение значений полей");
+					}else if(mysql_free_result(result); false){ err("Очистка ресурсов");
+					}else{ //mpre(_row, "Выборка " +sql, __LINE__);
+					}return _row; }(); false){ err("Значение поля");
 				}else{ //mpre(where, "Условие", __LINE__); mpre(insert, "Вставка", __LINE__); mpre(update, "Обновление", __LINE__); mpre("ОШИБКА Обновление значения " +sql, __LINE__);
 				}return false; }()){ err("Редактирование строка " +line);
 			}else if([&](){ // Добавление
@@ -1446,7 +1465,6 @@ int main(int argc, char **argv){
 			}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Загрузка итоговых сигналов size=" +to_string(ITOG_BITMAP.size()), __LINE__);
 			}return false; }()){ err("Время расчета");
 		}else if(int key = [&](int key = 0){ // Позиция обучения
-			//if(bmf::ARGV.end() == bmf::ARGV.find("learn")){ //mpre("Не установлено обучение" ,__LINE__);
 			if(bmf::dataset.end() == bmf::dataset.find("key")){ err("Поле ключа не найдено в базе");
 			}else if(int epoch = (bmf::ARGV.end() == bmf::ARGV.find("epoch") ? 0 : atoi(bmf::ARGV.at("epoch").c_str())); !epoch){ //mpre("Локальный ключ" ,__LINE__);
 			}else if(string _key = (bmf::ARGV.end() ==bmf::ARGV.find("key") ?bmf::dataset.at("key") :bmf::ARGV.at("key")) ;false){ err("Строка ключа");
@@ -1456,6 +1474,7 @@ int main(int argc, char **argv){
 		}else if(int err = [&](int err = 0){ // Позиция обучения
 			if(bmf::ARGV.end() == bmf::ARGV.find("learn")){ //mpre("Не установлено обучение" ,__LINE__);
 			}else if(int epoch = (bmf::ARGV.end() == bmf::ARGV.find("epoch") ? 0 : atoi(bmf::ARGV.at("epoch").c_str())); !epoch){ //mpre("Локальный ключ" ,__LINE__);
+			}else if(bmf::ARGV.end() != bmf::ARGV.find("key")){ //mpre("Не восстанавливаем размер ошибок" ,__LINE__);
 			}else if(bmf::dataset.end() == bmf::dataset.find("err")){ err("Поле ключа не найдено в базе");
 			}else if(err = atoi(bmf::dataset.at("err").c_str()); 0 > err){ err("Расчет значения последнего ключа");
 			}else{ //mpre("Текущее состояние ключа err=" +to_string(err), __LINE__);
