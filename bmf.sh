@@ -6,8 +6,8 @@
 #cat clump/dva.json | ./bimorph mysql://dva:dva@192.168.1.6/dva -c -
 #./bimorph mysql://dva:dva@192.168.1.6/dva ds=1 epoch=100 learn #verbose=2
 
-#cat clump/tri.json | ./bimorph mysql://tri:tri@192.168.1.6/tri -c -
-#./bimorph mysql://tri:tri@192.168.1.6/tri ds=1 epoch=100 learn #verbose
+cat clump/tri.json | ./bimorph mysql://tri:tri@192.168.1.6/tri -c -
+./bimorph mysql://tri:tri@192.168.1.6/tri ds=1 epoch=0 learn #verbose
 
 #cat clump/chetire.json | ./bimorph mysql://chetire:chetire@192.168.1.6/chetire -c -
 #./bimorph mysql://chetire:chetire@192.168.1.6/chetire ds=1 epoch=100 learn
@@ -20,9 +20,9 @@
 #./bimorph mysql://iris:iris@192.168.1.6/iris ds=2 epoch=2 learn #data #verbose #key=+10 #-microtime # ?cache=shared
 #./bimorph mysql://iris:iris@192.168.1.6/iris ds=3 epoch=2 learn #data #verbose #key=+10 #-microtime # ?cache=shared
 
-cat clump/iris.json | ./bimorph mysql://iris:iris@192.168.1.6/iris -c - # ?cache=shared
-./bimorph mysql://iris:iris@192.168.1.6/iris ds=1 epoch=100 learn #verbose=3 #key=+10 #-microtime # ?cache=shared
-./bimorph mysql://iris:iris@192.168.1.6/iris
+#cat clump/iris.json | ./bimorph mysql://iris:iris@192.168.1.6/iris -c - # ?cache=shared
+#./bimorph mysql://iris:iris@192.168.1.6/iris ds=1 epoch=100 learn #verbose=3 #key=+10 #-microtime # ?cache=shared
+#./bimorph mysql://iris:iris@192.168.1.6/iris
 
 #./bimorph mysql://mnist:mnist@192.168.1.6/mnist
 #./bimorph mysql://mnist:mnist@192.168.1.6/mnist ds=10 epoch=1 verbose=3 key=1080

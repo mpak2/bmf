@@ -6,4 +6,5 @@
 #gcc redis.cpp -O0 -lstdc++ -Wreturn-local-addr -std=c++17 -lstdc++fs -lm -lpthread -lhiredis -o redis && ./redis
 #gcc sycl.cpp -lstdc++ -Wreturn-local-addr -std=c++17 -lstdc++fs -lm -o sycl && ./sycl
 #gcc sycl.cpp -lstdc++ -std=c++17 -o sycl && ./sycl
-screen -c iris.screen
+#screen -c iris.screen
+gcc -Wdeprecated-declarations opencl.cpp -std=c++17 -lstdc++ -lOpenCL -o opencl && ./opencl
