@@ -1111,24 +1111,35 @@ int main(int argc, char **argv){
 				if(string value = val_itr.second; false){ mpre("ОШИБКА получения значения итератора", __LINE__);
 				}else if(TMs values = [&](TMs values = {}){ // Добавление значения
 					if(string name = val_itr.first; (0 >= name.length())){ mpre("ОШИБКА получения имени значения", __LINE__);
-					}else if(string _val = val_itr.second; false){ mpre("ОШИБКА получения значения из данных", __LINE__);
-					}else if(TMs _values = {{"name", name}, /*{"clump_id", bmf::clump_id}, {"value", _val}*/}; _values.empty()){ mpre("ОШИБКА фонмирования нового значения", __LINE__);
+					//}else if(static TMMs VALUES ;false){ err("Справочник значений");
+					}else if(values = bmf::Up_mysql(table, {{"name", name}}, {}, {}, __LINE__); !values.empty()){ //mpre("Выборка значения записанного ранее" ,__LINE__);
+					/*}else if([&](){ // Проверка наличия заголовка в базе
+						if(auto values_itr = VALUES.find(alias) ;values_itr == VALUES.end()){ //mpre("Значение не добавлялось ранее name=" +name ,__LINE__);
+						}else if(values_itr->second.end() == values_itr->second.find(name)){ //mpre("Имя не найдено в значении name=" +name ,__LINE__);
+						}else if(string values_id = values_itr->second.at(name); values_id.empty()){ err("Выборка идентификатора значения");
+						}else if(values = bmf::Up_mysql(table, {{"name", name}}, {}, {}, __LINE__); values.empty()){ err("Выборка значения записанного ранее");
+						}else{ //mpre("Пропускаем ранее добавленный заголовок values_id=" +values_id ,__LINE__);
+						}return false; }() ;!values.empty()){ //mpre("Не добавляем значение добавлен ранее name=" +name ,__LINE__);*/
+					}else if(TMs _values = {{"name", name}}; _values.empty()){ mpre("ОШИБКА фонмирования нового значения", __LINE__);
 					}else if((values = bmf::Up_mysql(table, _values, _values, {}, __LINE__)).empty()){ mpre("ОШИБКА обновления значения", __LINE__);
-					}else{ //mpre(values ,"Добавляем новое значение `"+ name+ "` ("+ alias+ ")", __LINE__); //mpre("Добавление значения", __LINE__);
+					//}else if(string values_id =values.end() ==values.find("id") ?"" :values.at("id") ;values_id.empty()){ err("Идентификатор значения");
+					//}else if(VALUES[alias][name] = values_id; VALUES.empty()){ err("Добавление в справочник");
+					}else{ //mpre(VALUES ,"Добавляем новое значение `"+ name+ "` ("+ alias+ ") VALUES.size()=" +to_string(VALUES.size()), __LINE__); //mpre("Добавление значения", __LINE__);
 					}return values; }(); values.empty()){ mpre("ОШИБКА добавления значения", __LINE__);
 				}else if(TMs bmf_titles = [&](TMs bmf_titles = {}){ // Получение заголовка значения если нет то его создание
-					//if(mpre("Проверка value=" +value, __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
 					if(string name = val_itr.first; (0 >= name.length())){ mpre("ОШИБКА получения имени значения", __LINE__);
 					}else if(regex b("^[0-9|.|-]+$"); regex_match(value, b)){ //mpre("Формат значения `"+ value+ "` верен ", __LINE__);
-					//}else if(mpre("Проверка", __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
-					/*}else if(std::string titles_id = [&](std::string titles_id = ""){ // Идентификатор заголовка
-						if(values.end() == values.find("id")){ mpre("ОШИБКА заголовок не задан в значении", __LINE__);
-						}else if(titles_id = values.at("id") +","+ value; titles_id.empty()){ mpre("ОШИБКА формата заголовока", __LINE__);
-						}else{ //mpre("Формирование заголовка "+ titles_id, __LINE__);
-						}return titles_id; }(); titles_id.empty()){ err("Формирования идентификатора заголовока");*/
+					//}else if(static TMMs TITLES ;false){ err("Статический список заголовков");
 					}else if(TMs where = {{alias+ "_values_id", values["id"]} ,{"name", value}}; where.empty()){ err("Условие выборки");
-					//}else if(mpre(where ,"Условия", __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
-					}else if(bmf_titles = bmf::Up_mysql(BMF_TITLES, where, {}, {}, __LINE__); !bmf_titles.empty()){ //mpre("Выборка значения записанного ранее", __LINE__);
+					}else if(string values_id =values.end() == values.find("id") ?"" :values.at("id") ;values_id.empty()){ err("Идентификатор значения");
+					}else if(bmf_titles = bmf::Up_mysql(BMF_TITLES, {{alias+ "_values_id", values_id}, {"name", value}}, {}, {}, __LINE__); !bmf_titles.empty()){ //mpre("Выборка значения записанного ранее" ,__LINE__);
+					/*}else if([&](){ // Проверка наличия заголовка в базе
+						if(auto titles_itr = TITLES.find(values_id) ;titles_itr == TITLES.end()){ //mpre("Значение не добавлялось ранее" ,__LINE__);
+						}else if(titles_itr->second.end() == titles_itr->second.find(value)){ //mpre("Имя не найдено в значении" ,__LINE__);
+						}else if(string titles_id = titles_itr->second.at(value); titles_id.empty()){ err("Выборка идентификатора заголовока");
+						}else if(bmf_titles = bmf::Up_mysql(BMF_TITLES, {{alias+ "_values_id", values_id}, {"name", value}}, {}, {}, __LINE__); bmf_titles.empty()){ err("Выборка значения записанного ранее");
+						}else{ //mpre("Пропускаем ранее добавленный заголовок titles_id=" +titles_id ,__LINE__);
+						}return false; }() ;!bmf_titles.empty()){ //mpre("Не добавляем заголовок добавлен ранее value=" +value ,__LINE__);*/
 					}else if([&](){ // Проверка на символ возврата коретки \r
 						if(int npos = value.find("\r"); (std::string::npos != npos)){ mpre("ОШИБКА заголовок содержит символ возврат коретки " +val_itr.first +":" + value+"", __LINE__);
 						}else if(int npos = value.find("\n"); (std::string::npos != npos)){ mpre("ОШИБКА заголовок содержит символ переноса строки " +val_itr.first +":" + value+"", __LINE__);
@@ -1146,8 +1157,10 @@ int main(int argc, char **argv){
 						}else if(nn = (NN.empty() ? -1 : NN.begin()->first-1); (0 <= nn)){ mpre("ОШИБКА нахождения следующего номера "+ to_string(nn), __LINE__);
 						}else{ //mpre("Определение следующего значения заголовока " +to_string(nn), __LINE__);
 						}return nn; }(); !nn){ mpre("ОШИБКА определения номера заголовка", __LINE__);
-					}else if(TMs _bmf_titles = {{alias+ "_values_id", values["id"]}, {"name", value}, {"value", to_string(nn)}}; _bmf_titles.empty()){ mpre("ОШИБКА получения нового заголовка", __LINE__);
-					}else if((bmf_titles = bmf::Up_mysql(BMF_TITLES, where, _bmf_titles, _bmf_titles, __LINE__)).empty()){ mpre("ОШИБКА обновления значения заголовка", __LINE__);
+					}else if(TMs _bmf_titles = {{alias+ "_values_id", values_id}, {"name", value}, {"value", to_string(nn)}}; _bmf_titles.empty()){ mpre("ОШИБКА получения нового заголовка", __LINE__);
+					}else if(bmf_titles = bmf::Up_mysql(BMF_TITLES, where, _bmf_titles, _bmf_titles, __LINE__) ;bmf_titles.empty()){ mpre("ОШИБКА обновления значения заголовка", __LINE__);
+					//}else if(string titles_id =bmf_titles.end() ==bmf_titles.find("id") ?"" :bmf_titles.at("id") ;titles_id.empty()){ err("Идентификатор заголовока");
+					//}else if(TITLES[values_id][value] = titles_id ;TITLES.empty()){ err("Сохранение списка заголовоков");
 					}else{ //mpre(bmf_titles, __LINE__, "Заголовок"); //mpre("ОШИБКА Установлено наличие заголовка", __LINE__);
 					}return bmf_titles; }(); false){ mpre("ОШИБКА получения заголовка", __LINE__);
 				}else if(string _value = bmf::Dec2bin(stod(bmf_titles.end() == bmf_titles.find("value") ? value : bmf_titles.at("value"))); (0 >= _value.length())){ mpre("ОШИБКА получения строки сиволов двоичного розультата "+ value, __LINE__);
@@ -1340,11 +1353,11 @@ int main(int argc, char **argv){
 			}} std::cerr << endl; return false; }()){ mpre("ОШИБКА расчета карты", __LINE__);
 		}else if(int dataset_count = in.size(); !dataset_count){ err("Размер обучающей выборки");
 		}else if([&](){ // Установка набора данных
-			if(std::string dataset_id = md5(bmf::ARGV.at("-")); dataset_id.empty()){ mpre("ОШИБКА расчета хеша набора обучающих данных", __LINE__);
-			}else if(TMs _dataset = {{"count", to_string(dataset_count)}, {"md5", dataset_id}, {"key", "0"}}; _dataset.empty()){ mpre("ОШИБКА создания записи нового набора данных", __LINE__);
-			}else if((bmf::dataset = bmf::Up_mysql(bmf::DATASET, {/*{"id", dataset_id}*/}, _dataset, _dataset, __LINE__)).empty()){ mpre("ОШИБКА добавления набора данных", __LINE__);
+			if(std::string dataset_md5 = md5(bmf::ARGV.at("-")); dataset_md5.empty()){ mpre("ОШИБКА расчета хеша набора обучающих данных", __LINE__);
+			}else if(TMs _dataset = {{"count", to_string(dataset_count)}, {"md5", dataset_md5}, {"key", "0"}}; _dataset.empty()){ mpre("ОШИБКА создания записи нового набора данных", __LINE__);
+			}else if((bmf::dataset = bmf::Up_mysql(bmf::DATASET, {{"md5", dataset_md5}}, _dataset, _dataset, __LINE__)).empty()){ mpre("ОШИБКА добавления набора данных", __LINE__);
 			}else if(bmf::dataset.end() == bmf::dataset.find("id")){ mpre("ОШИБКА набор данных не содержит поля идентификатора", __LINE__);
-			}else{ mpre("Набор данных " +bmf::dataset.at("id"), __LINE__);
+			}else{ mpre("Набор данных " +bmf::dataset.at("id") +" (" +dataset_md5 +")", __LINE__);
 			}return bmf::dataset.empty(); }()){ mpre("ОШИБКА устанвоки набора данных", __LINE__);
 		}else if(TMMs _DANO = bmf::List(bmf::DANO, {}, __LINE__); _DANO.empty()){ err("Список исходников");
 		}else if([&](int progress = 0){ for(auto dano_itr:_DANO){ // Двоичная карта исходников
@@ -1382,7 +1395,7 @@ int main(int argc, char **argv){
 			}else if(std::string dataset_map_id = "itog," +itog.at("id") +"," +bmf::dataset.at("id"); dataset_map_id.empty()){ mpre("ОШИБКА составления идентификатора карты", __LINE__);
 			}else if(TMs _dataset_map = {{"itog_id", itog.at("id")}, {"dataset_id", bmf::dataset.at("id")}, {"alias", "itog"}, {"map", map}}; _dataset_map.empty()){ mpre("ОШИБКА создания карты набора данных", __LINE__);
 			}else if(bmf::Up(bmf::DATASET_MAP, {{"id", dataset_map_id}}, _dataset_map, _dataset_map, __LINE__).empty()){ mpre("ОШИБКА обновления набора данных", __LINE__);
-			}else{ //mpre("Итог " +itog_itr.second.at("id") +" " +itog_itr.second.at("map"), __LINE__); //mpre(dano_itr.second, "Исходник", __LINE__);
+			}else{ //mpre("Итог " +dataset_map_id +" ", __LINE__); //mpre(dano_itr.second, "Исходник", __LINE__);
 			}} std::cerr << endl; return false; }()){ mpre("ОШИБКА составления двоичной карты", __LINE__);
 		}else{ //mpre(DANO, "Расчет итогов", __LINE__);
 		}return false; }()){ mpre("ОШИБКА расчета исходников", __LINE__);
@@ -1415,8 +1428,9 @@ int main(int argc, char **argv){
 			}else if(DATASET[id]["diff"] = dataset["diff"] = [&](int ers = 0, int count = 0){ for(auto itog_itr:_ITOG_){ // Расчет результата поитогово
 				if(TMs itog = itog_itr.second; itog.empty()){ mpre("ОШИБКА выборки итога", __LINE__);
 				}else if(std::string dataset_map_id = "itog," +itog.at("id") +"," +dataset.at("id"); dataset_map_id.empty()){ mpre("ОШИБКА составления идентификатора карты", __LINE__);
-				}else if(TMs itog_map = bmf::Up(bmf::DATASET_MAP, {{"id", dataset_map_id}}, {}, {}, __LINE__); itog_map.empty()){ mpre("ОШИБКА обнолвения карты исходника", __LINE__);
-				}else if(boost::dynamic_bitset<> gmap(itog_map.at("map")); gmap.empty()){ mpre("ОШИБКА установки карты итога", __LINE__);
+				}else if(TMs itog_map = bmf::Up(bmf::DATASET_MAP, {{"id", dataset_map_id}}, {}, {}, __LINE__); false){ mpre("ОШИБКА выборки карты исходника", __LINE__);
+				}else if(string map =itog_map.end() ==itog_map.find("map") ?"" :itog_map.at("map"); false){ err("Строка карты");
+				}else if(boost::dynamic_bitset<> gmap(string(dataset_count -map.length() ,'0') +map); gmap.empty()){ mpre("ОШИБКА установки карты итога", __LINE__);
 				}else if(ITOG[itog.at("id")] = gmap; ITOG.empty()){ mpre("ОШИБКА сохранения карты итога", __LINE__);
 				}else if(dataset.end() == dataset.find("id")){ err("Не найден идентификатор набора данных");
 				}else if(std::string index_id = (itog.end() == itog.find("index_id") ? "0" : itog.at("index_id")); false){ err("ОШИБКА расчета идентификатора морфа");
@@ -2166,7 +2180,11 @@ int main(int argc, char **argv){
 							if(64 <= nn){ mpre("Адрес группы не вычисляем dv nn=" +to_string(nn) +" adr=" +adr ,__LINE__);
 							}else if(string _addr = adr +addr_grp.substr(1 ,-1); _addr.empty()){ err("Адрес морфа");
 							}else if(string index_md5 = md5(itog_id +":" +_addr); index_md5.empty()){ err("Расчет идентификатора морфа");
-							}else if(TMs _index = BMF_INDEX.end() == BMF_INDEX.find(index_md5) ?_index :BMF_INDEX.at(index_md5); _index.empty()){ err("Выборка морфа");
+							}else if(TMs _index = [&](TMs _index ={}){ // Морф
+								if(_index = BMF_INDEX.end() == BMF_INDEX.find(index_md5) ?_index :BMF_INDEX.at(index_md5); !_index.empty()){ //mpre("Выборка морфа itog_id=" +itog_id +" _addr=" +_addr ,__LINE__);
+								}else if(_index = bmf::Up_mysql("index" ,{{"md5" ,index_md5}}, {}, {}, __LINE__); _index.empty()){ mpre("ОШИБКА Выборка из базы" ,__LINE__);
+								}else{ //mpre("Выборка из базы" ,__LINE__);
+								}return _index; }() ;_index.empty()){ mpre("ОШИБКА Выборка морфа itog_id=" +itog_id +" _addr=" +_addr ,__LINE__);
 							}else if(dano_id = _index.end() ==_index.find("dano_id") ?"" :_index.at("dano_id"); dano_id.empty()){ err("Идентификатор исходника");
 							}else{ //mpre("Идентификатор исходника" ,__LINE__);
 							}return dano_id; }() ;false){ err("Идентификатор исходника");
