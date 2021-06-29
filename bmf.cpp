@@ -153,7 +153,7 @@ namespace bmf{ // Глобальные переменные
 	std::function<std::string(TMs)> Calculate; // Расчет строки для расчета польской нотации
 	std::function<std::string(std::string,TM3i&)> Calc; // Расчет строки польской нотации
 	std::function<TMs(TMs)> Value; // История морфа
-	std::function<TMs(string,string,int,string,TMMs&,TMMb&,int)> Choice; // Расчет истории
+	std::function<TMs(string,TMs,string,int,string,TMMs&,TMMb&,int)> Choice; // Расчет истории
 	std::function<double(string)> Bin2dec; // Перерасчет размерности из двоичной в десятеричную
 	std::function<string(double)> Dec2bin; // Перерасчет размерности размерности из десятеричной в двоичную
 	std::function<string(TMs,string,int)> Learn; // Рерасчет морфа
@@ -1005,9 +1005,10 @@ int main(int argc, char **argv){
 		}else{ return false; //mpre("Функции успешно установлены", __LINE__);
 		}return true; }()){ mpre("Не выполнены все условия", __LINE__);
 	}else if([&](){ // Основные функции
-		if(bmf::Choice = ([&](std::string list ,string bmf_dano_id, int key ,string itog_id ,TMMs &DANO, TMMb &DANO_BITMAP ,int line){ //mpre("Выбор итога для расширения", __LINE__);
+		if(bmf::Choice = ([&](std::string list ,TMs index ,string link, int key ,string itog_id ,TMMs &DANO, TMMb &DANO_BITMAP ,int line){ //mpre("Выбор итога для расширения", __LINE__);
 			TMs _dano;
 			if(DANO_BITMAP.empty()){ err("Карта бит пуста");
+			}else if(string bmf_dano_id =(index.end() ==index.find("dano_id") ?"" :index.at("dano_id")); false){ err("Исходник расширяемого морфа");
 			}else if(int dataset_count = atoi(bmf::dataset.at("count").c_str()); !dataset_count){ mpre("ОШИБКА расчета количества примеров в наборе данных", __LINE__);
 			//}else if(static int _key = dataset_count -1; false){ err("Значение последнего ключа");
 			}else if(int _key = [&](int _key = 0){ // Значение прошедшего изменения
@@ -1069,35 +1070,59 @@ int main(int argc, char **argv){
 					}}return false; }()){ err("Расчет соответствия");
 				}else{ //mpre("Формирование списка ресурсов" ,__LINE__);
 				}return RES; }() ;false){ err("Список подходящих связей");
+			/*}else if(string link = [&](string link = ""){ // Ссылка морфа
+				if(index.empty()){ mpre("Морф не указан");
+				}else if(string addr =index.end() ==index.find("addr") ?"" :index.at("addr") ;addr.empty()){ err("Адрес морфа");
+				}else if(){
+				}else{ mpre("Получение ссылки вышестоящего морфа" ,__LINE__);
+				}return link; }(); false){ err("Ссылка морфа");*/
 			}else if([&](){ // Выбор исходника
 				if(!dano_id.empty()){ //mpre("Уже выбран первоначальный исходник" ,__LINE__);
 				}else if(RES.empty()){ err("Список подходящих значений не найден");
-				/*}else if(dano_id = (RES.end() == RES.find("unlock_01") ?"" :RES.at("unlock_01").rbegin()->second.rbegin()->first); !dano_id.empty()){ //mpre(RES.at("unlock_01") ,"Доступны изменения 01" ,__LINE__);
-				}else if(dano_id = (RES.end() == RES.find("unlock_10") ?"" :RES.at("unlock_10").rbegin()->second.rbegin()->first); !dano_id.empty()){ //mpre(RES.at("unlock_10") ,"Доступны изменения 10" ,__LINE__);*/
-				}else if([&]{ // Изменение с наибольшим количеством отличий
-					if(int pos01 = (RES.end() == RES.find("unlock_01") ?0 :RES.at("unlock_01").rbegin()->first) ;false){ err("Позиция 01");
-					}else if(int pos10 = (RES.end() == RES.find("unlock_10") ?0 :RES.at("unlock_10").rbegin()->first) ;false){ err("Позиция 10");
-					}else if(string fld = (pos01 >= pos10 ?"unlock_01" :"unlock_10"); fld.empty()){ err("Поле ресурса");
-					}else if(dano_id = (RES.end() == RES.find(fld) ?"" :RES.at(fld).rbegin()->second.rbegin()->first); dano_id.empty()){ //mpre("Позиция не найдена" ,__LINE__);
-					}else{ //mpre("Позиции pos01=" +to_string(pos01) +" pos10=" +to_string(pos10) ,__LINE__);
-					}return false; }(); !dano_id.empty()){ //mpre("Изменение с наибольшим количеством отличи" ,__LINE__);
-				//}else if([]){
-				}else if(auto [lock_01 ,dano_01_id] = [&](int pos =0 ,string dano_id ="" ,string field = "lock_01"){ // значение изменений
-					if(pos = (RES.end() == RES.find(field) ?0 :RES.at(field).begin()->first) ;0 >pos){ err("значение позиции");
-					}else if(dano_id = (RES.end() == RES.find(field) ?"" :RES.at(field).begin()->second.rbegin()->first); false){ err("идентификатор дано 01"); //mpre(res.at("unlock_01") ,"доступны изменения 01" ,__line__);
+				}else if(auto [ublock_01 ,dano_01_id] = [&](int pos =0 ,string dano_id ="" ,string field = "unlock_01"){ // значение изменений
+					if(pos = (RES.end() == RES.find(field) ?0 :RES.at(field).rbegin()->first) ;0 >pos){ err("значение позиции");
+					}else if(dano_id = (RES.end() == RES.find(field) ?"" :RES.at(field).rbegin()->second.rbegin()->first); false){ err("идентификатор дано 01"); //mpre(res.at("unlock_01") ,"доступны изменения 01" ,__line__);
 					}else{ //mpre("значение идентификатора " +field ,__LINE__);
-					}return make_pair(pos ,dano_id); }() ;0 >lock_01){ err("значение изменений");
-				}else if(auto [lock_10 ,dano_10_id] = [&](int pos =0 ,string dano_id ="" ,string field = "lock_10"){ // значение изменений
-					if(pos = (RES.end() == RES.find(field) ?0 :RES.at(field).begin()->first) ;0 >pos){ mpre(RES ,"Ресурсы" ,__LINE__); err("значение позиции");
-					}else if(dano_id = (RES.end() == RES.find(field) ?"" :RES.at(field).begin()->second.rbegin()->first); false){ mpre(RES ,"Ресурс" ,__LINE__); err("идентификатор дано 01"); //mpre(res.at("unlock_01") ,"доступны изменения 01" ,__line__);
+					}return make_pair(pos ,dano_id); }() ;false){ err("значение изменений");
+				}else if(auto [unlock_10 ,dano_10_id] = [&](int pos =0 ,string dano_id ="" ,string field = "unlock_10"){ // значение изменений
+					if(pos = (RES.end() == RES.find(field) ?0 :RES.at(field).rbegin()->first) ;0 >pos){ mpre(RES ,"Ресурсы" ,__LINE__); err("значение позиции");
+					}else if(dano_id = (RES.end() == RES.find(field) ?"" :RES.at(field).rbegin()->second.rbegin()->first); false){ mpre(RES ,"Ресурс" ,__LINE__); err("идентификатор дано 01"); //mpre(res.at("unlock_01") ,"доступны изменения 01" ,__line__);
 					}else{ //mpre("значение идентификатора " +field ,__LINE__);
-					}return make_pair(pos ,dano_id); }() ;0 >lock_01){ err("значение изменений");
+					}return make_pair(pos ,dano_id); }() ;false){ err("значение изменений");
+				}else if([&](){ // Выбор изменений по направлению
+					if(link.empty()){ //pre("Ссылка не указана");
+					}else if(dano_id = ("0" ==link ?dano_10_id :dano_01_id) ;dano_id.empty()){ //pre("Ссылка по направлению на найдена");
+					}else{ //mpre("Выборк ссылки по направлению link=" +link +" dano_id=" +dano_id ,__LINE__);
+					}return false; }() ;!dano_id.empty()){ //pre("Выбор изменений по направлению");
 				}else if([&](){ // Значение отсутствует
 					if(dano_01_id.empty() && dano_10_id.empty()){ err("Значения не найдены");
 					}else if(dano_id =(dano_01_id.empty() ?dano_10_id :""); !dano_id.empty()){ //mpre("Отсутствует dano_01_id" ,__LINE__);
 					}else if(dano_id =(dano_10_id.empty() ?dano_01_id :""); !dano_id.empty()){ //mpre("Отсутствует dano_10_id" ,__LINE__);
 					}else{ //mpre("Оба значения в наличии" ,__LINE__);
-					}return false; }(); !dano_id.empty()){ //mpre("Выбор по отсутствующему значению" ,__LINE__);
+					}return false; }() ;!dano_id.empty()){ //mpre("Выбор по отсутствующему значению" ,__LINE__);
+				/*}else if([&]{ // Изменение с наибольшим количеством отличий
+					if(int pos01 = (RES.end() == RES.find("unlock_01") ?0 :RES.at("unlock_01").rbegin()->first) ;false){ err("Позиция 01");
+					}else if(int pos10 = (RES.end() == RES.find("unlock_10") ?0 :RES.at("unlock_10").rbegin()->first) ;false){ err("Позиция 10");
+					}else if(string fld = (pos01 >= pos10 ?"unlock_01" :"unlock_10"); fld.empty()){ err("Поле ресурса");
+					}else if(dano_id = (RES.end() == RES.find(fld) ?"" :RES.at(fld).rbegin()->second.rbegin()->first); dano_id.empty()){ //mpre("Позиция не найдена" ,__LINE__);
+					}else{ //mpre("Позиции pos01=" +to_string(pos01) +" pos10=" +to_string(pos10) ,__LINE__);
+					}return false; }(); !dano_id.empty()){ //mpre("Изменение с наибольшим количеством отличий" ,__LINE__);
+				*/}else if(auto [lock_01 ,dano_01_id] = [&](int pos =0 ,string dano_id ="" ,string field = "lock_01"){ // значение изменений
+					if(pos = (RES.end() == RES.find(field) ?0 :RES.at(field).rbegin()->first) ;0 >pos){ err("значение позиции");
+					}else if(dano_id = (RES.end() == RES.find(field) ?"" :RES.at(field).rbegin()->second.rbegin()->first); false){ err("идентификатор дано 01"); //mpre(res.at("unlock_01") ,"доступны изменения 01" ,__line__);
+					}else{ //mpre("значение идентификатора " +field ,__LINE__);
+					}return make_pair(pos ,dano_id); }() ;false){ err("значение изменений");
+				}else if(auto [lock_10 ,dano_10_id] = [&](int pos =0 ,string dano_id ="" ,string field = "lock_10"){ // значение изменений
+					if(pos = (RES.end() == RES.find(field) ?0 :RES.at(field).rbegin()->first) ;0 >pos){ mpre(RES ,"Ресурсы" ,__LINE__); err("значение позиции");
+					}else if(dano_id = (RES.end() == RES.find(field) ?"" :RES.at(field).rbegin()->second.rbegin()->first); false){ mpre(RES ,"Ресурс" ,__LINE__); err("идентификатор дано 01"); //mpre(res.at("unlock_01") ,"доступны изменения 01" ,__line__);
+					}else{ //mpre("значение идентификатора " +field ,__LINE__);
+					}return make_pair(pos ,dano_id); }() ;false){ err("значение изменений");
+				}else if([&](){ // Значение отсутствует
+					if(dano_01_id.empty() && dano_10_id.empty()){ err("Значения не найдены");
+					}else if(dano_id =(dano_01_id.empty() ?dano_10_id :""); !dano_id.empty()){ //mpre("Отсутствует dano_01_id" ,__LINE__);
+					}else if(dano_id =(dano_10_id.empty() ?dano_01_id :""); !dano_id.empty()){ //mpre("Отсутствует dano_10_id" ,__LINE__);
+					}else{ //mpre("Оба значения в наличии" ,__LINE__);
+					}return false; }() ;!dano_id.empty()){ //mpre("Выбор по отсутствующему значению" ,__LINE__);
 				}else if(dano_id =(lock_01 > lock_10 ?dano_01_id :dano_10_id); !dano_id.empty()){ //mpre("Расчет разности lock_01=" +to_string(lock_01) +" lock_10=" +to_string(lock_10) ,__LINE__);
 				}else{ mpre(RES ,"ОШИБКА нет доступных вариантов lock_01=" +to_string(lock_01) +" dano_01_id=" +dano_01_id +" lock_10=" +to_string(lock_10) +" dano_10_id=" +dano_10_id ,__LINE__);
 				}return false; }(); dano_id.empty()){ err("Идентификатор исходника");
@@ -1614,7 +1639,7 @@ int main(int argc, char **argv){
 					if(std::string addr = "1"; addr.empty()){ err("Идентификатор первоначального морфа");
 					}else if(string index_md5 = md5(itog_id +":" +addr); index_md5.empty()){ err("Хеш морфа");
 					}else if(index = (BMF_INDEX.end() == BMF_INDEX.find(index_md5) ? index : BMF_INDEX.at(index_md5)); !index.empty()){ //mpre("Морф уже в базе" ,__LINE__);
-					}else if(TMs dano = bmf::Choice("" ,"" , key, itog_id, DANO, DANO_BITMAP ,__LINE__); dano.empty()){ err("Выборка первоначального исходника");
+					}else if(TMs dano = bmf::Choice("" ,{} ,"1" , key, itog_id, DANO, DANO_BITMAP ,__LINE__); dano.empty()){ err("Выборка первоначального исходника");
 					}else if(TMs _index = {{"grp", "0"}, {"addr", "1"} ,{"md5" ,index_md5}, {"dano_id", dano.at("id")}, {"itog_id", itog.at("id")}}; _index.empty()){ mpre("ОШИБКА формирования свойст нового морфа", __LINE__);
 					}else if(_index = bmf::Up_mysql(bmf::INDEX, {/*{"id", md5(addr)}*/}, _index, {}, __LINE__); _index.empty()){ mpre("ОШИБКА добавления корневого морфа в базу", __LINE__);
 					}else if(itog["index_id"] = _index.at("id"); itog.empty()){ mpre("ОШИБКА установки свойства связи итога с морфом", __LINE__);
@@ -2018,8 +2043,7 @@ int main(int argc, char **argv){
 							if(string index_md5 = md5(itog_id +":" +addr_new); index_md5.empty()){ err("Идентификатор морфа");
 							}else if(index_new = (BMF_INDEX.end() ==BMF_INDEX.find(index_md5) ?index_new :BMF_INDEX.at(index_md5)); !index_new.empty()){ //mpre("Новый морф уже в базе key=" +to_string(key) +" grow=" +grow +" itog_id=" +itog_id +" addr_grp=" +addr_grp +" link=" +link +" addr_new=" +addr_new ,__LINE__);
 							//}else if(string index_md5 = md5(itog_id +":" +addr_new); index_md5.empty()){ err("Хеш адреса");
-							}else if(string bmf_dano_id =(index_grow.end() ==index_grow.find("dano_id") ?"" :index_grow.at("dano_id")); bmf_dano_id.empty()){ err("Исходник расширяемого морфа");
-							}else if(TMs dano = bmf::Choice(list ,bmf_dano_id ,key ,itog_id, DANO, DANO_BITMAP ,__LINE__); dano.empty()){ err("Выборка первоначального исходника");
+							}else if(TMs dano = bmf::Choice(list ,index_grow ,link ,key ,itog_id, DANO, DANO_BITMAP ,__LINE__); dano.empty()){ err("Выборка первоначального исходника");
 							}else if(string index_id = [&](string index_id = "0"){ // Морф группы
 								if(1 == addr_new.length()%6){ //mpre("Собственно морф группы" ,__LINE__);
 								}else if(index_id = (index_grp.end() == index_grp.find("index_id") ? "" : index_grp.at("index_id")); index_id.empty()){ err("Группа");
