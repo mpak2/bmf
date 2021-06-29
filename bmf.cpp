@@ -1095,7 +1095,7 @@ int main(int argc, char **argv){
 					}else{ //mpre("Выборк ссылки по направлению link=" +link +" dano_id=" +dano_id ,__LINE__);
 					}return false; }() ;!dano_id.empty()){ //pre("Выбор изменений по направлению");
 				}else if([&](){ // Значение отсутствует
-					if(dano_01_id.empty() && dano_10_id.empty()){ err("Значения не найдены");
+					if(dano_01_id.empty() && dano_10_id.empty()){ //pre("Значения не найдены");
 					}else if(dano_id =(dano_01_id.empty() ?dano_10_id :""); !dano_id.empty()){ //mpre("Отсутствует dano_01_id" ,__LINE__);
 					}else if(dano_id =(dano_10_id.empty() ?dano_01_id :""); !dano_id.empty()){ //mpre("Отсутствует dano_10_id" ,__LINE__);
 					}else{ //mpre("Оба значения в наличии" ,__LINE__);
@@ -1496,12 +1496,13 @@ int main(int argc, char **argv){
 			}else{ mpre("Набор " +dataset["id"] +" количество:"+ dataset["count"] +" точность:"+ dataset["diff"] +" (" +dataset["perc"] +"%)" +epoch, __LINE__);
 			}}return false; }()){ mpre("ОШИБКА отображения списка набора данных", __LINE__);
 		}else if([&](){ // Полная статистика
-			if(string count = [&](int count =0){ for(auto [id ,dataset]:DATASET){ count += atoi((dataset.end() ==dataset.find("count") ?"0" :dataset.at("count")).c_str()); }return to_string(count); }(); count.empty()){ err("Количество примеров в наборе");
-			}else if(string diff = [&](float diff =0){ for(auto [id ,dataset]:DATASET){ diff += atof((dataset.end() ==dataset.find("diff") ?"0" :dataset.at("diff")).c_str()); }return to_string((float)diff /DATASET.size()); }(); diff.empty()){ err("Количество двоичных совпадений в наборе");
-			}else if(float perc = [&](float perc =0){ for(auto [id ,dataset]:DATASET){ perc += atof((dataset.end() ==dataset.find("perc") ?"0" :dataset.at("perc")).c_str()); }return (float)perc /DATASET.size(); }(); !perc){ err("Количество полных совпадений в наборе");
+			if(int cnt = [&](int cnt =0){ for(auto [id ,dataset]:DATASET){ cnt += "0" ==dataset.at("key") ?0 :1; }return cnt; }(); !cnt){ err("Количество наборов");
+			}else if(string count = [&](int count =0){ for(auto [id ,dataset]:DATASET){ int _count = atoi((dataset.end() ==dataset.find("count") ?"0" :dataset.at("count")).c_str()); count +=("0" == dataset.at("key") ?0 :_count); }return to_string(count); }(); count.empty()){ err("Количество примеров в наборе");
+			}else if(string diff = [&](float diff =0){ for(auto [id ,dataset]:DATASET){ float _diff = atof((dataset.end() ==dataset.find("diff") ?"0" :dataset.at("diff")).c_str()); diff +=("0" == dataset.at("key") ?0 :_diff); }return to_string(diff /cnt); }(); diff.empty()){ err("Количество двоичных совпадений в наборе");
+			}else if(float perc = [&](float perc =0){ for(auto [id ,dataset]:DATASET){ float _perc = atof((dataset.end() ==dataset.find("perc") ?"0" :dataset.at("perc")).c_str()); perc +=("0" == dataset.at("key") ?0 :_perc); }return perc /cnt; }(); !perc){ err("Количество полных совпадений в наборе");
 			}else if(string _perc = [&](string _perc = ""){ char chr[10]; sprintf(chr ,"%.3f" ,perc); return string(chr); }(); _perc.empty()){ mpre("ОШИБКА расчета строки процента ошибки", __LINE__);
-			}else if(string epoch = [&](float epoch =0){ for(auto [id ,dataset]:DATASET){ epoch += atof((dataset.end() ==dataset.find("epoch") ?"0" :dataset.at("epoch")).c_str()); }return to_string(epoch); }(); epoch.empty()){ err("Количество эпох в наборе");
-			}else{ mpre(string(65 ,'-') ,__LINE__); mpre("Наборов " +to_string(DATASET.size()) +" количество:" +count +" точность:" +diff +" (" +_perc +"%) эпох:" +epoch +" " ,__LINE__);
+			}else if(string epoch = [&](float epoch =0){ for(auto [id ,dataset]:DATASET){ epoch += atof((dataset.end() ==dataset.find("epoch") ?"0" :dataset.at("epoch")).c_str()); }return to_string(epoch /cnt); }(); epoch.empty()){ err("Количество эпох в наборе");
+			}else{ mpre(string(65 ,'-') ,__LINE__); mpre("Наборов:" +to_string(cnt) +" количество:" +count +" точность:" +diff +" (" +_perc +"%) эпох:" +epoch +" " ,__LINE__);
 			}return false; }()){ err("Полная статистика");
 		}else{ //mpre("Размер модели ", __LINE__);
 		}return bmf::dataset; }(); false){ err("Набор данных не установлен");
