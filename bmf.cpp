@@ -1078,7 +1078,7 @@ int main(int argc, char **argv){
 				}return link; }(); false){ err("Ссылка морфа");*/
 			}else if([&](){ // Выбор исходника
 				if(!dano_id.empty()){ //mpre("Уже выбран первоначальный исходник" ,__LINE__);
-				}else if(RES.empty()){ err("Список подходящих значений не найден");
+				}else if(RES.empty()){ err("Список подходящих значений исходников");
 				}else if(auto [ublock_01 ,dano_01_id] = [&](int pos =0 ,string dano_id ="" ,string field = "unlock_01"){ // значение изменений
 					if(pos = (RES.end() == RES.find(field) ?0 :RES.at(field).rbegin()->first) ;0 >pos){ err("значение позиции");
 					}else if(dano_id = (RES.end() == RES.find(field) ?"" :RES.at(field).rbegin()->second.rbegin()->first); false){ err("идентификатор дано 01"); //mpre(res.at("unlock_01") ,"доступны изменения 01" ,__line__);
@@ -1089,17 +1089,17 @@ int main(int argc, char **argv){
 					}else if(dano_id = (RES.end() == RES.find(field) ?"" :RES.at(field).rbegin()->second.rbegin()->first); false){ mpre(RES ,"Ресурс" ,__LINE__); err("идентификатор дано 01"); //mpre(res.at("unlock_01") ,"доступны изменения 01" ,__line__);
 					}else{ //mpre("значение идентификатора " +field ,__LINE__);
 					}return make_pair(pos ,dano_id); }() ;false){ err("значение изменений");
-				}else if([&](){ // Выбор изменений по направлению
-					if(link.empty()){ //pre("Ссылка не указана");
-					}else if(dano_id = ("0" ==link ?dano_10_id :dano_01_id) ;dano_id.empty()){ //pre("Ссылка по направлению на найдена");
-					}else{ //mpre("Выборк ссылки по направлению link=" +link +" dano_id=" +dano_id ,__LINE__);
-					}return false; }() ;!dano_id.empty()){ //pre("Выбор изменений по направлению");
 				}else if([&](){ // Значение отсутствует
 					if(dano_01_id.empty() && dano_10_id.empty()){ //pre("Значения не найдены");
 					}else if(dano_id =(dano_01_id.empty() ?dano_10_id :""); !dano_id.empty()){ //mpre("Отсутствует dano_01_id" ,__LINE__);
 					}else if(dano_id =(dano_10_id.empty() ?dano_01_id :""); !dano_id.empty()){ //mpre("Отсутствует dano_10_id" ,__LINE__);
 					}else{ //mpre("Оба значения в наличии" ,__LINE__);
 					}return false; }() ;!dano_id.empty()){ //mpre("Выбор по отсутствующему значению" ,__LINE__);
+				}else if([&](){ // Выбор изменений по направлению
+					if(link.empty()){ //pre("Ссылка не указана");
+					}else if(dano_id = ("0" ==link ?dano_10_id :dano_01_id) ;dano_id.empty()){ //pre("Ссылка по направлению на найдена");
+					}else{ //mpre("Выборк ссылки по направлению link=" +link +" dano_id=" +dano_id ,__LINE__);
+					}return false; }() ;!dano_id.empty()){ //pre("Выбор изменений по направлению");
 				/*}else if([&]{ // Изменение с наибольшим количеством отличий
 					if(int pos01 = (RES.end() == RES.find("unlock_01") ?0 :RES.at("unlock_01").rbegin()->first) ;false){ err("Позиция 01");
 					}else if(int pos10 = (RES.end() == RES.find("unlock_10") ?0 :RES.at("unlock_10").rbegin()->first) ;false){ err("Позиция 10");
@@ -1123,6 +1123,11 @@ int main(int argc, char **argv){
 					}else if(dano_id =(dano_10_id.empty() ?dano_01_id :""); !dano_id.empty()){ //mpre("Отсутствует dano_10_id" ,__LINE__);
 					}else{ //mpre("Оба значения в наличии" ,__LINE__);
 					}return false; }() ;!dano_id.empty()){ //mpre("Выбор по отсутствующему значению" ,__LINE__);
+				}else if([&](){ // Выбор изменений по направлению
+					if(link.empty()){ //pre("Ссылка не указана");
+					}else if(dano_id = ("0" ==link ?dano_10_id :dano_01_id) ;dano_id.empty()){ //pre("Ссылка по направлению на найдена");
+					}else{ //mpre("Выборк ссылки по направлению link=" +link +" dano_id=" +dano_id ,__LINE__);
+					}return false; }() ;!dano_id.empty()){ //pre("Выбор изменений по направлению");
 				}else if(dano_id =(lock_01 > lock_10 ?dano_01_id :dano_10_id); !dano_id.empty()){ //mpre("Расчет разности lock_01=" +to_string(lock_01) +" lock_10=" +to_string(lock_10) ,__LINE__);
 				}else{ mpre(RES ,"ОШИБКА нет доступных вариантов lock_01=" +to_string(lock_01) +" dano_01_id=" +dano_01_id +" lock_10=" +to_string(lock_10) +" dano_10_id=" +dano_10_id ,__LINE__);
 				}return false; }(); dano_id.empty()){ err("Идентификатор исходника");
@@ -1470,8 +1475,16 @@ int main(int argc, char **argv){
 				}else{ //mpre("Карта itog " +itog_map.at("map"), __LINE__); mpre("Карта index " +index_map.at("map"), __LINE__); mpre("Разница count=" +to_string(count) +" ers=" +to_string(ers), __LINE__);
 				}}return to_string(!ers ? 1 : (float)(count-ers)/count); }(); dataset.end() == dataset.find("diff")){ mpre("ОШИБКА расчета результата набора данных", __LINE__);
 			}else if(float perc = [&](int count = 0){ for(int i = 0; i < dataset_count; i++){ // Совпадение по значениям
-				if(int ers = [&](int ers = 0){ for( auto itog_itr:_ITOG_){ // Проверка всех итогов
+				if(int ers = [&](int ers = 0){ for(auto itog_itr:_ITOG_){ // Проверка всех итогов
 					if(TMs itog = itog_itr.second; itog.empty()){ mpre("ОШИБКА выборки итога", __LINE__);
+					}else if(string argv_itog_id =[&](string argv_itog_id ="",string arg ="itog"){ //Аргумент консоли
+						if(argv_itog_id =itog.end() ==itog.find("name") ?"" :itog.at("name") ;argv_itog_id.empty()){ err("Идентификатор итога");
+						}else if(bmf::ARGV.end() ==bmf::ARGV.find(arg)){ //mpre("Расчетный итог не указан в списке аргументов" ,__LINE__);
+						}else if(string name = itog.end() ==itog.find("name") ?"" :itog.at("name") ;name.empty()){ err("Не установлено имя итога");
+						}else if(argv_itog_id = (bmf::ARGV.at(arg) == name ?name :""); argv_itog_id.empty()){ //mpre("Пропуск расчета итога name=" +name ,__LINE__);
+						}else if(int verbose = atoi(bmf::ARGV.end() == bmf::ARGV.find("verbose") ?"" :bmf::ARGV.at("verbose").c_str()); 3 != verbose){ //mpre("Не отображаем подробную информацию" ,__LINE__);
+						}else{ //mpre(" Совпадение итога с аргументом командной строки name=" +name +" argv_itog_id=" +argv_itog_id, __LINE__);
+						}return argv_itog_id; }(); argv_itog_id.empty()){ //mpre("Пропуск расчета итога argv_itog_id=" +argv_itog_id ,__LINE__);
 					}else if(itog.end() == itog.find("id")){ mpre("ОШИБКА у итога не найдено поле идентификатора", __LINE__);
 					}else if(ITOG.end() == ITOG.find(itog.at("id"))){ mpre("ОШИБКА в справочнике карт итог не найден " +itog.at("id"), __LINE__);
 					}else if(boost::dynamic_bitset<> gmap = ITOG.at(itog.at("id")); gmap.empty()){ mpre("ОШИБКА восстановления карты итога", __LINE__);
@@ -1493,8 +1506,13 @@ int main(int argc, char **argv){
 				}else{ //mpre("Эпох dataset.at(epoch)=" +dataset.at("epoch") +" dataset_count=" +to_string(dataset_count) +" key=" +dataset.at("key") +" epoch=" +to_string(epoch), __LINE__);
 				}return to_string(epoch); }(); false){ err("Расчет эпох");
 			}else if(string epoch = (!atof(dataset["epoch"].c_str()) ?"" :" эпох:" +dataset["epoch"]); false){ err("Строковое значение эпох");
+			}else if(string format =bmf::ARGV.end() ==bmf::ARGV.find("format") ?"" :bmf::ARGV.at("format") ;"short" == format){ //mpre("Не выводим статистику по наборам данных" ,__LINE__);
 			}else{ mpre("Набор " +dataset["id"] +" количество:"+ dataset["count"] +" точность:"+ dataset["diff"] +" (" +dataset["perc"] +"%)" +epoch, __LINE__);
 			}}return false; }()){ mpre("ОШИБКА отображения списка набора данных", __LINE__);
+		}else if([&](){ // Строка делитель
+			if(string format =bmf::ARGV.end() ==bmf::ARGV.find("format") ?"" :bmf::ARGV.at("format") ;"short" == format){ //mpre("Не выводим статистику по наборам данных" ,__LINE__);
+			}else{ mpre(string(65 ,'-') ,__LINE__);
+			}return false; }()){ err("Строка делитель подробной и общей статистики");
 		}else if([&](){ // Полная статистика
 			if(int cnt = [&](int cnt =0){ for(auto [id ,dataset]:DATASET){ cnt += "0" ==dataset.at("key") ?0 :1; }return cnt; }(); !cnt){ err("Количество наборов");
 			}else if(string count = [&](int count =0){ for(auto [id ,dataset]:DATASET){ int _count = atoi((dataset.end() ==dataset.find("count") ?"0" :dataset.at("count")).c_str()); count +=("0" == dataset.at("key") ?0 :_count); }return to_string(count); }(); count.empty()){ err("Количество примеров в наборе");
@@ -1502,7 +1520,7 @@ int main(int argc, char **argv){
 			}else if(float perc = [&](float perc =0){ for(auto [id ,dataset]:DATASET){ float _perc = atof((dataset.end() ==dataset.find("perc") ?"0" :dataset.at("perc")).c_str()); perc +=("0" == dataset.at("key") ?0 :_perc); }return perc /cnt; }(); !perc){ err("Количество полных совпадений в наборе");
 			}else if(string _perc = [&](string _perc = ""){ char chr[10]; sprintf(chr ,"%.3f" ,perc); return string(chr); }(); _perc.empty()){ mpre("ОШИБКА расчета строки процента ошибки", __LINE__);
 			}else if(string epoch = [&](float epoch =0){ for(auto [id ,dataset]:DATASET){ epoch += atof((dataset.end() ==dataset.find("epoch") ?"0" :dataset.at("epoch")).c_str()); }return to_string(epoch /cnt); }(); epoch.empty()){ err("Количество эпох в наборе");
-			}else{ mpre(string(65 ,'-') ,__LINE__); mpre("Наборов:" +to_string(cnt) +" количество:" +count +" точность:" +diff +" (" +_perc +"%) эпох:" +epoch +" " ,__LINE__);
+			}else{ mpre("Наборов:" +to_string(cnt) +" количество:" +count +" точность:" +diff +" (" +_perc +"%) эпох:" +epoch +" " ,__LINE__);
 			}return false; }()){ err("Полная статистика");
 		}else{ //mpre("Размер модели ", __LINE__);
 		}return bmf::dataset; }(); false){ err("Набор данных не установлен");
@@ -1636,7 +1654,16 @@ int main(int argc, char **argv){
 				}return false; }()){ err("Обновление модели");
 			}else if(string table_grp = bmf::Table_grp(bmf::dataset.at("id") ,key) ;table_grp.empty()){ // Создание таблицы значений
 			}else if([&](){ for(auto [itog_id ,itog]:bmf::List(bmf::ITOG, {}, __LINE__)){ // Проверка списка итогов
-				if(TMs index = [&](TMs index = {}){ // Добавление первоначального морфа
+				if(string argv_itog_id =[&](string argv_itog_id ,string arg = "itog"){ //Аргумент консоли
+					if(bmf::ARGV.end() ==bmf::ARGV.find(arg)){ //mpre("Расчетный итог не указан в списке аргументов" ,__LINE__);
+					}else if(string name = itog.end() ==itog.find("name") ?"" :itog.at("name") ;name.empty()){ err("Не установлено имя итога");
+					}else if(argv_itog_id = (bmf::ARGV.at(arg) == name ?name :""); argv_itog_id.empty()){ //mpre("Пропуск расчета итога" ,__LINE__);
+					}else if(int verbose = atoi(bmf::ARGV.end() == bmf::ARGV.find("verbose") ?"" :bmf::ARGV.at("verbose").c_str()); 3 != verbose){ //mpre("Не отображаем подробную информацию" ,__LINE__);
+					}else{ mpre(" Совпадение итога с аргументом командной строки name=" +name +" argv_itog_id=" +argv_itog_id, __LINE__);
+					//}else{ //mpre("Выборка расчетоного итога из аргументов функции argv_itog_id=" +argv_itog_id ,__LINE__);
+					}return argv_itog_id; }(itog_id); argv_itog_id.empty()){ //mpre("Пропуск расчета итога itog_id=" +itog_id ,__LINE__);
+				//}else if(mpre("Проверка", __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
+				}else if(TMs index = [&](TMs index = {}){ // Добавление первоначального морфа
 					if(std::string addr = "1"; addr.empty()){ err("Идентификатор первоначального морфа");
 					}else if(string index_md5 = md5(itog_id +":" +addr); index_md5.empty()){ err("Хеш морфа");
 					}else if(index = (BMF_INDEX.end() == BMF_INDEX.find(index_md5) ? index : BMF_INDEX.at(index_md5)); !index.empty()){ //mpre("Морф уже в базе" ,__LINE__);
