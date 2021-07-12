@@ -23,8 +23,8 @@ int mpre(TMs row, int line, string comment = "", string prefix = "", string key 
 			std::cerr << prefix << "\t[" << field << "]=>" << val << "," << endl;
 		}; std::cerr << prefix << ")\n"; return false; }()){ err("Вывод массива");
 	}else if(int npos = comment.find("ОШИБКА"); (-1 == npos)){ //mpre("Вхождение ключевого слова", __LINE__);
-	}else if(std::cerr << line << ".^^^ Критическое сообщение ^^^ Остановка выполнения программы" << std::endl; false){ mpre("ОШИБКА отображения информации об ошибке", __LINE__);
-	}else if(int response = system("sleep 1"); true){ exit(mpre("Остановка выполнения программы", __LINE__));
+	//}else if(std::cerr << line << ".^^^ Критическое сообщение ^^^ Остановка выполнения программы" << std::endl; false){ mpre("ОШИБКА отображения информации об ошибке", __LINE__);
+	}else if(int response = system("sleep 1"); true){ exit(mpre(to_string(line) +" ^^^ Остановка выполнения программы", __LINE__));
 	}else{
 	}return 1;
 } int mpre(TMs row, string comment, int line){
