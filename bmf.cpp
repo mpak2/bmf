@@ -2047,6 +2047,7 @@ int main(int argc, char **argv){
 					}else if(string adr = "1" +link +bmf::Dec2bin(nn).substr(1, -1); adr.empty()){ err("Адрес нового морфа")
 					}else if(TMs index_new = [&](TMs index_new ={}){ // Создание нового морфа
 						if(string addr_new = adr +addr_grp.substr(1, -1); addr_new.empty()){ err("Расчет нового адреса");
+						}else if(mysql_query(bmf::mysql ,string("START TRANSACTION;").c_str())){ mpre("ОШИБКА запуска транзакции\n" +string(mysql_error(bmf::mysql)) ,__LINE__);
 						}else if(index_new = [&](TMs index_new = {}){ // Добавление нового морфа
 							if(string index_md5 = md5(itog_id +":" +addr_new); index_md5.empty()){ err("Идентификатор морфа");
 							}else if(index_new = (BMF_INDEX.end() ==BMF_INDEX.find(index_md5) ?index_new :BMF_INDEX.at(index_md5)); !index_new.empty()){ //mpre("Новый морф уже в базе key=" +to_string(key) +" grow=" +grow +" itog_id=" +itog_id +" addr_grp=" +addr_grp +" link=" +link +" addr_new=" +addr_new ,__LINE__);
@@ -2059,7 +2060,11 @@ int main(int argc, char **argv){
 									}else if(string link_self =1 <addr.length() ?addr.substr(1 ,1) :link; 1 != link_self.length()){ mpre("ОШИБКА Ссылка родителя addr_grow=" +addr_grow +" pos=" +to_string(pos) ,__LINE__);
 									}else if(string link_other = "0" ==link_self ?"1" :"0" ;1 != link_other.length()){ err("Ссылка брата");
 									}else if(string index_md5 =md5(itog_id +":" +addr) ;index_md5.empty()){ err("Идентификатор родителя");
-									}else if(TMs index =(BMF_INDEX.end() ==BMF_INDEX.find(index_md5) ?index :BMF_INDEX.at(index_md5)) ;index.empty()){ mpre(BMF_INDEX ,"Справочник" ,__LINE__); mpre("ОШИБКА Выборка родителя BMF_INDEX.size()=" +to_string(BMF_INDEX.size()) +" addr_grow=" +addr_grow +" itog_id=" +itog_id +" addr=" +addr +" index_md5=" +index_md5 ,__LINE__);
+									}else if(TMs index =[&](TMs index ={}){ // Выбор родителя
+										if(index =(BMF_INDEX.end() ==BMF_INDEX.find(index_md5) ?index :BMF_INDEX.at(index_md5)) ;!index.empty()){ //mpre(BMF_INDEX ,"Справочник" ,__LINE__); mpre("ОШИБКА Выборка родителя BMF_INDEX.size()=" +to_string(BMF_INDEX.size()) +" addr_grow=" +addr_grow +" itog_id=" +itog_id +" addr=" +addr +" index_md5=" +index_md5 ,__LINE__);
+										}else if(index = bmf::Up_mysql("index" ,{{"md5" ,index_md5}} ,{} ,{} ,__LINE__); index.empty()){ err("Морф родителя не найден");
+										}else{ //mpre(index ,"Родительский морф" ,__LINE__);
+										}return index; }(); index.empty()){ err("Выбор родителя");
 									}else if(string dano_id =index.end() ==index.find("dano_id") ?"" :index.at("dano_id") ;dano_id.empty()){ mpre(index ,"ОШИБКА Идентификатор исходника" ,__LINE__);
 									}else if(string _addr = "1" +link_other +addr.substr(1 ,pos); _addr.empty()){ err("Адрес ответвления");
 									}else if(string _index_md5 =md5(itog_id +":" +_addr); _index_md5.empty()){ err("Идентификатор смежного потомка родителя");
@@ -2105,8 +2110,7 @@ int main(int argc, char **argv){
 							//}else if(index_new = bmf::Up_mysql("index" ,{{"md5", index_md5}} ,_index_new ,_index_new ,__LINE__); index_new.empty()){ err("Добавление нового морфа");
 							}else if(string sql = "INSERT INTO `index` SET grp=" +index_id +" ,addr='" +addr_new +"' ,md5='" +index_md5 +"' ,dano_id=" +dano.at("id") +" ,itog_id=" +itog_id +" ON DUPLICATE KEY UPDATE addr=VALUES(addr);"; sql.empty()){ err("Проверка запроса");
 							}else if(mysql_query(bmf::mysql ,sql.c_str())){ mpre("ОШИБКА запроса " +sql +"\n" +string(mysql_error(bmf::mysql)) ,__LINE__);
-							}else if(index_new = bmf::Up_mysql("index" ,{{"md5", index_md5}} ,{} ,{} ,__LINE__); index_new.empty()){ err("Добавление нового морфа");
-							//}else if(index_new.end() == index_new.find("id")){ mpre(index_new ,"Новый морф" ,__LINE__); err("Идентификатор отсутствует");
+							}else if(index_new = bmf::Up_mysql("index" ,{{"id", to_string(mysql_insert_id(bmf::mysql))}} ,{} ,{} ,__LINE__); index_new.empty()){ mpre("Пропуск добавление нового морфа index_id=" +index_id ,__LINE__);
 							}else if(BMF_INDEX.insert(make_pair(index_md5 ,index_new)); BMF_INDEX.empty()){ err("Добавление морфа в справочник");
 							}else if([&](){ // Уведомление
 								if(int verbose = atoi(bmf::ARGV.end() == bmf::ARGV.find("verbose") ?"" :bmf::ARGV.at("verbose").c_str()); 1 != verbose){ //mpre("Не отображаем подробную информацию" ,__LINE__);
@@ -2116,9 +2120,10 @@ int main(int argc, char **argv){
 								}return false; }()){ err("Уведомление");
 							}else if(!++err){ err("Инкремент количества ошибок");
 							}else{ //mpre("Добавление нового key=" +to_string(key) +" itog_id=" +itog_id +" морфа grow=" +grow +" addr_new=" +addr_new ,__LINE__);
-						}return index_new; }(); index_new.empty()){ mpre("Пропуск добавление нового морфа" ,__LINE__);
+						}return index_new; }(); false){ err("Добавление нового морфа");
 						}else if(TMs _index_grp = [&](TMs index_grp = {}){ // Общая группа расширяемого морфа
-							if(string index_md5 = md5(itog_id +":" +addr_grp); index_md5.empty()){ err("Хеш морфа");
+							if(index_new.empty()){ mpre("Не добавляем общую группу" ,__LINE__);
+							}else if(string index_md5 = md5(itog_id +":" +addr_grp); index_md5.empty()){ err("Хеш морфа");
 							//}else if(TMs index =(BMF_INDEX.end() ==BMF_INDEX.find(index_md5) ?index :BMF_INDEX.at(index_md5)); index.empty()){ mpre("ОШИБКА Адрес группы расширяемого морфа addr_grow=" +addr_grow +" addr_grp=" +addr_grp ,__LINE__);
 							//}else if(TMs index = bmf::Up_mysql("index" ,{{"md5", index_md5}} ,{} ,{} ,__LINE__); index.empty()){ err("Добавление нового морфа");
 							}else if(TMs index = [&](TMs index = {}){ // Выборка морфа
@@ -2133,7 +2138,8 @@ int main(int argc, char **argv){
 							}else{ //mpre(index_grp ,"Группа расширяемого морфа" ,__LINE__);
 							}return index_grp; }(); index_grp.empty()){ err("Получение общей группы расширяемого морфа");
 						}else if([&](){ // Дочерняя группа
-							if(6 >= adr.length()){ //mpre("Не добавляем дочернюю группу adr=" +adr ,__LINE__);
+							if(index_new.empty()){ mpre("Не добавляем дочернюю группу" ,__LINE__);
+							}else if(6 >= adr.length()){ //mpre("Не добавляем дочернюю группу adr=" +adr ,__LINE__);
 							}else if(string addr_grp = addr_new.substr(addr_new.length() %6 ,-1); addr_grp.empty()){ err("Адрес гурппы");
 							}else if(string index_md5 =md5(itog_id +":" +addr_new); index_md5.empty()){ err("Хеш морфа группы");
 							//}else if(TMs _index = (BMF_INDEX.end() ==BMF_INDEX.find(index_md5) ?_index :BMF_INDEX.at(index_md5)); _index.empty()){ mpre("ОШИБКА Выборка морфа группы " +itog_id +":" +addr_grp ,__LINE__);
@@ -2151,7 +2157,8 @@ int main(int argc, char **argv){
 							}else{ //mpre("Группа новая addr_grow=" +addr_grow +" adr=" +adr +" link=" +link +" " +sql ,__LINE__);
 							}return false; }()){ err("Добавление дочерней группы");
 						}else if([&](){ // Обновление общей группы
-							if(string str_exist = string("1") +string(bmf::Bin2dec(adr), '0'); str_exist.empty()){ err("Установка бита");
+							if(index_new.empty()){ mpre("Не обновляем общую группу" ,__LINE__);
+							}else if(string str_exist = string("1") +string(bmf::Bin2dec(adr), '0'); str_exist.empty()){ err("Установка бита");
 							}else if(string index_md5 =md5(itog_id +":" +addr_grp); index_md5.empty()){ err("Хер морфа");
 							}else if(TMs _index =(BMF_INDEX.end() ==BMF_INDEX.find(index_md5) ?_index :BMF_INDEX.at(index_md5)); _index.empty()){ mpre("Морф группы не найден addr_grp=" +addr_grp ,__LINE__);
 							}else if(string index_id =(_index.end() ==_index.find("id") ?"0" :_index.at("id")); index_id.empty()){ err("Идентификатор группового морфа");
@@ -2160,6 +2167,7 @@ int main(int argc, char **argv){
 							}else if(mysql_query(bmf::mysql ,sql.c_str())){ mpre("ОШИБКА запроса " +sql +"\n" +string(mysql_error(bmf::mysql)) ,__LINE__);
 							}else{ //mpre("Запрос на обновление общей группы addr_grp=" +addr_grp +" nn=" +to_string(nn) +" " +sql ,__LINE__);
 							}return false; }()){ err("Обновление общей группы");
+						}else if(mysql_query(bmf::mysql ,string("COMMIT;").c_str())){ mpre("ОШИБКА окончания транзакции\n" +string(mysql_error(bmf::mysql)) ,__LINE__);
 						}else{ //mpre("Создание морфа addr_grow=" +addr_grow +" addr_grp=" +addr_grp +" link=" +link +" nn=" +to_string(nn) +" adr=" +adr ,__LINE__);
 						}return index_new; }(); index_new.empty()){ mpre("Пропуск Создание морфа" ,__LINE__);
 					}else{ //mpre("Конец обучение key=" +to_string(key) +" calc=" +(calc ? "1" : "0") +" learn=" +(learn ? "1" : "0") ,__LINE__);
