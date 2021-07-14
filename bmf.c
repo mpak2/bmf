@@ -68,15 +68,25 @@ int mpre(TMMs& TAB, int line, string comment = ""){
 		std::cerr << "__" << std::to_string(line) << "__";
 	}; std::cerr << "( // " << comment << "\n";
 	for(auto& itr:TAB){
-		string key = itr.first;
-		TMs row = itr.second;
-		mpre(row, line, comment, "\t", key);
+		/*if(string _comment = [&](string _comment ,string src = "ОШИБКА" ,string dst ="ошибка"){ // Удаляем строку ошибки
+			while(size_t pos = _comment.find(src) && (pos != std::string::npos)){
+				//std::cerr << "Позиция " << src << endl;
+				mpre("Позиция " +to_string(pos) +" comment=" +comment ,__LINE__);
+				_comment.replace(pos, src.size(), dst);
+				mpre("Результат " +to_string(pos) +" _comment=" +_comment ,__LINE__);
+			}return _comment; }(comment); false){ err("Комментарий");
+		}else if(mpre("Проверка comment=" +comment +" _comment=" +_comment, __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);*/
+		if(false){ err("Уведомление");
+		}else{
+			string key = itr.first;
+			TMs row = itr.second;
+			mpre(row, line, comment, "\t", key);
+		}
 	} std::cerr << ")\n";
 	return 1;
 } int mpre(TMMs TAB, string comment, int line){
 	return mpre(TAB, line, comment);
 }
-
 
 int mpre(TM3i& TABS, int line, string comment = ""){
 	std::cerr << "Array";
@@ -99,6 +109,30 @@ int mpre(TM3i& TABS, int line, string comment = ""){
 	}; std::cerr << ")\n";
 	return 1;
 } int mpre(TM3i TABS, string comment, int line){
+	return mpre(TABS, line, comment);
+}
+
+int mpre(TM3ii& TABS, int line, string comment = ""){
+	std::cerr << "Array";
+	if(line > 0){
+		std::cerr << "__" << std::to_string(line) << "__";
+	}; std::cerr << "( // " << comment << "\n";
+	for(auto &tab_itr:TABS){
+		if(int keys = tab_itr.first; false){ mpre("ОШИБКА получения ключа очередного элемента", __LINE__);
+		}else{
+			std::cerr << "\tArray";
+			if(line > 0){
+				std::cerr << "\t" << keys << " => " ;
+			}; std::cerr << "( // " << comment << "\n";
+			for(auto itr = tab_itr.second.begin(); itr != tab_itr.second.end(); itr++){
+				int key = itr->first;
+				TMs row = itr->second;
+				mpre(row, line, comment, "\t\t", to_string(key));
+			} std::cerr << "\t)\n";
+		}
+	}; std::cerr << ")\n";
+	return 1;
+} int mpre(TM3ii TABS, string comment, int line){
 	return mpre(TABS, line, comment);
 }
 

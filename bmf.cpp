@@ -80,6 +80,7 @@ typedef std::map<int ,string> TMi;
 typedef std::map<string ,TMs> TMMs;
 typedef std::map<int ,TMs> TMMi;
 typedef std::map<string ,TMMi> TM3i;
+typedef std::map<int ,TMMi> TM3ii;
 typedef std::map<string ,TMMs> TM3s;
 typedef std::map<string ,boost::dynamic_bitset<>> TMMb;
 typedef std::map<string ,TMMb> TM3b;
@@ -1512,10 +1513,10 @@ int main(int argc, char **argv){
 			}else{ mpre(string(65 ,'-') ,__LINE__);
 			}return false; }()){ err("Строка делитель подробной и общей статистики");
 		}else if([&](){ // Полная статистика
-			if(int cnt = [&](int cnt =0){ for(auto [id ,dataset]:DATASET){ cnt += "0" ==dataset.at("key") ?0 :1; }return cnt; }(); !cnt){ err("Количество наборов");
+			if(int cnt = [&](int cnt =0){ for(auto [id ,dataset]:DATASET){ cnt += "0" ==dataset.at("key") ?0 :1; }return (cnt ?cnt :DATASET.size()); }(); false){ err("Количество наборов");
 			}else if(string count = [&](int count =0){ for(auto [id ,dataset]:DATASET){ int _count = atoi((dataset.end() ==dataset.find("count") ?"0" :dataset.at("count")).c_str()); count +=("0" == dataset.at("key") ?0 :_count); }return to_string(count); }(); count.empty()){ err("Количество примеров в наборе");
 			}else if(string diff = [&](float diff =0){ for(auto [id ,dataset]:DATASET){ float _diff = atof((dataset.end() ==dataset.find("diff") ?"0" :dataset.at("diff")).c_str()); diff +=("0" == dataset.at("key") ?0 :_diff); }return to_string(diff /cnt); }(); diff.empty()){ err("Количество двоичных совпадений в наборе");
-			}else if(float perc = [&](float perc =0){ for(auto [id ,dataset]:DATASET){ float _perc = atof((dataset.end() ==dataset.find("perc") ?"0" :dataset.at("perc")).c_str()); perc +=("0" == dataset.at("key") ?0 :_perc); }return perc /cnt; }(); !perc){ err("Количество полных совпадений в наборе");
+			}else if(float perc = [&](float perc =0){ for(auto [id ,dataset]:DATASET){ float _perc = atof((dataset.end() ==dataset.find("perc") ?"0" :dataset.at("perc")).c_str()); perc +=("0" == dataset.at("key") ?0 :_perc); }return perc /cnt; }(); false){ err("Количество полных совпадений в наборе");
 			}else if(string _perc = [&](string _perc = ""){ char chr[10]; sprintf(chr ,"%.3f" ,perc); return string(chr); }(); _perc.empty()){ mpre("ОШИБКА расчета строки процента ошибки", __LINE__);
 			}else if(string epoch = [&](float epoch =0){ for(auto [id ,dataset]:DATASET){ epoch += atof((dataset.end() ==dataset.find("epoch") ?"0" :dataset.at("epoch")).c_str()); }return to_string(epoch /cnt); }(); epoch.empty()){ err("Количество эпох в наборе");
 			}else{ mpre("Наборов:" +to_string(cnt) +" количество:" +count +" точность:" +diff +" (" +_perc +"%) эпох:" +epoch +" " ,__LINE__);
@@ -1645,7 +1646,7 @@ int main(int argc, char **argv){
 					if(TMs index = index_itr.second; index.empty()){ err("Выборка обновленного морфа");
 					}else if(string index_md5 = (index.end() == index.find("md5") ? "" : index.at("md5")); index_md5.empty()){ err("Хеш адреса морфа");
 					}else if(BMF_INDEX.insert(make_pair(index_md5, index)); BMF_INDEX.empty()){ err("Обновление справочника");
-					}else{ //mpre(_INDEX ,"Обновление струкруты групп", __LINE__);
+					}else{ //mpre(BMF_INDEX ,"Обновление струкруты групп", __LINE__);
 					}}return false; }()){ err("Обновление структуры групп и списка морфов");
 				}else if(int verbose = atoi(bmf::ARGV.end() == bmf::ARGV.find("verbose") ?"" :bmf::ARGV.at("verbose").c_str()); 3 != verbose){ //mpre("Не отображаем подробную информацию" ,__LINE__);
 				}else{ mpre(" " +to_string((std::chrono::system_clock::now().time_since_epoch()).count()/1e9 - _microtime) +" Обновление модели key=" +to_string(key) +" " +to_string(_INDEX.size()) +" size=" +to_string(BMF_INDEX.size()) +" ", __LINE__);
@@ -2051,35 +2052,46 @@ int main(int argc, char **argv){
 							}else if(index_new = (BMF_INDEX.end() ==BMF_INDEX.find(index_md5) ?index_new :BMF_INDEX.at(index_md5)); !index_new.empty()){ //mpre("Новый морф уже в базе key=" +to_string(key) +" grow=" +grow +" itog_id=" +itog_id +" addr_grp=" +addr_grp +" link=" +link +" addr_new=" +addr_new ,__LINE__);
 							}else if(TMs dano =[&](TMMs _DANO ,TMs dano ={}){ // Новая связь с исходником
 								if(_DANO.empty()){ err("Список исходников");
-								}else if([&](){ for(int pos =addr_grow.length(); pos--; pos >0){ // Исключения из списка исходников
-									if(string addr = "1" +addr_grow.substr(pos +1, -1); addr.empty()){ err("Адрес родителя");
+								//}else if(mpre(BMF_INDEX ,"Проверка", __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
+								}else if(TMs PARENTS = [&](TMs PARENTS ={}){ for(int pos =addr_grow.length(); pos--; pos >0){ // Исключения из списка исходников
+									if(string addr = "1" +addr_grow.substr(addr_grow.length() -pos, -1); addr.empty()){ err("Адрес родителя");
+									//}else if(mpre("Проверка addr_grow=" +addr_grow +" addr=" +addr, __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
 									}else if(string link_self =1 <addr.length() ?addr.substr(1 ,1) :link; 1 != link_self.length()){ mpre("ОШИБКА Ссылка родителя addr_grow=" +addr_grow +" pos=" +to_string(pos) ,__LINE__);
 									}else if(string link_other = "0" ==link_self ?"1" :"0" ;1 != link_other.length()){ err("Ссылка брата");
+									}else if(string index_md5 =md5(itog_id +":" +addr) ;index_md5.empty()){ err("Идентификатор родителя");
+									}else if(TMs index =(BMF_INDEX.end() ==BMF_INDEX.find(index_md5) ?index :BMF_INDEX.at(index_md5)) ;index.empty()){ mpre(BMF_INDEX ,"Справочник" ,__LINE__); mpre("ОШИБКА Выборка родителя BMF_INDEX.size()=" +to_string(BMF_INDEX.size()) +" addr_grow=" +addr_grow +" itog_id=" +itog_id +" addr=" +addr +" index_md5=" +index_md5 ,__LINE__);
+									}else if(string dano_id =index.end() ==index.find("dano_id") ?"" :index.at("dano_id") ;dano_id.empty()){ mpre(index ,"ОШИБКА Идентификатор исходника" ,__LINE__);
 									}else if(string _addr = "1" +link_other +addr.substr(1 ,pos); _addr.empty()){ err("Адрес ответвления");
 									}else if(string _index_md5 =md5(itog_id +":" +_addr); _index_md5.empty()){ err("Идентификатор смежного потомка родителя");
-									}else if(BMF_INDEX.end() !=BMF_INDEX.find(_index_md5)){ //mpre("Не добавляем в исключение _addr=" +_addr ,__LINE__);
-									}else if(string index_md5 =md5(itog_id +":" +addr) ;index_md5.empty()){ err("Идентификатор родителя");
-									}else if(TMs index =BMF_INDEX.end() ==BMF_INDEX.find(index_md5) ?index :BMF_INDEX.at(index_md5) ;index.empty()){ mpre(BMF_INDEX ,"ОШИБКА Выборка родителя addr_grow=" +addr_grow +" itog_id=" +itog_id +" addr=" +addr +" index_md5=" +index_md5 ,__LINE__);
-									}else if(string dano_id =index.end() ==index.find("dano_id") ?"" :index.at("dano_id") ;dano_id.empty()){ mpre(index ,"ОШИБКА Идентификатор исходника" ,__LINE__);
-									}else if(_DANO.erase(dano_id); _DANO.empty()){ err("Удаление последнего исходника");
-									}else{ //mpre("Исключение позиция link=" +link +" addr_grow=" +addr_grow +" pos=" +to_string(pos) +" _addr=" +_addr +" link_self=" +link_self +" link_other=" +link_other ,__LINE__);
-									}}return false; }(); _DANO.empty()){ err("Удаление исключений из списка исходников");
-								}else if(TMMi LIST =[&](TMMi LIST ={}){ for(auto [dano_id ,dano]:_DANO){ // Расчет подходимости
+									}else if(string _pos =(BMF_INDEX.end() ==BMF_INDEX.find(_index_md5) ?"-" :"") +to_string(pos +1) ;_pos.empty()){ err("Учёт отрицания");
+									}else if(PARENTS.end() != PARENTS.find(dano_id)){ //mpre("Идентификатор исходника уже в списке" ,__LINE__);
+									}else if(PARENTS[dano_id] =_pos; PARENTS.empty()){ err("Новый элемент");
+									}else{ //mpre("Исключение позиция link=" +link +" addr_grow=" +addr_grow +" addr=" +addr +" pos=" +to_string(pos) +" _addr=" +_addr +" link_self=" +link_self +" link_other=" +link_other ,__LINE__);
+									}}return PARENTS; }() ;false){ err("Удаление исключений из списка исходников");
+								//}else if(mpre(PARENTS ,"Родители", __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
+								}else if(TM3ii LIST =[&](TM3ii LIST ={}){ for(auto [dano_id ,dano]:DANO){ // Расчет подходимости
 									if(DANO_BITMAP.end() == DANO_BITMAP.find(dano_id)){ err("Карта исходника не установлена");
 									}else if(string val =DANO_BITMAP.at(dano_id).test(key) ?"1" :"0" ;1 !=val.length()){ err("Значение исходника");
 									}else if(string learn_shift ="0" ==learn ?"1" :"0" ;1 !=learn_shift.length()){ err("Перевернутое значение");
 									}else if(string val_need ="-"==grow.substr(0 ,1) ?learn_shift :learn ;1 !=val_need.length()){ err("Необходимое значение");
 									}else if(val != val_need){ //mpre("Не подходящее значение val=" +val +" val_need=" +val_need ,__LINE__);
 									}else if(string name =dano.end() ==dano.find("name") ?"" :dano.at("name") ;name.empty()){ err("Имя исходника");
-									}else if(LIST[atoi(name.c_str())][dano_id] = val ;LIST.empty()){ err("Добавление элемента в список");
+									}else if(int pos = [&](int pos = 0){ // Позиция у родителей
+										if(string _pos = PARENTS.end() ==PARENTS.find(dano_id) ?"" :PARENTS.at(dano_id) ;_pos.empty()){ //mpre("Исходника нет среди родителей" ,__LINE__);
+										}else if(pos =abs(atoi(_pos.c_str())); 0 >=pos){ err("Корвертация позиции родителя");
+										}else{ //mpre("Позиция родителя pos=" +to_string(pos) ,__LINE__);
+										}return pos; }(); 0 >pos){ err("Позиция");
+									}else if(LIST[pos][atoi(name.c_str())][dano_id] = val ;LIST.empty()){ err("Добавление элемента в список");
 									}else{ //mpre("Исходник learn=" +learn +" grow=" +grow +" dano_id=" +dano_id +" val=" +val +" learn_shift=" +learn_shift +" val_need=" +val_need ,__LINE__);
 									}}return LIST; }() ;LIST.empty()){ mpre("Пустой cписок самых подходящих" ,__LINE__);
 								}else if(string dano_id =[&](string dano_id =""){ // Выбор идентификатора исходника
-									if(auto name_itr = LIST.rbegin(); LIST.rend() ==name_itr){ err("Подходящих исходников в списке не найдено");
+									if(auto pos_itr = LIST.begin(); LIST.end() ==pos_itr){ err("Подходящих позиций в списке не найдено");
+									}else if(auto name_itr = pos_itr->second.rbegin() ;pos_itr->second.rend() ==name_itr){ err("Исходник в списке не найден");
 									}else if(auto dano_itr = name_itr->second.rbegin() ;name_itr->second.rend() ==dano_itr){ err("Исходник в списке не найден");
 									}else if(dano_id =dano_itr->first; dano_id.empty()){ err("Получение идентификатора исходника");
 									}else{ //mpre(LIST ,"Подходящий исходник dano_id=" +dano_id ,__LINE__);
 									}return dano_id; }() ;dano_id.empty()){ err("Идентификатор исходника");
+								//}else if(mpre(LIST ,"Список dano_id=" +dano_id, __LINE__); false){ mpre("ОШИБКА уведомления", __LINE__);
 								}else if(dano =_DANO.end() ==_DANO.find(dano_id) ?dano :_DANO.at(dano_id); dano.empty()){ err("Исходник");
 								}else{ //mpre(LIST ,"Расчет исходника grow=" +grow +" addr_grow=" +addr_grow ,__LINE__);
 								}return dano; }(DANO) ;dano.empty()){ mpre("Пустой выбор связи с исходником" ,__LINE__);
